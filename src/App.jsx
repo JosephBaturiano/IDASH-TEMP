@@ -7,10 +7,12 @@ import Profile from './pages/Profile'
 import TeamTask from './pages/TeamTask'
 import TaskDeliverables from './pages/TaskDeliverables'
 import Home from './pages/Home'
-
+import Files from './pages/Files'
+import 'tailwindcss/tailwind.css'
 
 const App = () => {
   return (
+    
     <BrowserRouter>
       <Routes>
       <Route path='/' element={<Home/>}/>
@@ -20,6 +22,7 @@ const App = () => {
         <Route path='/teamtask' element={<TeamTask/>}/>
         <Route path='/timesheet' element={<TimeSheet/>}/>
         <Route path='/taskdeliverables' element={<TaskDeliverables/>}/>
+        <Route path='/files' element={<Files/>}/>
       </Routes>
     </BrowserRouter>
   )

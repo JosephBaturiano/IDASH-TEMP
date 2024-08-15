@@ -6,24 +6,30 @@ const Home = () => {
         <div>
             <li>
                 <Link to='/dashboard'>
-                    <button className="btn btn-primary">Dash board</button>
+                    <button className="btn btn-outline btn-success mb-4 mt-4">Dash board</button>
                 </Link>
             </li>
 
             <li>
                 <Link to='/announcement'>
-                    <btn>Announcement</btn>
+                    <button className="btn btn-outline btn-success mb-4">Announcement</button>
                 </Link>
             </li>
 
             <li>
                 <Link to='/taskdeliverables'>
-                    <btn>Task deliverables</btn>
+                    <button className="btn btn-outline btn-success mb-4">Task Deliverables</button>
+                </Link>
+            </li>
+
+            <li>
+                <Link to='/taskdeliverables'>
+                    <button className="btn btn-outline btn-success mb-4">Files</button>
                 </Link>
             </li>
 
             <li><Link to='/teamtask'>
-                <btn>Team task</btn>
+                <button className="btn btn-outline btn-success mb-4">Team Task</button>
             </Link>
             </li>
 
