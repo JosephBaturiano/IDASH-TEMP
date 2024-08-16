@@ -32,6 +32,10 @@ const Home = () => {
                 <button className="btn btn-outline btn-success mb-4">Team Task</button>
             </Link>
             </li>
+            <li><Link to='/timesheet'>
+                <button className="btn btn-outline btn-success mb-4">Timesheet</button>
+            </Link>
+            </li>
 
         </div>
     )
