@@ -4,7 +4,7 @@ import Home from './Home'; // Import the Home component
 const TaskDeliverables = () => {
   const [activeTab, setActiveTab] = useState('Task');
 
-  // Sample task data
+  // Sample data
   const tasks = [
     {
       id: 1,
@@ -59,31 +59,29 @@ const TaskDeliverables = () => {
     switch (activeTab) {
       case 'Task':
         return (
-          <table className="table-auto w-full border-separate border-spacing-y-2">
-            <thead>
-              <tr className="text-left bg-blue-200">
-                <th className="p-2">#</th>
-                <th className="p-2">Task Description</th>
-                <th className="p-2">Date Created</th>
-                <th className="p-2">Allocated Time</th>
-                <th className="p-2">Assigned To</th>
-                <th className="p-2">Status</th>
-                <th className="p-2">Action</th>
+          <table className="w-full border-collapse border border-gray-200">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border px-4 py-2 text-left">#</th>
+                <th className="border px-4 py-2 text-left">Task Description</th>
+                <th className="border px-4 py-2 text-left">Date Created</th>
+                <th className="border px-4 py-2 text-left">Allocated Time</th>
+                <th className="border px-4 py-2 text-left">Assigned To</th>
+                <th className="border px-4 py-2 text-left">Status</th>
+                <th className="border px-4 py-2 text-left">Action</th>
               </tr>
             </thead>
             <tbody>
               {tasks.map((task, index) => (
-                <tr key={index} className="bg-white shadow rounded">
-                  <th className="p-2">{task.id}</th>
-                  <td className="p-2">{task.description}</td>
-                  <td className="p-2">{task.dateCreated}</td>
-                  <td className="p-2">{task.allocatedTime}</td>
-                  <td className="p-2">{task.assignedTo}</td>
-                  <td className="p-2">{task.status}</td>
-                  <td className="p-2 text-center">
-                    <button className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
-                      <span className="text-lg">+</span>
-                    </button>
+                <tr key={index}>
+                  <td className="border px-4 py-2">{task.id}</td>
+                  <td className="border px-4 py-2">{task.description}</td>
+                  <td className="border px-4 py-2">{task.dateCreated}</td>
+                  <td className="border px-4 py-2">{task.allocatedTime}</td>
+                  <td className="border px-4 py-2">{task.assignedTo}</td>
+                  <td className="border px-4 py-2">{task.status}</td>
+                  <td className="border px-4 py-2">
+                    <button className="bg-[#134B70] text-white rounded-full p-2 hover:bg-[#0a2c46] transition-colors">+</button>
                   </td>
                 </tr>
               ))}
@@ -92,29 +90,27 @@ const TaskDeliverables = () => {
         );
       case 'Issues':
         return (
-          <table className="table-auto w-full border-separate border-spacing-y-2">
-            <thead>
-              <tr className="text-left bg-blue-200">
-                <th className="p-2">#</th>
-                <th className="p-2">Issue Description</th>
-                <th className="p-2">Date Created</th>
-                <th className="p-2">Assigned To</th>
-                <th className="p-2">Status</th>
-                <th className="p-2">Action</th>
+          <table className="w-full border-collapse border border-gray-200">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border px-4 py-2 text-left">#</th>
+                <th className="border px-4 py-2 text-left">Issue Description</th>
+                <th className="border px-4 py-2 text-left">Date Created</th>
+                <th className="border px-4 py-2 text-left">Assigned To</th>
+                <th className="border px-4 py-2 text-left">Status</th>
+                <th className="border px-4 py-2 text-left">Action</th>
               </tr>
             </thead>
             <tbody>
               {issues.map((issue, index) => (
-                <tr key={index} className="bg-white shadow rounded">
-                  <th className="p-2">{issue.id}</th>
-                  <td className="p-2">{issue.description}</td>
-                  <td className="p-2">{issue.dateCreated}</td>
-                  <td className="p-2">{issue.assignedTo}</td>
-                  <td className="p-2">{issue.status}</td>
-                  <td className="p-2 text-center">
-                    <button className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
-                      <span className="text-lg">+</span>
-                    </button>
+                <tr key={index}>
+                  <td className="border px-4 py-2">{issue.id}</td>
+                  <td className="border px-4 py-2">{issue.description}</td>
+                  <td className="border px-4 py-2">{issue.dateCreated}</td>
+                  <td className="border px-4 py-2">{issue.assignedTo}</td>
+                  <td className="border px-4 py-2">{issue.status}</td>
+                  <td className="border px-4 py-2">
+                    <button className="bg-[#134B70] text-white rounded-full p-2 hover:bg-[#0a2c46] transition-colors">+</button>
                   </td>
                 </tr>
               ))}
@@ -123,29 +119,27 @@ const TaskDeliverables = () => {
         );
       case 'Archive':
         return (
-          <table className="table-auto w-full border-separate border-spacing-y-2">
-            <thead>
-              <tr className="text-left bg-blue-200">
-                <th className="p-2">#</th>
-                <th className="p-2">Archived Task</th>
-                <th className="p-2">Date Created</th>
-                <th className="p-2">Assigned To</th>
-                <th className="p-2">Status</th>
-                <th className="p-2">Action</th>
+          <table className="w-full border-collapse border border-gray-200">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border px-4 py-2 text-left">#</th>
+                <th className="border px-4 py-2 text-left">Archived Task</th>
+                <th className="border px-4 py-2 text-left">Date Created</th>
+                <th className="border px-4 py-2 text-left">Assigned To</th>
+                <th className="border px-4 py-2 text-left">Status</th>
+                <th className="border px-4 py-2 text-left">Action</th>
               </tr>
             </thead>
             <tbody>
               {archives.map((archive, index) => (
-                <tr key={index} className="bg-white shadow rounded">
-                  <th className="p-2">{archive.id}</th>
-                  <td className="p-2">{archive.description}</td>
-                  <td className="p-2">{archive.dateCreated}</td>
-                  <td className="p-2">{archive.assignedTo}</td>
-                  <td className="p-2">{archive.status}</td>
-                  <td className="p-2 text-center">
-                    <button className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
-                      <span className="text-lg">+</span>
-                    </button>
+                <tr key={index}>
+                  <td className="border px-4 py-2">{archive.id}</td>
+                  <td className="border px-4 py-2">{archive.description}</td>
+                  <td className="border px-4 py-2">{archive.dateCreated}</td>
+                  <td className="border px-4 py-2">{archive.assignedTo}</td>
+                  <td className="border px-4 py-2">{archive.status}</td>
+                  <td className="border px-4 py-2">
+                    <button className="bg-[#134B70] text-white rounded-full p-2 hover:bg-[#0a2c46] transition-colors">+</button>
                   </td>
                 </tr>
               ))}
@@ -159,35 +153,36 @@ const TaskDeliverables = () => {
 
   return (
     <Home>
-      <div className="p-6 bg-blue-50 min-h-screen">
+      <div className="p-6">
         <h1 className="text-2xl font-bold mb-4">Task Deliverables</h1>
         {/* Tabs */}
-        <div className="tabs mb-4">
-          <a
-            className={`tab tab-bordered rounded-full px-6 py-2 ${activeTab === 'Task' ? 'tab-active bg-white shadow' : ''}`}
+        <div className="flex space-x-4 mb-4">
+          <button
+            className={`px-4 py-2 rounded-full transition-colors ${activeTab === 'Task' ? 'bg-white shadow-md' : 'bg-gray-300 hover:bg-gray-400'}`}
             onClick={() => setActiveTab('Task')}
           >
             Task
-          </a>
-          <a
-            className={`tab tab-bordered rounded-full px-6 py-2 ${activeTab === 'Issues' ? 'tab-active bg-white shadow' : ''}`}
+          </button>
+          <button
+            className={`px-4 py-2 rounded-full transition-colors ${activeTab === 'Issues' ? 'bg-white shadow-md' : 'bg-gray-300 hover:bg-gray-400'}`}
             onClick={() => setActiveTab('Issues')}
           >
             Issues
-          </a>
-          <a
-            className={`tab tab-bordered rounded-full px-6 py-2 ${activeTab === 'Archive' ? 'tab-active bg-white shadow' : ''}`}
+          </button>
+          <button
+            className={`px-4 py-2 rounded-full transition-colors ${activeTab === 'Archive' ? 'bg-white shadow-md' : 'bg-gray-300 hover:bg-gray-400'}`}
             onClick={() => setActiveTab('Archive')}
           >
             Archive
-          </a>
+          </button>
         </div>
 
         {/* Tab Content */}
-        <div>{renderTabContent()}</div>
+        <div className="mt-4">{renderTabContent()}</div>
       </div>
     </Home>
   );
 };
 
 export default TaskDeliverables;
+
