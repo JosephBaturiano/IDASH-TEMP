@@ -47,5 +47,4 @@ const Dashboard = () => {
     </Home>
   );
 };
-
 export default Dashboard;
