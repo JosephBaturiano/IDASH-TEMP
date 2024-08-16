@@ -3,7 +3,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
 const TopBar = ({ userName, userImage }) => {
-    const initials = "CJO"; // Replace with dynamic initials if necessary
+    const initials = "APC"; // Replace with dynamic initials if necessary
     const profileUrl = "#"; // Replace with profile URL
 
     // Placeholder for OJT time
