@@ -68,6 +68,18 @@ const TimeSheet = () => {
     fetchTimesheets(setTimesheets);
   }, []);
 
+  useEffect(() => {
+    if (isModalOpen) {
+      // Reset input fields when the modal opens
+      setNewTaskNumber('');
+      setNewDescription('');
+      setNewTimeStarted('');
+      setNewTimeEnded('');
+      setNewWithWhom('');
+      setNewDeliverables('');
+    }
+  }, [isModalOpen]);
+
   const filteredTimesheets = selectedDate
     ? timesheets.filter((item) => item.date === selectedDate)
     : timesheets;
