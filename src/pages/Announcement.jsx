@@ -14,7 +14,13 @@ const Announcement = ({children}) => {
         <SideBar />
       </div>
       
-      
+      {/* Main Content */}
+      <div className="flex flex-col w-[83%] ml-[17%]">
+        <TopBar />
+        <div className="p-4 bg-[#F0F8FF] h-full overflow-auto">
+          {children}
+        </div>
+      </div>
     </main>
   );
 };
