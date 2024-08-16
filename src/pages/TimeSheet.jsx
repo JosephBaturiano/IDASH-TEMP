@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios'; // Make sure axios is imported
 import AddIcon from '@mui/icons-material/Add';
 import TimeSheetCard from '../components/TimeSheetCard';
 import AddTimesheetModal from '../components/AddTimesheetModal';
@@ -77,36 +78,70 @@ const TimeSheet = () => {
     ? timesheets.filter((item) => item.date === selectedDate)
     : timesheets;
 
-  const handleAddTimesheet = () => {
-    if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
-      const newTimesheet = {
-        id: timesheets.length + 1, // Adjust as needed, ideally use UUID
-        taskNumber: newTaskNumber,
-        description: newDescription,
-        timeStarted: newTimeStarted,
-        timeEnded: newTimeEnded,
-        withWhom: newWithWhom,
-        deliverables: newDeliverables,
-        date: selectedDate || new Date().toISOString().split('T')[0], // Default to today if no date selected
-      };
-
-      // Add to local state
-      setTimesheets([...timesheets, newTimesheet]);
-
-      // Clear input fields
-      setNewTaskNumber('');
-      setNewDescription('');
-      setNewTimeStarted('');
-      setNewTimeEnded('');
-      setNewWithWhom('');
-      setNewDeliverables('');
-
-      // Close modal
-      setIsModalOpen(false);
-    } else {
-      alert('Please fill all fields.');
-    }
-  };
+    const handleAddTimesheet = () => {
+      if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
+        const postData = {
+          title: newTaskNumber,
+          content: newDescription,
+          status: 'publish',
+          acf: {
+            date_created: new Date().toISOString().split('T')[0], // Use the current date or selected date
+            task_number: newTaskNumber,
+            task_description: newDescription,
+            time_started: newTimeStarted,
+            time_ended: newTimeEnded,
+            with_whom: newWithWhom,
+            deliverables: newDeliverables,
+          }
+        };
+    
+        // Replace 'username' and 'password' with your actual Basic Auth credentials
+        const username = 'admin';
+        const password = 'XwNx 2pBm Hlgw DO9n 1oiR cuNf';
+        const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
+    
+        axios.post('https://cjo-acf.local/wp-json/wp/v2/timesheet', postData, {
+          headers: {
+            'Authorization': basicAuth,
+            'Content-Type': 'application/json', // Set Content-Type to application/json
+          },
+        })
+        .then((response) => {
+          console.log('Timesheet added:', response.data);
+    
+          // Add to local state
+          const newTimesheet = {
+            id: timesheets.length + 1, // Adjust as needed, ideally use UUID
+            taskNumber: newTaskNumber,
+            description: newDescription,
+            timeStarted: newTimeStarted,
+            timeEnded: newTimeEnded,
+            withWhom: newWithWhom,
+            deliverables: newDeliverables,
+            date: selectedDate || new Date().toISOString().split('T')[0], // Default to today if no date selected
+          };
+    
+          setTimesheets([...timesheets, newTimesheet]);
+    
+          // Clear input fields
+          setNewTaskNumber('');
+          setNewDescription('');
+          setNewTimeStarted('');
+          setNewTimeEnded('');
+          setNewWithWhom('');
+          setNewDeliverables('');
+    
+          // Close modal
+          setIsModalOpen(false);
+        })
+        .catch((error) => {
+          console.error('Error adding timesheet:', error);
+          alert('There was an error adding the timesheet.');
+        });
+      } else {
+        alert('Please fill all fields.');
+      }
+    };
 
   const handleEditTimesheet = (item) => {
     setCurrentEditingItem(item);
