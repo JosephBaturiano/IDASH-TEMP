@@ -1,19 +1,24 @@
-import TopBar from "../components/TopBar";
-import SideBar from "../components/SideBar";
+import React from 'react';
+import TopBar from '../components/TopBar';
+import SideBar from '../components/SideBar';
 
-function Home() {
-    return (
-        <main className="flex flex-col h-screen w-[100%]">
-            <div className="flex flex-row">
-                <div className="w-[20%] h-screen">
-                    <SideBar />
-                </div>
-                <div className="flex-grow">
-                    <TopBar />
-                </div>
-            </div>
-        </main>
-    );
+function Home({ children }) {
+  return (
+    <main className="flex h-screen w-full">
+      {/* Sidebar */}
+      <div className="w-[17%] h-full fixed">
+        <SideBar />
+      </div>
+      
+      {/* Main Content */}
+      <div className="flex flex-col w-[83%] ml-[17%]">
+        <TopBar />
+        <div className="p-4 bg-[#F0F8FF] h-full overflow-auto">
+          {children}
+        </div>
+      </div>
+    </main>
+  );
 }
 
 export default Home;
