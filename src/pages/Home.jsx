@@ -1,40 +1,24 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import TopBar from '../components/TopBar';
+import SideBar from '../components/SideBar';
 
-const Home = () => {
-    return (
-        <div>
-            <li>
-                <Link to='/dashboard'>
-                    <button className="btn btn-outline btn-success mb-4 mt-4">Dash board</button>
-                </Link>
-            </li>
-
-            <li>
-                <Link to='/announcement'>
-                    <button className="btn btn-outline btn-success mb-4">Announcement</button>
-                </Link>
-            </li>
-
-            <li>
-                <Link to='/taskdeliverables'>
-                    <button className="btn btn-outline btn-success mb-4">Task Deliverables</button>
-                </Link>
-            </li>
-
-            <li>
-                <Link to='/taskdeliverables'>
-                    <button className="btn btn-outline btn-success mb-4">Files</button>
-                </Link>
-            </li>
-
-            <li><Link to='/teamtask'>
-                <button className="btn btn-outline btn-success mb-4">Team Task</button>
-            </Link>
-            </li>
-
+function Home({ children }) {
+  return (
+    <main className="flex h-screen w-full">
+      {/* Sidebar */}
+      <div className="w-[17%] h-full fixed">
+        <SideBar />
+      </div>
+      
+      {/* Main Content */}
+      <div className="flex flex-col w-[83%] ml-[17%]">
+        <TopBar />
+        <div className="p-4 bg-[#F0F8FF] h-full overflow-auto">
+          {children}
         </div>
-    )
+      </div>
+    </main>
+  );
 }
 
-export default Home
+export default Home;
