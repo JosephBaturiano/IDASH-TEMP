@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Dashboard from './pages/dashboard'
+import Dashboard from './pages/Dashboard'
 import TimeSheet from './pages/TimeSheet'
 import Announcement from './pages/Announcement'
 import Profile from './pages/Profile'
