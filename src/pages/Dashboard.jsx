@@ -1,5 +1,5 @@
 import React from 'react';
-import Home from './Home'; // Import the Home component
+import Home from './Home'; 
 import ZoomCard from '../components/ZoomCard';
 import ProjectCard from '../components/ProjectCard';
 import Calendar from '../components/Calendar';
