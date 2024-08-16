@@ -1,53 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios'; // Make sure axios is imported
 import AddIcon from '@mui/icons-material/Add';
 import TimeSheetCard from '../components/TimeSheetCard';
 import AddTimesheetModal from '../components/AddTimesheetModal';
 import EditTimesheetModal from '../components/EditTimesheetModal';
 
-// Dummy data for timesheets
-const initialTimesheets = [
-  {
-    id: 1,
-    taskNumber: '1',
-    description: 'Complete project documentation for all',
-    timeStarted: '09:00',
-    timeEnded: '11:00',
-    withWhom: 'John Doe',
-    deliverables: 'Document draft',
-    date: '2024-08-15',
-  },
-  {
-    id: 2,
-    taskNumber: '2',
-    description: 'Review code',
-    timeStarted: '11:30',
-    timeEnded: '13:00',
-    withWhom: 'Jane Smith',
-    deliverables: 'Code review notes',
-    date: '2024-08-15',
-  },
-  {
-    id: 3,
-    taskNumber: '3',
-    description: 'Team meeting',
-    timeStarted: '14:00',
-    timeEnded: '15:00',
-    withWhom: 'Project Team',
-    deliverables: 'Meeting minutes',
-    date: '2024-08-16',
-  },
-  {
-    id: 4,
-    taskNumber: '7',
-    description: 'Team meeting',
-    timeStarted: '14:00',
-    timeEnded: '15:00',
-    withWhom: 'Project Team',
-    deliverables: 'Meeting minutes',
-    date: '2024-08-14',
-  },
-];
+// Function to format time into H:mm AM/PM format
+const formatTime = (time) => {
+  const [hours, minutes] = time.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours);
+  date.setMinutes(minutes);
+  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(date);
+};
+
+// Fetch the posts from WordPress and update the state
+const fetchTimesheets = async (setTimesheets) => {
+  try {
+    const response = await axios.get('https://cjo-acf.local/wp-json/wp/v2/timesheet', {
+      headers: {
+        'Authorization': 'Basic ' + btoa('admin:XwNx 2pBm Hlgw DO9n 1oiR cuNf'),
+      },
+    });
+    const posts = response.data;
+    const formattedPosts = posts.map((post) => ({
+      id: post.id,
+      taskNumber: post.acf.task_number,
+      description: post.acf.task_description,
+      timeStarted: formatTime(post.acf.time_started),
+      timeEnded: formatTime(post.acf.time_ended),
+      withWhom: post.acf.with_whom,
+      deliverables: post.acf.deliverables,
+      date: post.acf.date_created,
+    }));
+    setTimesheets(formattedPosts);
+  } catch (error) {
+    console.error('Error fetching timesheets:', error);
+  }
+};
 
 const TimesheetHeader = () => (
   <div className="grid grid-cols-7 pb-4 pt-4 border-b border-gray-200 bg-gray-50 text-gray-700 font-semibold text-center">
@@ -63,7 +53,7 @@ const TimesheetHeader = () => (
 
 const TimeSheet = () => {
   const [selectedDate, setSelectedDate] = useState('');
-  const [timesheets, setTimesheets] = useState(initialTimesheets);
+  const [timesheets, setTimesheets] = useState([]);
   const [newTaskNumber, setNewTaskNumber] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [newTimeStarted, setNewTimeStarted] = useState('');
@@ -74,55 +64,59 @@ const TimeSheet = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentEditingItem, setCurrentEditingItem] = useState(null);
 
+  useEffect(() => {
+    fetchTimesheets(setTimesheets);
+  }, []);
+
   const filteredTimesheets = selectedDate
     ? timesheets.filter((item) => item.date === selectedDate)
     : timesheets;
 
-    const handleAddTimesheet = () => {
-      if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
-        const postData = {
-          title: newTaskNumber,
-          content: newDescription,
-          status: 'publish',
-          acf: {
-            date_created: new Date().toISOString().split('T')[0], // Use the current date or selected date
-            task_number: newTaskNumber,
-            task_description: newDescription,
-            time_started: newTimeStarted,
-            time_ended: newTimeEnded,
-            with_whom: newWithWhom,
-            deliverables: newDeliverables,
-          }
-        };
-    
-        // Replace 'username' and 'password' with your actual Basic Auth credentials
-        const username = 'admin';
-        const password = 'XwNx 2pBm Hlgw DO9n 1oiR cuNf';
-        const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
-    
-        axios.post('https://cjo-acf.local/wp-json/wp/v2/timesheet', postData, {
-          headers: {
-            'Authorization': basicAuth,
-            'Content-Type': 'application/json', // Set Content-Type to application/json
-          },
-        })
+  const handleAddTimesheet = () => {
+    if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
+      const postData = {
+        title: newTaskNumber,
+        content: newDescription,
+        status: 'publish',
+        acf: {
+          date_created: new Date().toISOString().split('T')[0], // Use the current date or selected date
+          task_number: newTaskNumber,
+          task_description: newDescription,
+          time_started: newTimeStarted,
+          time_ended: newTimeEnded,
+          with_whom: newWithWhom,
+          deliverables: newDeliverables,
+        }
+      };
+
+      // Replace 'username' and 'password' with your actual Basic Auth credentials
+      const username = 'admin';
+      const password = 'XwNx 2pBm Hlgw DO9n 1oiR cuNf';
+      const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
+
+      axios.post('https://cjo-acf.local/wp-json/wp/v2/timesheet', postData, {
+        headers: {
+          'Authorization': basicAuth,
+          'Content-Type': 'application/json', // Set Content-Type to application/json
+        },
+      })
         .then((response) => {
           console.log('Timesheet added:', response.data);
-    
-          // Add to local state
+
+          // Add to local state with formatted time
           const newTimesheet = {
             id: timesheets.length + 1, // Adjust as needed, ideally use UUID
             taskNumber: newTaskNumber,
             description: newDescription,
-            timeStarted: newTimeStarted,
-            timeEnded: newTimeEnded,
+            timeStarted: formatTime(newTimeStarted),
+            timeEnded: formatTime(newTimeEnded),
             withWhom: newWithWhom,
             deliverables: newDeliverables,
             date: selectedDate || new Date().toISOString().split('T')[0], // Default to today if no date selected
           };
-    
+
           setTimesheets([...timesheets, newTimesheet]);
-    
+
           // Clear input fields
           setNewTaskNumber('');
           setNewDescription('');
@@ -130,7 +124,7 @@ const TimeSheet = () => {
           setNewTimeEnded('');
           setNewWithWhom('');
           setNewDeliverables('');
-    
+
           // Close modal
           setIsModalOpen(false);
         })
@@ -138,10 +132,10 @@ const TimeSheet = () => {
           console.error('Error adding timesheet:', error);
           alert('There was an error adding the timesheet.');
         });
-      } else {
-        alert('Please fill all fields.');
-      }
-    };
+    } else {
+      alert('Please fill all fields.');
+    }
+  };
 
   const handleEditTimesheet = (item) => {
     setCurrentEditingItem(item);
@@ -162,8 +156,8 @@ const TimeSheet = () => {
             ...item,
             taskNumber: newTaskNumber,
             description: newDescription,
-            timeStarted: newTimeStarted,
-            timeEnded: newTimeEnded,
+            timeStarted: formatTime(newTimeStarted),
+            timeEnded: formatTime(newTimeEnded),
             withWhom: newWithWhom,
             deliverables: newDeliverables,
           }
@@ -192,6 +186,7 @@ const TimeSheet = () => {
         <div className="flex items-center space-x-4">
           <input
             type="date"
+            style={{backgroundColor: '#e3e1e1'}}
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
             className="border rounded-lg p-2 text-gray-900 focus:ring-2 focus:ring-blue-500"
