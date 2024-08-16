@@ -105,7 +105,7 @@ const TimeSheet = () => {
 
           // Add to local state with formatted time
           const newTimesheet = {
-            id: timesheets.length + 1, // Adjust as needed, ideally use UUID
+            id: response.data.id, // Use the ID returned from the API response
             taskNumber: newTaskNumber,
             description: newDescription,
             timeStarted: formatTime(newTimeStarted),
@@ -150,31 +150,66 @@ const TimeSheet = () => {
 
   const handleSaveEdit = () => {
     if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
-      const updatedTimesheets = timesheets.map((item) =>
-        item.id === currentEditingItem.id
-          ? {
-            ...item,
-            taskNumber: newTaskNumber,
-            description: newDescription,
-            timeStarted: formatTime(newTimeStarted),
-            timeEnded: formatTime(newTimeEnded),
-            withWhom: newWithWhom,
-            deliverables: newDeliverables,
-          }
-          : item
-      );
+      const updatedPostData = {
+        title: newTaskNumber,
+        content: newDescription,
+        status: 'publish',
+        acf: {
+          date_created: currentEditingItem.date, // Use the existing date or selected date
+          task_number: newTaskNumber,
+          task_description: newDescription,
+          time_started: newTimeStarted,
+          time_ended: newTimeEnded,
+          with_whom: newWithWhom,
+          deliverables: newDeliverables,
+        }
+      };
 
-      setTimesheets(updatedTimesheets);
+      // Replace 'username' and 'password' with your actual Basic Auth credentials
+      const username = 'admin';
+      const password = 'XwNx 2pBm Hlgw DO9n 1oiR cuNf';
+      const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
 
-      // Clear input fields and close modal
-      setNewTaskNumber('');
-      setNewDescription('');
-      setNewTimeStarted('');
-      setNewTimeEnded('');
-      setNewWithWhom('');
-      setNewDeliverables('');
-      setIsEditModalOpen(false);
-      setCurrentEditingItem(null);
+      axios.put(`https://cjo-acf.local/wp-json/wp/v2/timesheet/${currentEditingItem.id}`, updatedPostData, {
+        headers: {
+          'Authorization': basicAuth,
+          'Content-Type': 'application/json', // Set Content-Type to application/json
+        },
+      })
+        .then((response) => {
+          console.log('Timesheet updated:', response.data);
+
+          // Update local state with formatted time
+          const updatedTimesheets = timesheets.map((item) =>
+            item.id === currentEditingItem.id
+              ? {
+                ...item,
+                taskNumber: newTaskNumber,
+                description: newDescription,
+                timeStarted: formatTime(newTimeStarted),
+                timeEnded: formatTime(newTimeEnded),
+                withWhom: newWithWhom,
+                deliverables: newDeliverables,
+              }
+              : item
+          );
+
+          setTimesheets(updatedTimesheets);
+
+          // Clear input fields and close modal
+          setNewTaskNumber('');
+          setNewDescription('');
+          setNewTimeStarted('');
+          setNewTimeEnded('');
+          setNewWithWhom('');
+          setNewDeliverables('');
+          setIsEditModalOpen(false);
+          setCurrentEditingItem(null);
+        })
+        .catch((error) => {
+          console.error('Error updating timesheet:', error);
+          alert('There was an error updating the timesheet.');
+        });
     } else {
       alert('Please fill all fields.');
     }
