@@ -14,4 +14,3 @@ const MediaCard = ({ name, url }) => (
 );
 
 export default MediaCard;
-
