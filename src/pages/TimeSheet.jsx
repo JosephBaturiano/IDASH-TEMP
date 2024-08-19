@@ -7,12 +7,13 @@ import EditTimesheetModal from '../components/EditTimesheetModal';
 import Home from './Home';
 
 // Define API configuration constants
-const API_BASE_URL = 'https://cjo-acf.local/wp-json/wp/v2/timesheet';
+const API_BASE_URL = 'https://jbm-acf.local/wp-json/wp/v2/timesheet';
 const AUTH_USERNAME = 'admin';
-const AUTH_PASSWORD = 'XwNx 2pBm Hlgw DO9n 1oiR cuNf';
+const AUTH_PASSWORD = 'oML3 3mDp p9D5 tM9w RLkm OKDH';
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
 
 // Function to format time into H:mm AM/PM format
+// Function to format time into g:i a format
 const formatTime = (time) => {
   if (!time) return 'Invalid time'; // Handle empty or null time values
 
@@ -23,12 +24,21 @@ const formatTime = (time) => {
     return 'Invalid time'; // Handle invalid time format
   }
 
+  // Create a new Date object to set the time
   const date = new Date();
   date.setHours(hours);
   date.setMinutes(minutes);
 
-  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(date);
+  // Format the time to g:i a (12-hour clock without leading zeroes and with lowercase am/pm)
+  const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  
+  // Get formatted time and convert to lowercase
+  const formattedTime = formatter.format(date).toLowerCase();
+
+  return formattedTime;
 };
+
 
 // Fetch the posts from WordPress and update the state
 const fetchTimesheets = async (setTimesheets) => {
