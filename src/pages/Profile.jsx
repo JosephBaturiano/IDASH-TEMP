@@ -1,11 +1,49 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import SchoolIcon from '@mui/icons-material/School';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import CallIcon from '@mui/icons-material/Call';
 
 const Profile = () => {
+  const [profileData, setProfileData] = useState({
+    university: '',
+    address: '',
+    email: '',
+    telephone: '',
+    badgeOne: '',
+    badgeTwo: '',
+    about: '',
+  });
   const ojtTime = "00:00:00";
+
+  useEffect(() => {
+    // Fetching updated data from the WordPress API
+    let config = {
+      method: 'get',
+      url: 'http://edl-wp1.local/wp-json/wp/v2/users/me',
+      headers: { 
+        'Authorization': 'Basic dXNlcjo2VmlIIGcxelAgR2xEUiBoT0NzIFExTWsgTVVLUw==',
+      },
+    };
+
+    axios.request(config)
+      .then((response) => {
+        const acfData = response.data.acf;  // Accessing the ACF fields
+        setProfileData({
+          university: acfData.university,
+          address: acfData.address,
+          email: acfData.email,
+          telephone: acfData.telephone,
+          badgeOne: acfData.badge_one, // Adjusted for ACF field names
+          badgeTwo: acfData.badge_two, // Adjusted for ACF field names
+          about: acfData.about,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []); // Empty dependency array ensures this runs only once after the initial render
 
   return (
     <div className="flex justify-center items-start gap-10 bg-[#f0f8ff]">  {/* Center the containers */}
@@ -26,19 +64,19 @@ const Profile = () => {
           <div className="flex flex-col text-left space-y-1"> {/* Align text to the left and add vertical spacing */}
             <div className="flex items-center space-x-4"> {/* Flex container to align icon and text */}
               <SchoolIcon className="text-black" />
-              <p className="text-sm">Polytechnic University of the Philippines</p>
+              <p className="text-sm">{profileData.university}</p>
             </div>
             <div className="flex items-center space-x-4"> {/* Flex container to align icon and text */}
               <LocationOnIcon className="text-black" />
-              <p className="text-sm">Sta. Mesa Manila</p>
+              <p className="text-sm">{profileData.address}</p>
             </div>
             <div className="flex items-center space-x-4"> {/* Flex container to align icon and text */}
               <AlternateEmailIcon className="text-black" />
-              <p className="text-sm">123@gmail.com</p>
+              <p className="text-sm">{profileData.email}</p>
             </div>
             <div className="flex items-center space-x-4"> {/* Flex container to align icon and text */}
               <CallIcon className="text-black" />
-              <p className="text-sm">09123456789</p>
+              <p className="text-sm">{profileData.telephone}</p>
             </div>
           </div>
         </div>
@@ -47,18 +85,16 @@ const Profile = () => {
       <div className="flex flex-col justify-between h-[600px] my-16">  {/* Stack the elements vertically */}
         <div className="bg-[#dbedff] rounded-lg shadow-md h-[180px] w-[600px] overflow-hidden"> {/* Ensure the container hides overflow */}
           <h2 className="text-2xl font-medium px-5 pt-3">Badges</h2>
-          <div className="flex gap- px-4 pt-1">
-            <img src="src/assets/ReactLogo.png" alt="React Badge" className="h-[130px] w-[130px]" />
-            <img src="src/assets/TensorFlow.png" alt="Tensor Flow Badge" className="h-[130px] w-[130px]" />
+          <div className="flex gap-4 px-4 pt-1">
+            <img src={profileData.badgeOne} alt="React Badge" className="h-[130px] w-[130px]" />
+            <img src={profileData.badgeTwo} alt="TensorFlow Badge" className="h-[130px] w-[130px]" />
           </div>
         </div>
 
         <div className="bg-[#dbedff] rounded-lg shadow-md h-[180px] w-[600px]">
           <h2 className="text-2xl font-medium px-5 pt-3">About Me</h2>
           <div className="px-5 pt-3"> {/* Added padding */}
-            <p className="text-sm text-gray-700 text-justify">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit."</p>
+            <p className="text-sm text-gray-700 text-justify">{profileData.about}</p>
           </div>
         </div>
 
@@ -78,7 +114,7 @@ const Profile = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;
