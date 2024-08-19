@@ -58,13 +58,13 @@ const fetchTimesheets = async (setTimesheets) => {
 const TimesheetHeader = () => (
   <thead className="bg-gray-50">
     <tr className="text-gray-700 font-semibold text-center">
-      <th className="px-2 py-1 text-gray-900">Task #</th>
-      <th className="px-2 py-1 text-gray-900">Task Description</th>
-      <th className="px-2 py-1 text-gray-900">Time Started</th>
-      <th className="px-2 py-1 text-gray-900">Time Ended</th>
-      <th className="px-2 py-1 text-gray-900">With Whom</th>
-      <th className="px-2 py-1 text-gray-900">Deliverables</th>
-      <th className="px-2 py-1 text-gray-900">Action</th>
+      <th className="px-2 py-2 text-gray-900">Task #</th>
+      <th className="px-2 py-2 text-gray-900">Task Description</th>
+      <th className="px-2 py-2 text-gray-900">Time Started</th>
+      <th className="px-2 py-2 text-gray-900">Time Ended</th>
+      <th className="px-2 py-2 text-gray-900">With Whom</th>
+      <th className="px-2 py-2 text-gray-900">Deliverables</th>
+      <th className="px-2 py-2 text-gray-900">Action</th>
     </tr>
   </thead>
 );
