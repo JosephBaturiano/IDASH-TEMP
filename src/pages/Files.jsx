@@ -81,7 +81,7 @@ const Files = () => {
             </div>
 
             <hr className="border-t border-gray-400 my-5" />
-
+            
             <div>
                 {activeTab && (
                     <div className="mx-auto mt-8 mb-8 max-w-4xl">
@@ -96,7 +96,7 @@ const Files = () => {
             </div>
 
             <hr className="border-t border-gray-400 my-5" />
-            
+            <h2 className="text-2xl font-bold mb-4 text-black">Media</h2>
             <div className="mx-auto mt-8 mb-8 max-w-4xl"> {/* Increased max-width */}
                 
                 <div className="grid grid-cols-3 gap-4 justify-items-center">
