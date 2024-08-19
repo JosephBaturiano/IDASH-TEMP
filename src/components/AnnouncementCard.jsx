@@ -10,7 +10,7 @@ const AnnouncementCard = () => {
         const fetchAnnouncements = async () => {
             try {
                 // Replace with your WordPress REST API endpoint for 'announcements' post type
-                const response = await axios.get('https://cjo-acf.local/wp-json/wp/v2/announcement');
+                const response = await axios.get('https://jbm-acf.local/wp-json/wp/v2/announcement');
                 setAnnouncements(response.data);
             } catch (err) {
                 setError(err.message);
