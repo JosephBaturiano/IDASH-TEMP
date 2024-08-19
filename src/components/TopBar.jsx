@@ -42,13 +42,6 @@ const TopBar = () => {
         setAnchorEl(null);
     };
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
 
     return (
         <div className="bg-white text-gray-900 py-4 px-6 flex items-center justify-between shadow-md">
