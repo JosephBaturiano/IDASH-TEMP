@@ -16,6 +16,7 @@ const TopBar = () => {
     const [ojtTime, setOjtTime] = useState('00:00:00'); // Placeholder for OJT time
 
 
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
