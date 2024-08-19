@@ -22,20 +22,7 @@ const Dashboard = () => {
           <div className="text-[20px] font-bold">
             <h1>Ongoing Projects</h1>
           </div>
-          <ProjectCard
-            TeamLogo={ReactLogo}
-            title="Intern Dashboard"
-            date="August 13, 2024"
-            assignedTo="Team React, React Native, UI/UX"
-            progress={10}
-          />
-          <ProjectCard
-            TeamLogo={TensorFlow}
-            title="Refactor ChatGPT"
-            date="August 13, 2024"
-            assignedTo="Team TensorFlow"
-            progress={10}
-          />
+          <ProjectCard/>
         </div>
 
         {/* Right Column (Calendar and Notification Cards) */}
