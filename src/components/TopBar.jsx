@@ -1,9 +1,12 @@
+
 import React, { useEffect, useState } from 'react';
+
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Menu, MenuItem, IconButton, ListItemIcon } from '@mui/material';
 import { Logout, Person, Settings } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+
 import axios from 'axios';
 import Initials from '../components/Initials'; // Adjust the import path accordingly
 
@@ -11,6 +14,7 @@ const TopBar = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [username, setUsername] = useState('');
     const [ojtTime, setOjtTime] = useState('00:00:00'); // Placeholder for OJT time
+
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -38,6 +42,14 @@ const TopBar = () => {
         setAnchorEl(null);
     };
 
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
     return (
         <div className="bg-white text-gray-900 py-4 px-6 flex items-center justify-between shadow-md">
             <div className="flex items-center">
@@ -52,7 +64,9 @@ const TopBar = () => {
                 </div>
                 <NotificationsIcon className="w-8 h-8 text-gray-900 cursor-pointer transition-transform duration-300 hover:scale-110" />
                 <div className="flex items-center space-x-4">
+
                     <Initials initials={username} className="text-xl font-semibold" />
+
                     <IconButton onClick={handleClick} className="p-0">
                         <AccountCircleIcon className="w-12 h-12 text-gray-900 cursor-pointer transition-transform duration-300 hover:scale-110" />
                     </IconButton>

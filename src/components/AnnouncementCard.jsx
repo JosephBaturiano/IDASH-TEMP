@@ -1,33 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const AnnouncementCard = () => {
+    const [announcements, setAnnouncements] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchAnnouncements = async () => {
+            try {
+                // Replace with your WordPress REST API endpoint for 'announcements' post type
+                const response = await axios.get('https://cjo-acf.local/wp-json/wp/v2/announcement');
+                setAnnouncements(response.data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAnnouncements();
+    }, []);
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error}</p>;
+
     return (
         <div>
-            <div className="mb-4 p-4 border rounded-lg bg-gray-100">
-                <h2 className="font-semibold text-lg">Absence to meeting:</h2>
-                <ul className="list-disc pl-5">
-                    <li>1st offense: warning</li>
-                    <li>2nd offense: 1 day suspension</li>
-                    <li>3rd offense: 1 day deduction</li>
-                    <li>4th offense: 1 week suspension</li>
-                    <li>5th offense: termination</li>
-                </ul>
-            </div>
-            <div className="mb-4 p-4 border rounded-lg bg-gray-100">
-                <h2 className="font-semibold text-lg">Tardiness to meeting:</h2>
-                <ul className="list-disc pl-5">
-                    <li>1st offense: warning</li>
-                    <li>2nd offense: 1 hour deduction</li>
-                    <li>3rd offense: 3 hours deduction</li>
-                    <li>4th offense: 1 day deduction</li>
-                    <li>5th offense: 3 days deduction</li>
-                </ul>
-            </div>
-            <div className="p-4 border rounded-lg bg-gray-100">
-                <p>
-                    Please update your availability for next week on/before Friday 8pm of each week. If you don’t, we will assume you won’t be available. You will <strong>not</strong> be allowed to log your time for that week.
-                </p>
-            </div>
+            <h2 className="font-semibold text-lg mb-2">Announcements</h2>
+            {announcements.length === 0 ? (
+                <p>No announcements available</p>
+            ) : (
+                announcements.map((announcement) => (
+                    <div key={announcement.id} className="mb-4 p-4 border rounded-lg bg-gray-100">
+                        <h2 className="font-semibold text-lg">{announcement.title.rendered}</h2>
+                        <div dangerouslySetInnerHTML={{ __html: announcement.content.rendered }} />
+                    </div>
+                ))
+            )}
         </div>
     );
 };
