@@ -56,16 +56,25 @@ const Profile = () => {
         <div className="bg-[#dbedff] rounded-lg shadow-md h-[180px] w-[600px]">
           <h2 className="text-2xl font-medium px-5 pt-3">About Me</h2>
           <div className="px-5 pt-3"> {/* Added padding */}
-            <p className="text-sm text-gray-700 text-justify">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit."
-
-</p>
+            <p className="text-sm text-gray-700 text-justify">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit."</p>
           </div>
         </div>
 
-        <div className="bg-[#dbedff] rounded-lg shadow-md h-[180px] w-[600px]">
-
+        <div className="bg-[#dbedff] rounded-lg shadow-md h-[150px] w-[600px]">
+          <h2 className="text-2xl font-medium px-5 pt-3 mb-5">Directory</h2>
+          <div className="flex gap-8 px-4 pt-1">
+            <a href="https://github.com/vt4b" target="_blank" rel="noopener noreferrer">
+              <img src="src/assets/github-logo.png" alt="github" className="h-[60px] w-[60px]" />
+            </a>
+            <a href="https://discord.com" target="_blank" rel="noopener noreferrer">
+              <img src="src/assets/discord-logo.png" alt="discord" className="h-[60px] w-[60px]" />
+            </a>
+            <a href="https://drive.google.com/drive/folders/1wKjQNXLYTmaqTpsEOyZgol4JpFmnvjfW" target="_blank" rel="noopener noreferrer">
+              <img src="src/assets/gdrive-logo.png" alt="gdrive" className="h-[60px] w-[60px]" />
+            </a>
+          </div>
         </div>
       </div>
     </div>
