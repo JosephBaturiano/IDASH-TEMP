@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Make sure axios is imported
+import axios from 'axios';
 import AddIcon from '@mui/icons-material/Add';
 import TimeSheetCard from '../components/TimeSheetCard';
 import AddTimesheetModal from '../components/AddTimesheetModal';
 import EditTimesheetModal from '../components/EditTimesheetModal';
 import Home from './Home'; 
 
-// Function to format time into H:mm AM/PM format
+// Define API configuration constants
+const API_BASE_URL = 'https://cjo-acf.local/wp-json/wp/v2/timesheet';
+const AUTH_USERNAME = 'admin';
+const AUTH_PASSWORD = 'XwNx 2pBm Hlgw DO9n 1oiR cuNf';
+const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
+
 // Function to format time into H:mm AM/PM format
 const formatTime = (time) => {
   if (!time) return 'Invalid time'; // Handle empty or null time values
@@ -28,9 +33,9 @@ const formatTime = (time) => {
 // Fetch the posts from WordPress and update the state
 const fetchTimesheets = async (setTimesheets) => {
   try {
-    const response = await axios.get('https://jbm-acf.local/wp-json/wp/v2/timesheet', {
+    const response = await axios.get(API_BASE_URL, {
       headers: {
-        'Authorization': 'Basic ' + btoa('admin:oML3 3mDp p9D5 tM9w RLkm OKDH'),
+        'Authorization': AUTH_HEADER,
       },
     });
     const posts = response.data;
@@ -112,14 +117,9 @@ const TimeSheet = () => {
         }
       };
 
-      // Replace 'username' and 'password' with your actual Basic Auth credentials
-      const username = 'admin';
-      const password = 'oML3 3mDp p9D5 tM9w RLkm OKDH';
-      const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
-
-      axios.post('https://jbm-acf.local/wp-json/wp/v2/timesheet', postData, {
+      axios.post(API_BASE_URL, postData, {
         headers: {
-          'Authorization': basicAuth,
+          'Authorization': AUTH_HEADER,
           'Content-Type': 'application/json', // Set Content-Type to application/json
         },
       })
@@ -188,14 +188,9 @@ const TimeSheet = () => {
         }
       };
 
-      // Replace 'username' and 'password' with your actual Basic Auth credentials
-      const username = 'admin';
-      const password = 'oML3 3mDp p9D5 tM9w RLkm OKDH';
-      const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
-
-      axios.put(`https://jbm-acf.local/wp-json/wp/v2/timesheet/${currentEditingItem.id}`, updatedPostData, {
+      axios.put(`${API_BASE_URL}/${currentEditingItem.id}`, updatedPostData, {
         headers: {
-          'Authorization': basicAuth,
+          'Authorization': AUTH_HEADER,
           'Content-Type': 'application/json', // Set Content-Type to application/json
         },
       })
