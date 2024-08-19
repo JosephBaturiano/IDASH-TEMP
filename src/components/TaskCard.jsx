@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const TaskCard = ({ tasks }) => {
+const TaskCard = ({ initialTasks }) => {
+  const [tasks, setTasks] = useState(initialTasks);
+
+  const handleStatusChange = (e, index) => {
+    const updatedTasks = [...tasks];
+    updatedTasks[index].status = e.target.value;
+    setTasks(updatedTasks); // Update the tasks state to trigger a re-render
+  };
+
   return (
     <table className="w-full border-collapse border border-gray-200">
       <thead className="bg-gray-100">
@@ -22,7 +30,17 @@ const TaskCard = ({ tasks }) => {
             <td className="border px-4 py-2">{task.dateCreated}</td>
             <td className="border px-4 py-2">{task.allocatedTime}</td>
             <td className="border px-4 py-2">{task.assignedTo}</td>
-            <td className="border px-4 py-2">{task.status}</td>
+            <td className="border px-4 py-2">
+              <select
+                value={task.status}
+                onChange={(e) => handleStatusChange(e, index)}
+                className="bg-white border border-gray-300 rounded-full px-2 py-1"
+              >
+                <option value="Done">Done</option>
+                <option value="Pending">Pending</option>
+                <option value="Not Started">Not Started</option>
+              </select>
+            </td>
             <td className="border px-4 py-2">
               <button className="bg-[#134B70] text-white rounded-full p-2 hover:bg-[#0a2c46] transition-colors">+</button>
             </td>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Home from './Home'; // Import the Home component
 import TaskCard from '../components/TaskCard'; // Import the TaskCard component
 import IssuesCard from '../components/IssuesCard'; // Import the IssuesCard component
+import ArchiveCard from '../components/ArchiveCard';
 
 const TaskDeliverables = () => {
   const [activeTab, setActiveTab] = useState('Task');
@@ -60,38 +61,12 @@ const TaskDeliverables = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'Task':
-        return <TaskCard tasks={tasks} />;
+        return <TaskCard initialTasks={tasks} />;
       case 'Issues':
-        return <IssuesCard issues={issues} />;
+        return <IssuesCard initialIssues={issues} />;
       case 'Archive':
-        return (
-          <table className="w-full border-collapse border border-gray-200">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="border px-4 py-2 text-left">#</th>
-                <th className="border px-4 py-2 text-left">Archived Task</th>
-                <th className="border px-4 py-2 text-left">Date Created</th>
-                <th className="border px-4 py-2 text-left">Assigned To</th>
-                <th className="border px-4 py-2 text-left">Status</th>
-                <th className="border px-4 py-2 text-left">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {archives.map((archive, index) => (
-                <tr key={index}>
-                  <td className="border px-4 py-2">{archive.id}</td>
-                  <td className="border px-4 py-2">{archive.description}</td>
-                  <td className="border px-4 py-2">{archive.dateCreated}</td>
-                  <td className="border px-4 py-2">{archive.assignedTo}</td>
-                  <td className="border px-4 py-2">{archive.status}</td>
-                  <td className="border px-4 py-2">
-                    <button className="bg-[#134B70] text-white rounded-full p-2 hover:bg-[#0a2c46] transition-colors">+</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        );
+        return <ArchiveCard initialArchives={archives} />;
+        ;
       default:
         return null;
     }
