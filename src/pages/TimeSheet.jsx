@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Make sure axios is imported
+import axios from 'axios';
 import AddIcon from '@mui/icons-material/Add';
 import TimeSheetCard from '../components/TimeSheetCard';
 import AddTimesheetModal from '../components/AddTimesheetModal';
 import EditTimesheetModal from '../components/EditTimesheetModal';
-import Home from './Home'; 
+import Home from './Home';
 
-// Function to format time into H:mm AM/PM format
+// Define API configuration constants
+const API_BASE_URL = 'https://cjo-acf.local/wp-json/wp/v2/timesheet';
+const AUTH_USERNAME = 'admin';
+const AUTH_PASSWORD = 'XwNx 2pBm Hlgw DO9n 1oiR cuNf';
+const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
+
 // Function to format time into H:mm AM/PM format
 const formatTime = (time) => {
   if (!time) return 'Invalid time'; // Handle empty or null time values
@@ -28,9 +33,9 @@ const formatTime = (time) => {
 // Fetch the posts from WordPress and update the state
 const fetchTimesheets = async (setTimesheets) => {
   try {
-    const response = await axios.get('https://jbm-acf.local/wp-json/wp/v2/timesheet', {
+    const response = await axios.get(API_BASE_URL, {
       headers: {
-        'Authorization': 'Basic ' + btoa('admin:oML3 3mDp p9D5 tM9w RLkm OKDH'),
+        'Authorization': AUTH_HEADER,
       },
     });
     const posts = response.data;
@@ -38,8 +43,8 @@ const fetchTimesheets = async (setTimesheets) => {
       id: post.id,
       taskNumber: post.acf.task_number,
       description: post.acf.task_description,
-      timeStarted: (post.acf.time_started),
-      timeEnded: (post.acf.time_ended),
+      timeStarted: formatTime(post.acf.time_started),
+      timeEnded: formatTime(post.acf.time_ended),
       withWhom: post.acf.with_whom,
       deliverables: post.acf.deliverables,
       date: post.acf.date_created,
@@ -51,16 +56,19 @@ const fetchTimesheets = async (setTimesheets) => {
 };
 
 const TimesheetHeader = () => (
-  <div className="grid grid-cols-7 pb-4 pt-4 border-b border-gray-200 bg-gray-50 text-gray-700 font-semibold text-center">
-    <div className="flex items-center justify-center text-gray-900">Task #</div>
-    <div className="flex items-center justify-center text-gray-900">Task Description</div>
-    <div className="flex items-center justify-center text-gray-900">Time Started</div>
-    <div className="flex items-center justify-center text-gray-900">Time Ended</div>
-    <div className="flex items-center justify-center text-gray-900">With Whom</div>
-    <div className="flex items-center justify-center text-gray-900">Deliverables</div>
-    <div className="flex items-center justify-center text-gray-900">Action</div>
-  </div>
+  <thead className="bg-gray-50">
+    <tr className="text-gray-700 font-semibold text-center">
+      <th className="px-2 py-2 text-gray-900">Task #</th>
+      <th className="px-2 py-2 text-gray-900">Task Description</th>
+      <th className="px-2 py-2 text-gray-900">Time Started</th>
+      <th className="px-2 py-2 text-gray-900">Time Ended</th>
+      <th className="px-2 py-2 text-gray-900">With Whom</th>
+      <th className="px-2 py-2 text-gray-900">Deliverables</th>
+      <th className="px-2 py-2 text-gray-900">Action</th>
+    </tr>
+  </thead>
 );
+
 
 const TimeSheet = () => {
   const [selectedDate, setSelectedDate] = useState('');
@@ -112,14 +120,9 @@ const TimeSheet = () => {
         }
       };
 
-      // Replace 'username' and 'password' with your actual Basic Auth credentials
-      const username = 'admin';
-      const password = 'oML3 3mDp p9D5 tM9w RLkm OKDH';
-      const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
-
-      axios.post('https://jbm-acf.local/wp-json/wp/v2/timesheet', postData, {
+      axios.post(API_BASE_URL, postData, {
         headers: {
-          'Authorization': basicAuth,
+          'Authorization': AUTH_HEADER,
           'Content-Type': 'application/json', // Set Content-Type to application/json
         },
       })
@@ -131,8 +134,8 @@ const TimeSheet = () => {
             id: response.data.id, // Use the ID returned from the API response
             taskNumber: newTaskNumber,
             description: newDescription,
-            timeStarted: (newTimeStarted),
-            timeEnded: (newTimeEnded),
+            timeStarted: formatTime(newTimeStarted),
+            timeEnded: formatTime(newTimeEnded),
             withWhom: newWithWhom,
             deliverables: newDeliverables,
             date: selectedDate || new Date().toISOString().split('T')[0], // Default to today if no date selected
@@ -178,7 +181,7 @@ const TimeSheet = () => {
         content: newDescription,
         status: 'publish',
         acf: {
-          date_created: currentEditingItem.date, // Use the existing date or selected date
+          date_created: currentEditingItem.date,
           task_number: newTaskNumber,
           task_description: newDescription,
           time_started: newTimeStarted,
@@ -188,46 +191,33 @@ const TimeSheet = () => {
         }
       };
 
-      // Replace 'username' and 'password' with your actual Basic Auth credentials
-      const username = 'admin';
-      const password = 'oML3 3mDp p9D5 tM9w RLkm OKDH';
-      const basicAuth = 'Basic ' + btoa(`${username}:${password}`);
-
-      axios.put(`https://jbm-acf.local/wp-json/wp/v2/timesheet/${currentEditingItem.id}`, updatedPostData, {
+      axios.post(`${API_BASE_URL}/${currentEditingItem.id}`, updatedPostData, {
         headers: {
-          'Authorization': basicAuth,
+          'Authorization': AUTH_HEADER,
           'Content-Type': 'application/json', // Set Content-Type to application/json
         },
       })
         .then((response) => {
           console.log('Timesheet updated:', response.data);
 
-          // Update local state with formatted time
+          // Update local state
           const updatedTimesheets = timesheets.map((item) =>
             item.id === currentEditingItem.id
               ? {
                 ...item,
                 taskNumber: newTaskNumber,
                 description: newDescription,
-                timeStarted: (newTimeStarted),
-                timeEnded: (newTimeEnded),
+                timeStarted: formatTime(newTimeStarted),
+                timeEnded: formatTime(newTimeEnded),
                 withWhom: newWithWhom,
                 deliverables: newDeliverables,
               }
               : item
           );
-
           setTimesheets(updatedTimesheets);
 
-          // Clear input fields and close modal
-          setNewTaskNumber('');
-          setNewDescription('');
-          setNewTimeStarted('');
-          setNewTimeEnded('');
-          setNewWithWhom('');
-          setNewDeliverables('');
+          // Close modal
           setIsEditModalOpen(false);
-          setCurrentEditingItem(null);
         })
         .catch((error) => {
           console.error('Error updating timesheet:', error);
@@ -240,76 +230,91 @@ const TimeSheet = () => {
 
   return (
     <Home>
-      <div className="space-y-6 max-w-6xl mx-auto px-4">
-        <div className="flex justify-between items-center pt-4">
-          <div className="flex items-center space-x-4">
+      <div className="p-4">
+        <div className="flex justify-between items-center mb-4">
+          {/* Date filter */}
+          <label htmlFor="date" className="block text-gray-700 font-medium mr-2">Filter by Date:</label>
+          <div className="flex-grow">
             <input
               type="date"
-              style={{ backgroundColor: '#e3e1e1' }}
+              id="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="border rounded-lg p-2 text-gray-900 focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 rounded-lg px-3 py-2"
             />
           </div>
+
+          {/* Add Timesheet Button */}
           <button
-            className="btn bg-green-600 text-white btn-md flex items-center space-x-2"
             onClick={() => setIsModalOpen(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300"
           >
-            <AddIcon className="w-4 h-4" />
-            <span>Add Timesheet</span>
+            <AddIcon />
+            Add Timesheet
           </button>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg border border-gray-200 overflow-x-auto">
-          <TimesheetHeader />
-          <div className="flex flex-col">
-            {filteredTimesheets.length > 0 ? (
-              filteredTimesheets.map((item) => (
-                <TimeSheetCard key={item.id} item={item} onEdit={handleEditTimesheet} />
-              ))
-            ) : (
-              <div className="text-center text-gray-500 py-4">No timesheets found for the selected date.</div>
-            )}
-          </div>
+        {/* Timesheet Table */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-gray-50 border border-gray-200">
+            <TimesheetHeader />
+            <tbody>
+              {filteredTimesheets.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="px-4 py-2 text-center text-gray-500">
+                    No timesheets available for this date.
+                  </td>
+                </tr>
+              ) : (
+                filteredTimesheets.map((item) => (
+                  <TimeSheetCard key={item.id} item={item} onEdit={handleEditTimesheet} />
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
 
-        {/* Modal for adding a new timesheet */}
-        <AddTimesheetModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleAddTimesheet}
-          newTaskNumber={newTaskNumber}
-          setNewTaskNumber={setNewTaskNumber}
-          newDescription={newDescription}
-          setNewDescription={setNewDescription}
-          newTimeStarted={newTimeStarted}
-          setNewTimeStarted={setNewTimeStarted}
-          newTimeEnded={newTimeEnded}
-          setNewTimeEnded={setNewTimeEnded}
-          newWithWhom={newWithWhom}
-          setNewWithWhom={setNewWithWhom}
-          newDeliverables={newDeliverables}
-          setNewDeliverables={setNewDeliverables}
-        />
+        {/* Add Timesheet Modal */}
+        {isModalOpen && (
+          <AddTimesheetModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={handleAddTimesheet}
+            newTaskNumber={newTaskNumber}
+            setNewTaskNumber={setNewTaskNumber}
+            newDescription={newDescription}
+            setNewDescription={setNewDescription}
+            newTimeStarted={newTimeStarted}
+            setNewTimeStarted={setNewTimeStarted}
+            newTimeEnded={newTimeEnded}
+            setNewTimeEnded={setNewTimeEnded}
+            newWithWhom={newWithWhom}
+            setNewWithWhom={setNewWithWhom}
+            newDeliverables={newDeliverables}
+            setNewDeliverables={setNewDeliverables}
+          />
+        )}
 
-        {/* Modal for editing a timesheet */}
-        <EditTimesheetModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSubmit={handleSaveEdit}
-          taskNumber={newTaskNumber}
-          setTaskNumber={setNewTaskNumber}
-          description={newDescription}
-          setDescription={setNewDescription}
-          timeStarted={newTimeStarted}
-          setTimeStarted={setNewTimeStarted}
-          timeEnded={newTimeEnded}
-          setTimeEnded={setNewTimeEnded}
-          withWhom={newWithWhom}
-          setWithWhom={setNewWithWhom}
-          deliverables={newDeliverables}
-          setDeliverables={setNewDeliverables}
-        />
+        {/* Edit Timesheet Modal */}
+        {isEditModalOpen && (
+          <EditTimesheetModal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            onSubmit={handleSaveEdit}
+            taskNumber={newTaskNumber}
+            setTaskNumber={setNewTaskNumber}
+            description={newDescription}
+            setDescription={setNewDescription}
+            timeStarted={newTimeStarted}
+            setTimeStarted={setNewTimeStarted}
+            timeEnded={newTimeEnded}
+            setTimeEnded={setNewTimeEnded}
+            withWhom={newWithWhom}
+            setWithWhom={setNewWithWhom}
+            deliverables={newDeliverables}
+            setDeliverables={setNewDeliverables}
+          />
+        )}
       </div>
     </Home>
   );
