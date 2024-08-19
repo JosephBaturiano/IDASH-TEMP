@@ -10,7 +10,7 @@ const RulesCard = () => {
         const fetchRules = async () => {
             try {
                 // Replace with your WordPress REST API endpoint for the 'rules' custom post type
-                const response = await axios.get('https://cjo-acf.local/wp-json/wp/v2/rule');
+                const response = await axios.get('https://jbm-acf.local/wp-json/wp/v2/rule');
                 setRules(response.data);
             } catch (err) {
                 setError(err.message);

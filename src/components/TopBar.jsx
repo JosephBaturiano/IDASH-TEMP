@@ -19,6 +19,7 @@ const TopBar = () => {
         // Add more notifications here
     ]);
 
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -45,6 +46,7 @@ const TopBar = () => {
         setNotificationEl(event.currentTarget);
     };
 
+
     const handleProfileClose = () => {
         setAnchorEl(null);
     };
@@ -52,6 +54,7 @@ const TopBar = () => {
     const handleNotificationClose = () => {
         setNotificationEl(null);
     };
+
 
     return (
         <div className="bg-white text-gray-900 py-4 px-6 flex items-center justify-between shadow-md">
