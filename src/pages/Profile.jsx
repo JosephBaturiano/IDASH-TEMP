@@ -44,11 +44,29 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Right section */}
       <div className="flex flex-col justify-between h-[600px] my-16">  {/* Stack the elements vertically */}
-        <div className="bg-[#dbedff] rounded-lg shadow-md h-[180px] w-[600px]"></div>
-        <div className="bg-[#dbedff] rounded-lg shadow-md h-[180px] w-[600px]"></div>
-        <div className="bg-[#dbedff] rounded-lg shadow-md h-[180px] w-[600px]"></div>
+        <div className="bg-[#dbedff] rounded-lg shadow-md h-[180px] w-[600px] overflow-hidden"> {/* Ensure the container hides overflow */}
+          <h2 className="text-2xl font-medium px-5 pt-3">Badges</h2>
+          <div className="flex gap- px-4 pt-1">
+            <img src="src/assets/ReactLogo.png" alt="React Badge" className="h-[130px] w-[130px]" />
+            <img src="src/assets/TensorFlow.png" alt="Tensor Flow Badge" className="h-[130px] w-[130px]" />
+          </div>
+        </div>
+
+        <div className="bg-[#dbedff] rounded-lg shadow-md h-[180px] w-[600px]">
+          <h2 className="text-2xl font-medium px-5 pt-3">About Me</h2>
+          <div className="px-5 pt-3"> {/* Added padding */}
+            <p className="text-sm text-gray-700 text-justify">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit."
+
+</p>
+          </div>
+        </div>
+
+        <div className="bg-[#dbedff] rounded-lg shadow-md h-[180px] w-[600px]">
+
+        </div>
       </div>
     </div>
   )
