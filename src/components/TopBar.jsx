@@ -4,7 +4,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 
 const TopBar = ({ userName, userImage }) => {
     const initials = "APC"; // Replace with dynamic initials if necessary
-    const profileUrl = "#"; // Replace with profile URL
+    const profileUrl = "/profile"; // Replace with profile URL
 
     // Placeholder for OJT time
     const ojtTime = "00:00:00"; // Replace this with dynamic content as needed
