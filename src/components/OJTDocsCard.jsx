@@ -3,7 +3,7 @@ import React from 'react';
 const OJTDocsCard = ({ name, url }) => (
     <a
         href={url}
-        className="flex items-center bg-[#AFD4FB] rounded-lg p-3 shadow-md"
+        className="flex items-center bg-[#DBEDFF] rounded-lg p-3 shadow-md"
         target="_blank"
         rel="noopener noreferrer"
     >
