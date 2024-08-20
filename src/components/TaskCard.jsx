@@ -6,10 +6,19 @@ const TaskCard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const authUsername = import.meta.env.VITE_AUTH_USERNAME;
+  const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
+  const authHeader = `Basic ${btoa(`${authUsername}:${authPassword}`)}`;
+
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get('http://mrs-woo1.local/wp-json/wp/v2/task');
+        const response = await axios.get(`${apiBaseUrl}task`, {
+          headers: {
+            Authorization: authHeader,
+          },
+        });
         setTasks(response.data);
       } catch (err) {
         setError(err.message);
@@ -18,7 +27,7 @@ const TaskCard = () => {
       }
     };
     fetchTasks();
-  }, []);
+  }, [apiBaseUrl, authHeader]);
 
   const handleStatusChange = async (e, taskId) => {
     const newStatus = e.target.value;
@@ -28,27 +37,24 @@ const TaskCard = () => {
         : task
     );
     setTasks(updatedTasks);
-
+  
     try {
       // Update the status in WordPress
-      await axios.post(`http://mrs-woo1.local/wp-json/wp/v2/task/${taskId}`, {
-        acf: { status: newStatus }
+      await axios({
+        method: 'PUT',
+        url: `${apiBaseUrl}task/${taskId}`,
+        data: {
+          acf: { status: newStatus }
+        },
+        headers: {
+          Authorization: authHeader,
+        },
       });
     } catch (err) {
       setError(`Failed to update status: ${err.message}`);
     }
   };
-
-  // Helper function to format date
-  const formatDate = (dateString) => {
-    if (!dateString) return 'No date';
-    const year = dateString.substring(0, 4);
-    const month = dateString.substring(4, 6);
-    const day = dateString.substring(6, 8);
-    const shortYear = year.substring(2, 4); // Get the last 2 digits of the year
-    return `${month}/${day}/${shortYear}`;
-  };
-
+  
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -72,7 +78,7 @@ const TaskCard = () => {
             <tr key={task.id}>
               <td className="border px-4 py-2">{task.acf ? task.acf.task_number : 'No number'}</td>
               <td className="border px-4 py-2">{task.acf ? task.acf.task_description : 'No description'}</td>
-              <td className="border px-4 py-2">{task.acf ? formatDate(task.acf.date_created) : 'No date'}</td>
+              <td className="border px-4 py-2">{task.acf ? task.acf.date_created : 'No date'}</td>
               <td className="border px-4 py-2">{task.acf ? task.acf.allocated_time : 'No time'}</td>
               <td className="border px-4 py-2">{task.acf ? task.acf.assigned_to : 'Not assigned'}</td>
               <td className="border px-4 py-2">

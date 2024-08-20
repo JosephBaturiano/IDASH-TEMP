@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import FormData from 'form-data'; // Ensure you have this library installed
 
 const ArchiveCard = () => {
   const [archives, setArchives] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const apiBaseUrl = `${import.meta.env.VITE_API_BASE_URL}archive`;
+  const authUsername = import.meta.env.VITE_AUTH_USERNAME;
+  const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
+  const authHeader = `Basic ${btoa(`${authUsername}:${authPassword}`)}`;
+
   useEffect(() => {
     const fetchArchives = async () => {
       try {
-        const response = await axios.get('http://mrs-woo1.local/wp-json/wp/v2/archive', {
+        const response = await axios.get(apiBaseUrl, {
           headers: {
-            'Authorization': 'Bearer YOUR_ACCESS_TOKEN' // Replace with actual token
+            'Authorization': authHeader
           }
         });
         setArchives(response.data);
@@ -23,20 +27,20 @@ const ArchiveCard = () => {
       }
     };
     fetchArchives();
-  }, []);
+  }, [apiBaseUrl, authHeader]);
 
   const handleStatusChange = async (e, index) => {
     const newStatus = e.target.value;
     const updatedArchives = [...archives];
-    updatedArchives[index].acf.status = newStatus;
+    updatedArchives[index].status = newStatus; // Updated field
     setArchives(updatedArchives);
 
     try {
-      await axios.post(`http://mrs-woo1.local/wp-json/wp/v2/archive/${updatedArchives[index].id}`, {
-        acf: { status: newStatus }
+      await axios.post(`${apiBaseUrl}/${updatedArchives[index].id}`, {
+        status: newStatus // Updated field
       }, {
         headers: {
-          'Authorization': 'Bearer YOUR_ACCESS_TOKEN' 
+          'Authorization': authHeader
         }
       });
     } catch (err) {
@@ -54,33 +58,25 @@ const ArchiveCard = () => {
     data.append('status', 'publish');
     data.append('title', 'content'); 
 
-    const config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: 'http://mrs-woo1.local/wp-json/wp/v2/archive',
-      headers: { 
-        'Authorization': 'Bearer YOUR_ACCESS_TOKEN', // Replace with actual token
-        ...data.getHeaders()
-      },
-      data: data
-    };
-
     try {
-      const response = await axios.request(config);
+      const response = await axios.post(apiBaseUrl, data, {
+        headers: { 
+          'Authorization': authHeader,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       setArchives([...archives, response.data]);
     } catch (err) {
       setError(`Failed to add archive: ${err.message}`);
     }
   };
 
-  // Helper function to format date
   const formatDate = (dateString) => {
     if (!dateString) return 'No date';
     const year = dateString.substring(0, 4);
-    const month = dateString.substring(4, 6);
-    const day = dateString.substring(6, 8);
-    const shortYear = year.substring(2, 4); // Get the last 2 digits of the year
-    return `${month}/${day}/${shortYear}`;
+    const month = dateString.substring(5, 7);
+    const day = dateString.substring(8, 10);
+    return `${month}/${day}/${year}`;
   };
 
   if (loading) return <p>Loading...</p>;
@@ -105,12 +101,12 @@ const ArchiveCard = () => {
             <tr key={archive.id}>
               <td className="border px-4 py-2">{archive.acf.task_number || 'N/A'}</td>
               <td className="border px-4 py-2">{archive.acf.task_description}</td>
-              <td className="border px-4 py-2">{formatDate(archive.acf.date_created)}</td>
+              <td className="border px-4 py-2">{formatDate(archive.date)}</td> {/* Updated to use 'date' */}
               <td className="border px-4 py-2">{archive.acf.allocated_time}</td>
               <td className="border px-4 py-2">{archive.acf.assigned_to}</td>
               <td className="border px-4 py-2">
                 <select
-                  value={archive.acf.status}
+                  value={archive.status} // Updated to use 'status'
                   onChange={(e) => handleStatusChange(e, index)}
                   className="bg-white border border-gray-300 rounded-full px-2 py-1"
                 >
@@ -120,7 +116,7 @@ const ArchiveCard = () => {
                 </select>
               </td>
               <td className="border px-4 py-2">
-                <button className="bg-[#134B70] text-white rounded-full p-2 hover:bg-[#0a2c46] transition-colors">+</button>
+                <button className="bg-[#134B70] text-white rounded-full p-2 hover:bg-[#0a2c46] transition-colors" onClick={addArchive}>+</button>
               </td>
             </tr>
           ))}

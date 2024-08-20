@@ -1,9 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const IssuesCard = ({ initialIssues }) => {
-  const [issues, setIssues] = useState(initialIssues);
+  const [issues, setIssues] = useState(initialIssues || []);
   const [error, setError] = useState(null);
+
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL + 'issues'; // Ensure endpoint is correct
+  const authUsername = import.meta.env.VITE_AUTH_USERNAME;
+  const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
+  const authHeader = `Basic ${btoa(`${authUsername}:${authPassword}`)}`;
+
+  useEffect(() => {
+    // Fetch initial issues if not passed as props
+    if (!initialIssues) {
+      axios.get(apiBaseUrl, {
+        headers: {
+          Authorization: authHeader,
+        },
+      })
+      .then(response => {
+        setIssues(response.data);
+      })
+      .catch(error => {
+        setError(`Error fetching issues: ${error.message}`);
+      });
+    }
+  }, [apiBaseUrl, authHeader, initialIssues]);
 
   const handleStatusChange = (e, index) => {
     const updatedIssues = [...issues];
@@ -15,18 +37,17 @@ const IssuesCard = ({ initialIssues }) => {
   const formatDate = (dateString) => {
     if (!dateString) return 'No date';
     const year = dateString.substring(0, 4);
-    const month = dateString.substring(4, 6);
-    const day = dateString.substring(6, 8);
-    const shortYear = year.substring(2, 4); // Get the last 2 digits of the year
-    return `${month}/${day}/${shortYear}`;
+    const month = dateString.substring(5, 7); // Adjusted to get the correct month
+    const day = dateString.substring(8, 10); // Adjusted to get the correct day
+    return `${month}/${day}/${year}`;
   };
 
   const addIssue = async (data) => {
     try {
-      const response = await axios.post('http://mrs-woo1.local/wp-json/wp/v2/issues', data, {
+      const response = await axios.post(apiBaseUrl, data, {
         headers: {
-          'Authorization': 'Bearer YOUR_ACCESS_TOKEN', // Replace with actual token
-          ...data.getHeaders(),
+          Authorization: authHeader,
+          'Content-Type': 'application/json',
         },
       });
       setIssues([...issues, response.data]);

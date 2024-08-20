@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Home from './Home'; // Import the Home component
 import TaskCard from '../components/TaskCard'; // Import the TaskCard component
 import IssuesCard from '../components/IssuesCard'; // Import the IssuesCard component
-import ArchiveCard from '../components/ArchiveCard';
+import ArchiveCard from '../components/ArchiveCard'; // Import the ArchiveCard component
 import axios from 'axios';
 
 const TaskDeliverables = () => {
@@ -10,38 +10,48 @@ const TaskDeliverables = () => {
   const [tasks, setTasks] = useState([]);
   const [issues, setIssues] = useState([]);
   const [archives, setArchives] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const authUsername = import.meta.env.VITE_AUTH_USERNAME;
+  const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
+  const authHeader = `Basic ${btoa(`${authUsername}:${authPassword}`)}`;
 
   useEffect(() => {
-    // Fetch tasks
-    axios.get('http://mrs-woo1.local/wp-json/wp/v2/task')
-      .then(response => {
-        setTasks(response.data);
-      })
-      .catch(error => console.error('Error fetching tasks:', error));
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [tasksResponse, issuesResponse, archivesResponse] = await Promise.all([
+          axios.get(`${apiBaseUrl}task`, { headers: { Authorization: authHeader } }),
+          axios.get(`${apiBaseUrl}issue`, { headers: { Authorization: authHeader } }),
+          axios.get(`${apiBaseUrl}archive`, { headers: { Authorization: authHeader } })
+        ]);
+        setTasks(tasksResponse.data);
+        setIssues(issuesResponse.data);
+        setArchives(archivesResponse.data);
+      } catch (err) {
+        setError('Error fetching data.');
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Fetch issues
-    axios.get('http://mrs-woo1.local/wp-json/wp/v2/issues')
-      .then(response => {
-        setIssues(response.data);
-      })
-      .catch(error => console.error('Error fetching issues:', error));
-
-    // Fetch archives
-    axios.get('http://mrs-woo1.local/wp-json/wp/v2/archives')
-      .then(response => {
-        setArchives(response.data);
-      })
-      .catch(error => console.error('Error fetching archives:', error));
-  }, []);
+    fetchData();
+  }, [apiBaseUrl, authHeader]);
 
   const renderTabContent = () => {
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>{error}</p>;
+
     switch (activeTab) {
       case 'Task':
-        return <TaskCard initialTasks={tasks} />;
+        return <TaskCard tasks={tasks} />;
       case 'Issues':
-        return <IssuesCard initialIssues={issues} />;
+        return <IssuesCard issues={issues} />;
       case 'Archive':
-        return <ArchiveCard initialArchives={archives} />;
+        return <ArchiveCard archives={archives} />;
       default:
         return null;
     }
