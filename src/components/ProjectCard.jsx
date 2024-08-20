@@ -7,16 +7,24 @@ const getRandomColor = () => {
 };
 
 const formatDate = (dateStr) => {
-  const year = dateStr.substring(0, 4);
-  const month = dateStr.substring(4, 6) - 1; // Months are 0-based
-  const day = dateStr.substring(6, 8);
+  if (!dateStr) {
+    console.error('Invalid date string:', dateStr);
+    return 'Invalid Date'; // Fallback value
+  }
 
-  const date = new Date(year, month, day);
-  
+  // Create a Date object from ISO 8601 string
+  const date = new Date(dateStr);
+
+  // Ensure that date is valid
+  if (isNaN(date.getTime())) {
+    console.error('Invalid date object created:', date);
+    return 'Invalid Date';
+  }
+
   return new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric'
+    month: 'long',  // Full month name (e.g., "August")
+    day: 'numeric', // Day of the month (e.g., "20")
+    year: 'numeric' // Full year (e.g., "2024")
   }).format(date);
 };
 
@@ -53,9 +61,9 @@ const ProjectList = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get('https://jbm-acf.local/wp-json/wp/v2/project', {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}project`, {
           headers: {
-            'Authorization': 'Basic ' + btoa('admin:oML3 3mDp p9D5 tM9w RLkm OKDH'),
+            'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`),
           },
         });
 
@@ -64,9 +72,9 @@ const ProjectList = () => {
 
         const getLogoUrl = async (id) => {
           try {
-            const { data } = await axios.get(`https://jbm-acf.local/wp-json/wp/v2/media/${id}`, {
+            const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}media/${id}`, {
               headers: {
-                'Authorization': 'Basic ' + btoa('admin:oML3 3mDp p9D5 tM9w RLkm OKDH'),
+                'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`),
               },
             });
             return data.source_url; // Adjust this if the field is different
@@ -82,7 +90,7 @@ const ProjectList = () => {
             id: project.id,
             logo: logoUrl,
             project_title: project.title.rendered,
-            project_created: project.acf.project_created,
+            project_created: project.date, // Use the 'date' field for project_created
             assigned_to: project.acf.assigned_to,
             progress: Math.floor(Math.random() * 100), // Random progress value
             link: project.link, // Link to the project
