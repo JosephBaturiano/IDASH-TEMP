@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Menu, MenuItem, IconButton, ListItemIcon, Divider } from '@mui/material';
 import { Logout, Person, Settings } from '@mui/icons-material';
@@ -30,7 +29,9 @@ const TopBar = () => {
                     },
                 });
                 const userName = response.data.name;
+                const avatarUrl = response.data.avatar_urls['96']; // Choose the desired avatar size
                 setUsername(userName);
+                setProfilePicUrl(avatarUrl);
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -103,9 +104,19 @@ const TopBar = () => {
                 </div>
                 <div className="flex items-center space-x-4">
                     <FullName name={username} /> {/* Use the FullName component to display the username */}
-                    <IconButton onClick={handleProfileClick} className="p-0">
-                        <AccountCircleIcon className="w-12 h-12 text-gray-900 cursor-pointer transition-transform duration-300 hover:scale-110" />
-                    </IconButton>
+                    {profilePicUrl ? (
+                        <img
+                            src={profilePicUrl}
+                            alt="Profile"
+                            className="w-12 h-12 rounded-full object-cover cursor-pointer"
+                            onClick={handleProfileClick}
+                        />
+                    ) : (
+                        <div className="w-12 h-12 flex items-center justify-center bg-gray-300 rounded-full cursor-pointer" onClick={handleProfileClick}>
+                            <span className="text-gray-800 text-xl">U</span>
+                        </div>
+                    )}
+
                     <Menu
                         anchorEl={anchorEl}
                         open={Boolean(anchorEl)}
@@ -121,7 +132,7 @@ const TopBar = () => {
                             <ListItemIcon>
                                 <Person fontSize="small" />
                             </ListItemIcon>
-                            Profile       
+                            Profile
                         </MenuItem>
                         <MenuItem onClick={handleProfileClose}>
                             <ListItemIcon>
