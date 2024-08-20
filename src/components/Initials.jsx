@@ -1,12 +1,11 @@
-
 import React from 'react';
 
-const Initials = ({ initials, className }) => {
+const FullName = ({ name }) => {
   return (
-    <div className={`flex items-center justify-center w-full h-full  text-gray-900 font-bold ${className}`}>
-      {initials}
-    </div>
+      <div className="text-gray-900 font-semibold">
+          {name || 'N/A'} {/* Display 'N/A' if no name is provided */}
+      </div>
   );
 };
 
-export default Initials;
+export default FullName;

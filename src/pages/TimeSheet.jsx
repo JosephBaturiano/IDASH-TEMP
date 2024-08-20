@@ -6,14 +6,14 @@ import AddTimesheetModal from '../components/AddTimesheetModal';
 import EditTimesheetModal from '../components/EditTimesheetModal';
 import Home from './Home';
 
-// Define API configuration constants
-const API_BASE_URL = 'https://jbm-acf.local/wp-json/wp/v2/timesheet';
-const AUTH_USERNAME = 'admin';
-const AUTH_PASSWORD = 'oML3 3mDp p9D5 tM9w RLkm OKDH';
+
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
+const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
+const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
 
-// Function to format time into H:mm AM/PM format
-// Function to format time into g:i a format
+
 const formatTime = (time) => {
   if (!time) return 'Invalid time'; // Handle empty or null time values
 
