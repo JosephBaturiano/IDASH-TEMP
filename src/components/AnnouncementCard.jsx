@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+
+// API Base URL and Credentials
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'announcement';
+const USERNAME = import.meta.env.VITE_AUTH_USERNAME;
+const PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
+
+// Base64 Encode credentials
+const credentials = btoa(`${USERNAME}:${PASSWORD}`);
+const AUTH_HEADER = `Basic ${credentials}`;
 
 const AnnouncementCard = () => {
     const [announcements, setAnnouncements] = useState([]);
@@ -9,11 +17,26 @@ const AnnouncementCard = () => {
     useEffect(() => {
         const fetchAnnouncements = async () => {
             try {
-                // Replace with your WordPress REST API endpoint for 'announcements' post type
-                const response = await axios.get('https://jbm-acf.local/wp-json/wp/v2/announcement');
-                setAnnouncements(response.data);
+                const response = await fetch(API_BASE_URL, {
+                    headers: {
+                        'Authorization': AUTH_HEADER,
+                    },
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Log the response data for debugging
+                console.log('API Response:', data);
+
+                setAnnouncements(data);
             } catch (err) {
-                setError(err.message);
+                // Log the full error for debugging
+                console.error('Error fetching announcements:', err);
+                setError(err.message || 'An error occurred');
             } finally {
                 setLoading(false);
             }
