@@ -7,7 +7,6 @@ import EditTimesheetModal from '../components/EditTimesheetModal';
 import Home from './Home';
 
 
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
 const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
@@ -41,25 +40,35 @@ const formatTime = (time) => {
 
 
 // Fetch the posts from WordPress and update the state
-const fetchTimesheets = async (setTimesheets) => {
+const fetchTimesheets = async (authorId, setTimesheets) => {
   try {
-    const response = await axios.get(API_BASE_URL, {
+    const response = await axios.get(`${API_BASE_URL}?author=${authorId}`, {
       headers: {
         'Authorization': AUTH_HEADER,
       },
     });
-    const posts = response.data;
-    const formattedPosts = posts.map((post) => ({
-      id: post.id,
-      taskNumber: post.acf.task_number,
-      description: post.acf.task_description,
-      timeStarted: formatTime(post.acf.time_started),
-      timeEnded: formatTime(post.acf.time_ended),
-      withWhom: post.acf.with_whom,
-      deliverables: post.acf.deliverables,
-      date: post.acf.date_created,
-    }));
-    setTimesheets(formattedPosts);
+
+    // Log the response data for debugging
+    console.log('API Response:', response.data);
+
+    // Ensure that response.data is an array
+    if (Array.isArray(response.data)) {
+      const posts = response.data;
+
+      const formattedPosts = posts.map((post) => ({
+        id: post.id,
+        taskNumber: post.acf.task_number,
+        description: post.acf.task_description,
+        timeStarted: formatTime(post.acf.time_started),
+        timeEnded: formatTime(post.acf.time_ended),
+        withWhom: post.acf.with_whom,
+        deliverables: post.acf.deliverables,
+        date: post.acf.date_created,
+      }));
+      setTimesheets(formattedPosts);
+    } else {
+      console.error('API Response is not an array:', response.data);
+    }
   } catch (error) {
     console.error('Error fetching timesheets:', error);
   }
@@ -92,10 +101,28 @@ const TimeSheet = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentEditingItem, setCurrentEditingItem] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    fetchTimesheets(setTimesheets);
+    // Fetch the current user ID from WordPress
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
+      headers: {
+        'Authorization': AUTH_HEADER,
+      },
+    })
+    .then(response => {
+      setUserId(response.data.id);
+    })
+    .catch(error => {
+      console.error('Error fetching user info:', error);
+    });
   }, []);
+
+  useEffect(() => {
+    if (userId) {
+      fetchTimesheets(userId, setTimesheets);
+    }
+  }, [userId]);
 
   useEffect(() => {
     if (isModalOpen) {
