@@ -1,62 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Home from './Home'; // Import the Home component
 import TaskCard from '../components/TaskCard'; // Import the TaskCard component
 import IssuesCard from '../components/IssuesCard'; // Import the IssuesCard component
 import ArchiveCard from '../components/ArchiveCard';
+import axios from 'axios';
 
 const TaskDeliverables = () => {
   const [activeTab, setActiveTab] = useState('Task');
+  const [tasks, setTasks] = useState([]);
+  const [issues, setIssues] = useState([]);
+  const [archives, setArchives] = useState([]);
 
-  // Sample data
-  const tasks = [
-    {
-      id: 1,
-      description: 'Create Expo App',
-      dateCreated: '01/08/24',
-      allocatedTime: '2:00:00',
-      assignedTo: 'All',
-      status: 'Done',
-    },
-    {
-      id: 2,
-      description: 'Discuss and finalize the features of Intern Dashboard',
-      dateCreated: '01/08/24',
-      allocatedTime: '2:00:00',
-      assignedTo: 'All',
-      status: 'Done',
-    },
-    {
-      id: 3,
-      description: 'Mock up the UI for Intern Dashboard',
-      dateCreated: '01/08/24',
-      allocatedTime: '2:00:00',
-      assignedTo: 'UI/UX',
-      status: 'Pending',
-    },
-    // Add more tasks as needed
-  ];
+  useEffect(() => {
+    // Fetch tasks
+    axios.get('http://mrs-woo1.local/wp-json/wp/v2/task')
+      .then(response => {
+        setTasks(response.data);
+      })
+      .catch(error => console.error('Error fetching tasks:', error));
 
-  const issues = [
-    {
-      id: 1,
-      description: 'Bug in the Expo App',
-      dateCreated: '02/08/24',
-      assignedTo: 'React Team',
-      status: 'Open',
-    },
-    // Add more issues as needed
-  ];
+    // Fetch issues
+    axios.get('http://mrs-woo1.local/wp-json/wp/v2/issues')
+      .then(response => {
+        setIssues(response.data);
+      })
+      .catch(error => console.error('Error fetching issues:', error));
 
-  const archives = [
-    {
-      id: 1,
-      description: 'Old UI Mockups',
-      dateCreated: '30/07/24',
-      assignedTo: 'UI/UX',
-      status: 'Archived',
-    },
-    // Add more archives as needed
-  ];
+    // Fetch archives
+    axios.get('http://mrs-woo1.local/wp-json/wp/v2/archives')
+      .then(response => {
+        setArchives(response.data);
+      })
+      .catch(error => console.error('Error fetching archives:', error));
+  }, []);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -66,7 +42,6 @@ const TaskDeliverables = () => {
         return <IssuesCard initialIssues={issues} />;
       case 'Archive':
         return <ArchiveCard initialArchives={archives} />;
-        ;
       default:
         return null;
     }
