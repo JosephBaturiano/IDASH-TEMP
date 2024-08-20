@@ -6,6 +6,8 @@ import AddTimesheetModal from '../components/AddTimesheetModal';
 import EditTimesheetModal from '../components/EditTimesheetModal';
 import Home from './Home';
 import TimeRendered from '../components/TimeRendered'; // Import the new component
+import { useTimesheets } from '../context/TimesheetContext'; // Adjust the import path
+
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
@@ -92,7 +94,7 @@ const TimesheetHeader = () => (
 
 const TimeSheet = () => {
   const [selectedDate, setSelectedDate] = useState('');
-  const [timesheets, setTimesheets] = useState([]);
+  const { timesheets, setTimesheets } = useTimesheets();
   const [newTaskNumber, setNewTaskNumber] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [newTimeStarted, setNewTimeStarted] = useState('');
@@ -312,8 +314,8 @@ const TimeSheet = () => {
           </table>
         </div>
 
-        {/* Time Rendered Component */}
-        <TimeRendered timesheets={timesheets} />
+        {/* Time Rendered Component 
+        <TimeRendered timesheets={timesheets} />*/}
 
         {/* Add Timesheet Modal */}
         {isModalOpen && (
