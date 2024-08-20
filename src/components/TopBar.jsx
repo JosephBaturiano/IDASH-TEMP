@@ -5,13 +5,14 @@ import { Logout, Person, Settings } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import FullName from '../components/FullName'; // Import the FullName component
+import TimeRendered from './TimeRendered';
+import { useTimesheets } from '../context/TimesheetContext'; // Adjust the import path
 
 const TopBar = () => {
+    const { timesheets } = useTimesheets();
     const [anchorEl, setAnchorEl] = useState(null);
     const [notificationEl, setNotificationEl] = useState(null);
     const [username, setUsername] = useState('');
-    const [profilePicUrl, setProfilePicUrl] = useState(''); // State to hold the profile picture URL
-    const [ojtTime, setOjtTime] = useState('00:00:00'); // Placeholder for OJT time
     const [notifications, setNotifications] = useState([
         { id: 1, description: 'New task assigned', date: '2024-08-18', time: '09:00 AM' },
         { id: 2, description: 'Meeting at 3 PM', date: '2024-08-18', time: '12:00 PM' },
@@ -62,9 +63,9 @@ const TopBar = () => {
             </div>
             <div className="flex items-center space-x-6">
                 <div className="flex items-center space-x-4 bg-gray-200 p-2 rounded-lg shadow-md">
-                    <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-gray-600">Time Rendered</span>
-                        <span className="text-lg font-medium">{ojtTime}</span>
+                    <div className="flex flex-col font-bold text-center">
+                        <span className="text-xs font-bold text-gray-600 pb-1">Time Rendered</span>
+                        <TimeRendered timesheets={timesheets} />
                     </div>
                 </div>
                 <div className="indicator">
