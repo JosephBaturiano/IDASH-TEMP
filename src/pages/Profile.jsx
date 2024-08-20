@@ -4,8 +4,10 @@ import SchoolIcon from '@mui/icons-material/School';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import CallIcon from '@mui/icons-material/Call';
+import EditIcon from '@mui/icons-material/Edit'; // Import the Edit icon
 import TopBar from '../components/TopBar';
 import SideBar from '../components/SideBar';
+import EditProfileModal from '../components/EditProfileModal'; // Import the modal component
 
 const Profile = ({ children }) => {
   const [profileData, setProfileData] = useState({
@@ -19,6 +21,7 @@ const Profile = ({ children }) => {
     about: '',
     user: '',
   });
+  const [modalOpen, setModalOpen] = useState(false); // State for modal visibility
   const ojtTime = "00:00:00";
 
   useEffect(() => {
@@ -66,6 +69,41 @@ const Profile = ({ children }) => {
     }
   };
 
+  const handleEditClick = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  const handleSaveProfile = (updatedProfileData) => {
+    // Preserve the current profile photo URL
+    const updatedData = {
+      ...updatedProfileData,
+      user: profileData.user, // Include the profile photo URL if needed
+    };
+  
+    // Update profile data in WordPress
+    axios.post('http://edl-wp1.local/wp-json/wp/v2/users/me', updatedData, {
+      headers: {
+        'Authorization': 'Basic dXNlcjo2VmlIIGcxelAgR2xEUiBoT0NzIFExTWsgTVVLUw==',
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((response) => {
+      console.log('Profile updated successfully');
+      // Update state with new data
+      setProfileData(prevData => ({
+        ...prevData,
+        ...updatedProfileData,
+      }));
+    })
+    .catch((error) => {
+      console.error('Error updating profile:', error);
+    });
+  };  
+
   return (
     <main className="flex h-screen w-full">
       {/* Sidebar */}
@@ -80,13 +118,21 @@ const Profile = ({ children }) => {
           <div className="flex justify-center items-stretch gap-10 h-full"> {/* Centralize content */}
             {/* Left Section */}
             <div className="flex flex-col items-center h-full">
-              <div className="bg-white rounded-lg shadow-md w-[400px] p-6 mb-10 h-full">
+              <div className="bg-white rounded-lg shadow-md w-[400px] p-6 mb-10 h-full relative">
                 {profileData.user && (
-                  <img
-                    src={profileData.user}
-                    alt="Profile"
-                    className="rounded-3xl w-full h-[250px] w-[230px] object-cover mb-2 mx-auto"
-                  />
+                  <div className="relative group">
+                    <img
+                      src={profileData.user}
+                      alt="Profile"
+                      className="rounded-3xl w-full h-[250px] w-[225px] object-cover mb-2 mx-auto"
+                    />
+                    <div
+                      onClick={handleEditClick}
+                      className="absolute top-2 right-2 bg-gray-700 bg-opacity-50 p-2 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    >
+                      <EditIcon className="text-white" />
+                    </div>
+                  </div>
                 )}
                 <h2 className="text-center text-2xl font-medium mb-5">Maraiah Queen Arceta</h2>
 
@@ -157,6 +203,14 @@ const Profile = ({ children }) => {
           </div>
         </div>
       </div>
+
+      {/* Modal for editing profile */}
+      <EditProfileModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        profileData={profileData}
+        onSave={handleSaveProfile}
+      />
     </main>
   );
 };
