@@ -1,56 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const IssuesCard = ({ initialIssues }) => {
-  const [issues, setIssues] = useState(initialIssues || []);
+const IssuesCard = () => {
+  const [issues, setIssues] = useState([]);
   const [error, setError] = useState(null);
 
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL + 'issues'; // Ensure endpoint is correct
-  const authUsername = import.meta.env.VITE_AUTH_USERNAME;
-  const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
-  const authHeader = `Basic ${btoa(`${authUsername}:${authPassword}`)}`;
-
   useEffect(() => {
-    // Fetch initial issues if not passed as props
-    if (!initialIssues) {
-      axios.get(apiBaseUrl, {
-        headers: {
-          Authorization: authHeader,
-        },
-      })
-      .then(response => {
+    // Fetch issues data when the component mounts
+    const fetchIssues = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}issues`, {
+          auth: {
+            username: import.meta.env.VITE_AUTH_USERNAME,
+            password: import.meta.env.VITE_AUTH_PASSWORD,
+          },
+        });
         setIssues(response.data);
-      })
-      .catch(error => {
-        setError(`Error fetching issues: ${error.message}`);
-      });
-    }
-  }, [apiBaseUrl, authHeader, initialIssues]);
+      } catch (err) {
+        setError(`Failed to fetch issues: ${err.message}`);
+      }
+    };
+
+    fetchIssues();
+  }, []); // Empty dependency array means this effect runs once on mount
 
   const handleStatusChange = (e, index) => {
     const updatedIssues = [...issues];
-    updatedIssues[index].acf.status = e.target.value;
-    setIssues(updatedIssues); // Update state with new issues list
+    updatedIssues[index].status = e.target.value;
+    setIssues(updatedIssues);
   };
 
+  // Helper function to format date
   const formatDate = (dateString) => {
     if (!dateString) return 'No date';
-    const [year, month, day] = dateString.split('-'); // Assuming YYYY-MM-DD format
-    return `${month}/${day}/${year}`;
-  };
-
-  const addIssue = async (data) => {
-    try {
-      const response = await axios.post(apiBaseUrl, data, {
-        headers: {
-          Authorization: authHeader,
-          'Content-Type': 'application/json',
-        },
-      });
-      setIssues([...issues, response.data]);
-    } catch (err) {
-      setError(`Failed to add issue: ${err.message}`);
-    }
+    const year = dateString.substring(0, 4);
+    const month = dateString.substring(4, 6);
+    const day = dateString.substring(6, 8);
+    const shortYear = year.substring(2, 4); // Get the last 2 digits of the year
+    return `${month}/${day}/${shortYear}`;
   };
 
   return (
@@ -78,7 +65,7 @@ const IssuesCard = ({ initialIssues }) => {
               <td className="border px-4 py-2">{issue.acf.issue_number}</td>
               <td className="border px-4 py-2">
                 <select
-                  value={issue.acf.status || 'Open'} // Fallback to 'Open' if status is undefined
+                  value={issue.acf.status}
                   onChange={(e) => handleStatusChange(e, index)}
                   className="bg-white border border-gray-300 rounded-full px-2 py-1"
                 >
