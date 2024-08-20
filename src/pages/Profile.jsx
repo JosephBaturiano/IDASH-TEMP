@@ -27,9 +27,9 @@ const Profile = ({ children }) => {
   useEffect(() => {
     let config = {
       method: 'get',
-      url: 'http://edl-wp1.local/wp-json/wp/v2/users/me',
+      url: 'https://idash.visible.team/wp-json/wp/v2/users/me',
       headers: {
-        'Authorization': 'Basic dXNlcjo2VmlIIGcxelAgR2xEUiBoT0NzIFExTWsgTVVLUw==',
+        'Authorization': 'Basic RURMOlZPdUsgMTBNZCB4MGpUIG14WDAgV3JlUCB4dGlv',
       },
     };
 
@@ -61,7 +61,7 @@ const Profile = ({ children }) => {
 
   const fetchImageUrl = async (imageId) => {
     try {
-      const response = await axios.get(`http://edl-wp1.local/wp-json/wp/v2/media/${imageId}`);
+      const response = await axios.get(`https://idash.visible.team/wp-json/wp/v2/media/${imageId}`); 
       return response.data.source_url;
     } catch (error) {
       console.error('Error fetching image URL:', error);
@@ -85,9 +85,9 @@ const Profile = ({ children }) => {
     };
   
     // Update profile data in WordPress
-    axios.post('http://edl-wp1.local/wp-json/wp/v2/users/me', updatedData, {
+    axios.post('https://idash.visible.team/wp-json/wp/v2/users/me', updatedData, {
       headers: {
-        'Authorization': 'Basic dXNlcjo2VmlIIGcxelAgR2xEUiBoT0NzIFExTWsgTVVLUw==',
+        'Authorization': 'Basic RURMOlZPdUsgMTBNZCB4MGpUIG14WDAgV3JlUCB4dGlv',
         'Content-Type': 'application/json',
       },
     })
