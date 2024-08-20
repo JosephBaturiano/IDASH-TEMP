@@ -5,6 +5,7 @@ import TimeSheetCard from '../components/TimeSheetCard';
 import AddTimesheetModal from '../components/AddTimesheetModal';
 import EditTimesheetModal from '../components/EditTimesheetModal';
 import Home from './Home';
+import TimeRendered from '../components/TimeRendered'; // Import the new component
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
@@ -292,7 +293,7 @@ const TimeSheet = () => {
         </div>
 
         {/* Timesheet Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto mb-4">
           <table className="min-w-full bg-gray-50 border border-gray-200">
             <TimesheetHeader />
             <tbody>
@@ -310,6 +311,9 @@ const TimeSheet = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Time Rendered Component */}
+        <TimeRendered timesheets={timesheets} />
 
         {/* Add Timesheet Modal */}
         {isModalOpen && (
