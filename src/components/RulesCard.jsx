@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'rule';
+
 const RulesCard = () => {
     const [rules, setRules] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -10,7 +12,7 @@ const RulesCard = () => {
         const fetchRules = async () => {
             try {
                 // Replace with your WordPress REST API endpoint for the 'rules' custom post type
-                const response = await axios.get('https://jbm-acf.local/wp-json/wp/v2/rule');
+                const response = await axios.get(`${API_BASE_URL}`);
                 setRules(response.data);
             } catch (err) {
                 setError(err.message);
