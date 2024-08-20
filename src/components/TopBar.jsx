@@ -12,10 +12,12 @@ const TopBar = () => {
     const { timesheets } = useTimesheets();
     const [anchorEl, setAnchorEl] = useState(null);
     const [notificationEl, setNotificationEl] = useState(null);
+    const [profilePicUrl, setProfilePicUrl] = useState('');
     const [username, setUsername] = useState('');
     const [notifications, setNotifications] = useState([
         { id: 1, description: 'New task assigned', date: '2024-08-18', time: '09:00 AM' },
         { id: 2, description: 'Meeting at 3 PM', date: '2024-08-18', time: '12:00 PM' },
+        { id: 3, description: 'Project deadline extended', date: '2024-08-17', time: '05:00 PM' },
         { id: 3, description: 'Project deadline extended', date: '2024-08-17', time: '05:00 PM' },
         // Add more notifications here
     ]);
