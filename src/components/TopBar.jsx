@@ -4,9 +4,9 @@ import { Menu, MenuItem, IconButton, ListItemIcon, Divider } from '@mui/material
 import { Logout, Person, Settings } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import FullName from '../components/FullName'; // Import the FullName component
+import FullName from '../components/FullName';
 import TimeRendered from './TimeRendered';
-import { useTimesheets } from '../context/TimesheetContext'; // Adjust the import path
+import { useTimesheets } from '../context/TimesheetContext';
 
 const TopBar = () => {
     const { timesheets } = useTimesheets();
@@ -14,13 +14,7 @@ const TopBar = () => {
     const [notificationEl, setNotificationEl] = useState(null);
     const [profilePicUrl, setProfilePicUrl] = useState('');
     const [username, setUsername] = useState('');
-    const [notifications, setNotifications] = useState([
-        { id: 1, description: 'New task assigned', date: '2024-08-18', time: '09:00 AM' },
-        { id: 2, description: 'Meeting at 3 PM', date: '2024-08-18', time: '12:00 PM' },
-        { id: 3, description: 'Project deadline extended', date: '2024-08-17', time: '05:00 PM' },
-        { id: 3, description: 'Project deadline extended', date: '2024-08-17', time: '05:00 PM' },
-        // Add more notifications here
-    ]);
+    const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -31,7 +25,7 @@ const TopBar = () => {
                     },
                 });
                 const userName = response.data.name;
-                const avatarUrl = response.data.avatar_urls['96']; // Choose the desired avatar size
+                const avatarUrl = response.data.avatar_urls['96'];
                 setUsername(userName);
                 setProfilePicUrl(avatarUrl);
             } catch (error) {
@@ -39,7 +33,67 @@ const TopBar = () => {
             }
         };
 
+        const fetchRules = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}rule`, {
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`),
+                    },
+                });
+
+                const newRules = response.data.map(rule => ({
+                    id: `rule-${rule.id}`,
+                    description: `New rule: ${rule.title.rendered}`,
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().toLocaleTimeString(),
+                }));
+
+                setNotifications(prevNotifications => {
+                    const newNotifications = [...prevNotifications];
+                    newRules.forEach(rule => {
+                        if (!newNotifications.some(notif => notif.id === rule.id)) {
+                            newNotifications.push(rule);
+                        }
+                    });
+                    return newNotifications;
+                });
+            } catch (error) {
+                console.error('Error fetching rules:', error);
+            }
+        };
+
+        const fetchAnnouncements = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}announcement`, {
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`),
+                    },
+                });
+
+                const newAnnouncements = response.data.map(announcement => ({
+                    id: `announcement-${announcement.id}`,
+                    description: `New announcement: ${announcement.title.rendered}`,
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().toLocaleTimeString(),
+                }));
+
+                setNotifications(prevNotifications => {
+                    const newNotifications = [...prevNotifications];
+                    newAnnouncements.forEach(announcement => {
+                        if (!newNotifications.some(notif => notif.id === announcement.id)) {
+                            newNotifications.push(announcement);
+                        }
+                    });
+                    return newNotifications;
+                });
+            } catch (error) {
+                console.error('Error fetching announcements:', error);
+            }
+        };
+
         fetchUserData();
+        fetchRules();
+        fetchAnnouncements();
     }, []);
 
     const handleProfileClick = (event) => {
@@ -81,16 +135,23 @@ const TopBar = () => {
                         onClose={handleNotificationClose}
                         PaperProps={{
                             style: {
-                                width: '300px', // Adjust the width of the dropdown
-                                maxHeight: '400px', // Adjust the max height of the dropdown
-                                overflow: 'auto', // Enable scrolling for overflow
-                                padding: '10px', // Adjust the padding inside the dropdown
+                                width: '300px',
+                                maxHeight: '400px',
+                                overflow: 'auto',
+                                padding: '10px',
                             },
                         }}
                     >
                         {notifications.length > 0 ? (
                             notifications.map((notification) => (
-                                <MenuItem key={notification.id} onClick={handleNotificationClose}>
+                                <MenuItem
+                                    key={notification.id}
+                                    onClick={() => {
+                                        handleNotificationClose();
+                                        window.location.href = '/announcement';
+                                    }}
+                                >
+
                                     <div className="flex flex-col">
                                         <span>{notification.description}</span>
                                         <span>{notification.date} - {notification.time}</span>
@@ -105,7 +166,7 @@ const TopBar = () => {
                     </Menu>
                 </div>
                 <div className="flex items-center space-x-4">
-                    <FullName name={username} /> {/* Use the FullName component to display the username */}
+                    <FullName name={username} />
                     {profilePicUrl ? (
                         <img
                             src={profilePicUrl}
@@ -125,8 +186,8 @@ const TopBar = () => {
                         onClose={handleProfileClose}
                         PaperProps={{
                             style: {
-                                width: '200px', // Adjust the width of the dropdown
-                                padding: '10px', // Adjust the padding inside the dropdown
+                                width: '200px',
+                                padding: '10px',
                             },
                         }}
                     >
