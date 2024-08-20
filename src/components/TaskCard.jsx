@@ -39,6 +39,16 @@ const TaskCard = () => {
     }
   };
 
+  // Helper function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No date';
+    const year = dateString.substring(0, 4);
+    const month = dateString.substring(4, 6);
+    const day = dateString.substring(6, 8);
+    const shortYear = year.substring(2, 4); // Get the last 2 digits of the year
+    return `${month}/${day}/${shortYear}`;
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -62,7 +72,7 @@ const TaskCard = () => {
             <tr key={task.id}>
               <td className="border px-4 py-2">{task.acf ? task.acf.task_number : 'No number'}</td>
               <td className="border px-4 py-2">{task.acf ? task.acf.task_description : 'No description'}</td>
-              <td className="border px-4 py-2">{task.acf ? task.acf.date_created : 'No date'}</td>
+              <td className="border px-4 py-2">{task.acf ? formatDate(task.acf.date_created) : 'No date'}</td>
               <td className="border px-4 py-2">{task.acf ? task.acf.allocated_time : 'No time'}</td>
               <td className="border px-4 py-2">{task.acf ? task.acf.assigned_to : 'Not assigned'}</td>
               <td className="border px-4 py-2">

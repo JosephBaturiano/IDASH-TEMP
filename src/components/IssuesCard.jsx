@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import FormData from 'form-data';
 
 const IssuesCard = ({ initialIssues }) => {
   const [issues, setIssues] = useState(initialIssues);
@@ -8,20 +7,21 @@ const IssuesCard = ({ initialIssues }) => {
 
   const handleStatusChange = (e, index) => {
     const updatedIssues = [...issues];
-    updatedIssues[index].status = e.target.value;
+    updatedIssues[index].acf.status = e.target.value;
     setIssues(updatedIssues);
   };
 
-  const addIssue = async () => {
-    const data = new FormData();
-    data.append('acf[date]', '8/19/2024'); // Adjust date as needed
-    data.append('acf[task_number]', '1');
-    data.append('acf[description]', 'text');
-    data.append('acf[who]', 'text');
-    data.append('acf[issue_number]', '1');
-    data.append('title', 'content');
-    data.append('status', 'publish');
+  // Helper function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No date';
+    const year = dateString.substring(0, 4);
+    const month = dateString.substring(4, 6);
+    const day = dateString.substring(6, 8);
+    const shortYear = year.substring(2, 4); // Get the last 2 digits of the year
+    return `${month}/${day}/${shortYear}`;
+  };
 
+  const addIssue = async (data) => {
     try {
       const response = await axios.post('http://mrs-woo1.local/wp-json/wp/v2/issues', data, {
         headers: {
@@ -37,7 +37,6 @@ const IssuesCard = ({ initialIssues }) => {
 
   return (
     <div>
-      {/* The Add Issue button has been removed */}
       {error && <p className="text-red-500">Error: {error}</p>}
       <table className="w-full border-collapse border border-gray-200">
         <thead className="bg-gray-100">
@@ -54,7 +53,7 @@ const IssuesCard = ({ initialIssues }) => {
         <tbody>
           {issues.map((issue, index) => (
             <tr key={issue.id}>
-              <td className="border px-4 py-2">{issue.acf.date}</td>
+              <td className="border px-4 py-2">{formatDate(issue.acf.date)}</td>
               <td className="border px-4 py-2">{issue.acf.task_number}</td>
               <td className="border px-4 py-2">{issue.acf.description}</td>
               <td className="border px-4 py-2">{issue.acf.who}</td>

@@ -36,7 +36,7 @@ const ArchiveCard = () => {
         acf: { status: newStatus }
       }, {
         headers: {
-          'Authorization': 'Bearer YOUR_ACCESS_TOKEN' // Replace with actual token
+          'Authorization': 'Bearer YOUR_ACCESS_TOKEN' 
         }
       });
     } catch (err) {
@@ -46,13 +46,13 @@ const ArchiveCard = () => {
 
   const addArchive = async () => {
     const data = new FormData();
-    data.append('acf[task_number]', '1'); // Ensure this is correct as per your API
+    data.append('acf[task_number]', '1'); 
     data.append('acf[task_description]', 'text');
     data.append('acf[date_created]', '08/19/2024');
     data.append('acf[allocated_time]', '8:15 PM');
     data.append('acf[assigned_to]', 'text');
     data.append('status', 'publish');
-    data.append('title', 'content'); // Ensure the `title` field is correct as per your API
+    data.append('title', 'content'); 
 
     const config = {
       method: 'post',
@@ -71,6 +71,16 @@ const ArchiveCard = () => {
     } catch (err) {
       setError(`Failed to add archive: ${err.message}`);
     }
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No date';
+    const year = dateString.substring(0, 4);
+    const month = dateString.substring(4, 6);
+    const day = dateString.substring(6, 8);
+    const shortYear = year.substring(2, 4); // Get the last 2 digits of the year
+    return `${month}/${day}/${shortYear}`;
   };
 
   if (loading) return <p>Loading...</p>;
@@ -93,9 +103,9 @@ const ArchiveCard = () => {
         <tbody>
           {archives.map((archive, index) => (
             <tr key={archive.id}>
-              <td className="border px-4 py-2">{archive.acf.task_number || 'N/A'}</td> {/* Adjust as needed */}
+              <td className="border px-4 py-2">{archive.acf.task_number || 'N/A'}</td>
               <td className="border px-4 py-2">{archive.acf.task_description}</td>
-              <td className="border px-4 py-2">{archive.acf.date_created}</td>
+              <td className="border px-4 py-2">{formatDate(archive.acf.date_created)}</td>
               <td className="border px-4 py-2">{archive.acf.allocated_time}</td>
               <td className="border px-4 py-2">{archive.acf.assigned_to}</td>
               <td className="border px-4 py-2">
