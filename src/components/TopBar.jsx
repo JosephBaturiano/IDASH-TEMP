@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { Menu, MenuItem, IconButton, ListItemIcon, Typography, Divider } from '@mui/material';
+import { Menu, MenuItem, IconButton, ListItemIcon, Divider } from '@mui/material';
 import { Logout, Person, Settings } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Initials from '../components/Initials'; // Adjust the import path accordingly
+import FullName from '../components/FullName'; // Import the FullName component
 
 const TopBar = () => {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -19,13 +19,12 @@ const TopBar = () => {
         // Add more notifications here
     ]);
 
-
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get('https://jbm-acf.local/wp-json/wp/v2/users/me', {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
                     headers: {
-                        'Authorization': 'Basic ' + btoa('cjo:K4zX bNiA xj1f 6ktu bEng YZq3'),
+                        'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`),
                     },
                 });
                 const userName = response.data.name;
@@ -46,7 +45,6 @@ const TopBar = () => {
         setNotificationEl(event.currentTarget);
     };
 
-
     const handleProfileClose = () => {
         setAnchorEl(null);
     };
@@ -54,7 +52,6 @@ const TopBar = () => {
     const handleNotificationClose = () => {
         setNotificationEl(null);
     };
-
 
     return (
         <div className="bg-white text-gray-900 py-4 px-6 flex items-center justify-between shadow-md">
@@ -86,28 +83,24 @@ const TopBar = () => {
                             },
                         }}
                     >
-                        <Typography variant="h6" className="px-2">Notifications</Typography>
-                        <Divider />
                         {notifications.length > 0 ? (
                             notifications.map((notification) => (
                                 <MenuItem key={notification.id} onClick={handleNotificationClose}>
                                     <div className="flex flex-col">
-                                        <Typography variant="body2">{notification.description}</Typography>
-                                        <Typography variant="caption" color="textSecondary">
-                                            {notification.date} - {notification.time}
-                                        </Typography>
+                                        <span>{notification.description}</span>
+                                        <span>{notification.date} - {notification.time}</span>
                                     </div>
                                 </MenuItem>
                             ))
                         ) : (
                             <MenuItem>
-                                <Typography variant="body2">No new notifications</Typography>
+                                <span>No new notifications</span>
                             </MenuItem>
                         )}
                     </Menu>
                 </div>
                 <div className="flex items-center space-x-4">
-                    <Initials initials={username} className="text-xl font-semibold" />
+                    <FullName name={username} /> {/* Use the FullName component to display the username */}
                     <IconButton onClick={handleProfileClick} className="p-0">
                         <AccountCircleIcon className="w-12 h-12 text-gray-900 cursor-pointer transition-transform duration-300 hover:scale-110" />
                     </IconButton>
