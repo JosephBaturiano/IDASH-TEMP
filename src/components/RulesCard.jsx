@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+// API Base URL and Credentials
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'rule';
+const USERNAME = import.meta.env.VITE_AUTH_USERNAME;
+const PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
+
+// Base64 Encode credentials
+const credentials = btoa(`${USERNAME}:${PASSWORD}`);
+const AUTH_HEADER = `Basic ${credentials}`;
 
 const RulesCard = () => {
     const [rules, setRules] = useState([]);
@@ -11,11 +18,21 @@ const RulesCard = () => {
     useEffect(() => {
         const fetchRules = async () => {
             try {
-                // Replace with your WordPress REST API endpoint for the 'rules' custom post type
-                const response = await axios.get(`${API_BASE_URL}`);
+                // Fetch rules from the API using Axios
+                const response = await axios.get(API_BASE_URL, {
+                    headers: {
+                        'Authorization': AUTH_HEADER,
+                    },
+                });
+
+                // Log the response data for debugging
+                console.log('API Response:', response.data);
+
                 setRules(response.data);
             } catch (err) {
-                setError(err.message);
+                // Log the full error for debugging
+                console.error('Error fetching rules:', err);
+                setError(err.message || 'An error occurred');
             } finally {
                 setLoading(false);
             }
