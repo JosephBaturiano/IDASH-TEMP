@@ -9,14 +9,14 @@ import TaskDeliverables from './pages/TaskDeliverables'
 import Home from './pages/Home'
 import Files from './pages/Files'
 import 'tailwindcss/tailwind.css'
+import { TimesheetProvider } from './context/TimesheetContext'
 
 const App = () => {
   return (
-    
+    <TimesheetProvider>
     <BrowserRouter>
       <Routes>
-      <Route path='/' element={<Home/>}/>
-        <Route path='/dashboard' element={<Dashboard/>}/>
+      <Route path='/' element={<Dashboard/>}/>
         <Route path='/announcement' element={<Announcement/>}/>
         <Route path='/profile' element={<Profile/>}/>
         <Route path='/teamtask' element={<TeamTask/>}/>
@@ -25,6 +25,7 @@ const App = () => {
         <Route path='/files' element={<Files/>}/>
       </Routes>
     </BrowserRouter>
+    </TimesheetProvider>
   )
 }
 

@@ -1,10 +1,14 @@
 import React from 'react'
+import Home from './Home'
+import ProjectCard from '../components/ProjectCard'
 
 const TeamTask = () => {
   return (
-    <div>
-      <h1>This is team task</h1>
-    </div>
+<Home>
+  <ProjectCard>
+
+  </ProjectCard>
+</Home>
   )
 }
 

@@ -14,7 +14,7 @@ const SideBar = () => {
 
       {/* Navigation Items */}
       <nav className="flex flex-col text-[17px] font-semibold space-y-7">
-        <NavItem icon={<Dashboard />} label="Dashboard" path="/dashboard" />
+        <NavItem icon={<Dashboard />} label="Dashboard" path="/" />
         <NavItem icon={<Announcement />} label="Announcement" path="/announcement" />
         <NavItem icon={<GridOn/>} label="Timesheet" path="/timesheet"/>
         <NavItem icon={<Task />} label="Task Deliverables" path="/taskdeliverables" />
