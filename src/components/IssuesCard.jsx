@@ -30,15 +30,12 @@ const IssuesCard = ({ initialIssues }) => {
   const handleStatusChange = (e, index) => {
     const updatedIssues = [...issues];
     updatedIssues[index].acf.status = e.target.value;
-    setIssues(updatedIssues);
+    setIssues(updatedIssues); // Update state with new issues list
   };
 
-  // Helper function to format date
   const formatDate = (dateString) => {
     if (!dateString) return 'No date';
-    const year = dateString.substring(0, 4);
-    const month = dateString.substring(5, 7); // Adjusted to get the correct month
-    const day = dateString.substring(8, 10); // Adjusted to get the correct day
+    const [year, month, day] = dateString.split('-'); // Assuming YYYY-MM-DD format
     return `${month}/${day}/${year}`;
   };
 
@@ -81,7 +78,7 @@ const IssuesCard = ({ initialIssues }) => {
               <td className="border px-4 py-2">{issue.acf.issue_number}</td>
               <td className="border px-4 py-2">
                 <select
-                  value={issue.acf.status}
+                  value={issue.acf.status || 'Open'} // Fallback to 'Open' if status is undefined
                   onChange={(e) => handleStatusChange(e, index)}
                   className="bg-white border border-gray-300 rounded-full px-2 py-1"
                 >
