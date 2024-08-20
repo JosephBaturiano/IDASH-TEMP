@@ -1,17 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import { Menu, MenuItem, IconButton, ListItemIcon, Divider } from '@mui/material';
+import { Logout, Person, Settings } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import FullName from '../components/FullName'; // Import the FullName component
 
-const TopBar = ({ userName, userImage }) => {
-    const initials = "APC"; // Replace with dynamic initials if necessary
-    const profileUrl = "/profile"; // Replace with profile URL
+const TopBar = () => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [notificationEl, setNotificationEl] = useState(null);
+    const [username, setUsername] = useState('');
+    const [ojtTime, setOjtTime] = useState('00:00:00'); // Placeholder for OJT time
+    const [notifications, setNotifications] = useState([
+        { id: 1, description: 'New task assigned', date: '2024-08-18', time: '09:00 AM' },
+        { id: 2, description: 'Meeting at 3 PM', date: '2024-08-18', time: '12:00 PM' },
+        { id: 3, description: 'Project deadline extended', date: '2024-08-17', time: '05:00 PM' },
+        // Add more notifications here
+    ]);
 
-    // Placeholder for OJT time
-    const ojtTime = "00:00:00"; // Replace this with dynamic content as needed
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`),
+                    },
+                });
+                const userName = response.data.name;
+                setUsername(userName);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    const handleProfileClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleNotificationClick = (event) => {
+        setNotificationEl(event.currentTarget);
+    };
+
+    const handleProfileClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleNotificationClose = () => {
+        setNotificationEl(null);
+    };
 
     return (
         <div className="bg-white text-gray-900 py-4 px-6 flex items-center justify-between shadow-md">
-            {/* Move Welcome Intern to the left */}
             <div className="flex items-center">
                 <h1 className="text-2xl font-bold">Welcome Intern!</h1>
             </div>
@@ -22,12 +65,75 @@ const TopBar = ({ userName, userImage }) => {
                         <span className="text-lg font-medium">{ojtTime}</span>
                     </div>
                 </div>
-                <NotificationsIcon className="w-8 h-8 text-gray-900 cursor-pointer transition-transform duration-300 hover:scale-110" />
+                <div className="indicator">
+                    <span className="indicator-item badge bg-red-500 text-white">{notifications.length}</span>
+                    <IconButton onClick={handleNotificationClick} className="p-0">
+                        <NotificationsIcon className="w-8 h-8 text-gray-900 cursor-pointer transition-transform duration-300 hover:scale-110" />
+                    </IconButton>
+                    <Menu
+                        anchorEl={notificationEl}
+                        open={Boolean(notificationEl)}
+                        onClose={handleNotificationClose}
+                        PaperProps={{
+                            style: {
+                                width: '300px', // Adjust the width of the dropdown
+                                maxHeight: '400px', // Adjust the max height of the dropdown
+                                overflow: 'auto', // Enable scrolling for overflow
+                                padding: '10px', // Adjust the padding inside the dropdown
+                            },
+                        }}
+                    >
+                        {notifications.length > 0 ? (
+                            notifications.map((notification) => (
+                                <MenuItem key={notification.id} onClick={handleNotificationClose}>
+                                    <div className="flex flex-col">
+                                        <span>{notification.description}</span>
+                                        <span>{notification.date} - {notification.time}</span>
+                                    </div>
+                                </MenuItem>
+                            ))
+                        ) : (
+                            <MenuItem>
+                                <span>No new notifications</span>
+                            </MenuItem>
+                        )}
+                    </Menu>
+                </div>
                 <div className="flex items-center space-x-4">
-                    <span className="text-xl font-semibold">{initials}</span>
-                    <a href={profileUrl}>
+                    <FullName name={username} /> {/* Use the FullName component to display the username */}
+                    <IconButton onClick={handleProfileClick} className="p-0">
                         <AccountCircleIcon className="w-12 h-12 text-gray-900 cursor-pointer transition-transform duration-300 hover:scale-110" />
-                    </a>
+                    </IconButton>
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleProfileClose}
+                        PaperProps={{
+                            style: {
+                                width: '200px', // Adjust the width of the dropdown
+                                padding: '10px', // Adjust the padding inside the dropdown
+                            },
+                        }}
+                    >
+                        <MenuItem onClick={handleProfileClose} component={Link} to="/profile">
+                            <ListItemIcon>
+                                <Person fontSize="small" />
+                            </ListItemIcon>
+                            Profile       
+                        </MenuItem>
+                        <MenuItem onClick={handleProfileClose}>
+                            <ListItemIcon>
+                                <Settings fontSize="small" />
+                            </ListItemIcon>
+                            Settings
+                        </MenuItem>
+                        <MenuItem onClick={handleProfileClose}>
+                            <ListItemIcon>
+                                <Logout fontSize="small" />
+                            </ListItemIcon>
+                            Logout
+                        </MenuItem>
+                    </Menu>
                 </div>
             </div>
         </div>
