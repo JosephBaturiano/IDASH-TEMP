@@ -10,9 +10,11 @@ import Home from './pages/Home'
 import Files from './pages/Files'
 import 'tailwindcss/tailwind.css'
 import { TimesheetProvider } from './context/TimesheetContext'
+import { NotificationProvider } from './context/NotificationContext'
 
 const App = () => {
   return (
+    <NotificationProvider> 
     <TimesheetProvider>
     <BrowserRouter>
       <Routes>
@@ -26,6 +28,7 @@ const App = () => {
       </Routes>
     </BrowserRouter>
     </TimesheetProvider>
+    </NotificationProvider> 
   )
 }
 
