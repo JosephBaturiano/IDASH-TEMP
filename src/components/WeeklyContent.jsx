@@ -1,64 +1,13 @@
+// TimesheetItem.jsx
 import React from 'react';
 
-const WeeklyContent = ({ description }) => {
+function TimesheetItem({ description, date }) {
   return (
-    <div>
-      {/* Table */}
-      <table className="w-full text-left border-collapse border border-black">
-        <thead>
-          <tr className="border border-black">
-            <th className="border border-black px-4 py-2">DAY</th>
-            <th className="border border-black px-4 py-2">ACTIVITIES</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="border border-black">
-            <td className="border border-black px-4 py-2">July 24, 2024</td>
-            <td className="border border-black px-4 py-2">
-              {description || 'No description available'} 
-            </td>   
-          </tr>
-          <tr className="border border-black">
-            <td className="border border-black px-4 py-2">July 24, 2024</td>
-            <td className="border border-black px-4 py-2">
-              {description || 'No description available'} 
-            </td>   
-          </tr>
-
-          <tr className="border border-black">
-            <td className="border border-black px-4 py-2">July 24, 2024</td>
-            <td className="border border-black px-4 py-2">
-              {description || 'No description available'} 
-            </td>   
-          </tr>
-          <tr className="border border-black">
-            <td className="border border-black px-4 py-2">July 24, 2024</td>
-            <td className="border border-black px-4 py-2">
-              {description || 'No description available'} 
-            </td>   
-          </tr>
-          <tr className="border border-black">
-            <td className="border border-black px-4 py-2">July 24, 2024</td>
-            <td className="border border-black px-4 py-2">
-              {description || 'No description available'} 
-            </td>   
-          </tr>
-          <tr className="border border-black">
-            <td className="border border-black px-4 py-2">July 24, 2024</td>
-            <td className="border border-black px-4 py-2">
-              {description || 'No description available'} 
-            </td>   
-          </tr>
-                    <tr className="border border-black">
-            <td className="border border-black px-4 py-2">July 24, 2024</td>
-            <td className="border border-black px-4 py-2">
-              {description || 'No description available'} 
-            </td>   
-          </tr>
-        </tbody>
-      </table>
+    <div className="timesheet-item">
+      <p>Description: {description}</p>
+      <p>Date: {date}</p>
     </div>
   );
-};
+}
 
-export default WeeklyContent;
+export default TimesheetItem;
