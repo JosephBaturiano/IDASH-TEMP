@@ -7,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import TimeRendered from './TimeRendered';
 import { useTimesheets } from '../context/TimesheetContext';
 
-const ProfileCard = ({ profileData = {}, ojtTime, handleEditClick }) => {
+const ProfileCard = ({ profileData = {}, handleEditClick }) => {
   const {
     user = '',
     name = '', // Updated to directly access from profileData
