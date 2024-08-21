@@ -7,6 +7,8 @@ import FullName from '../components/FullName';
 import TimeRendered from './TimeRendered';
 import { useTimesheets } from '../context/TimesheetContext';
 import { useNotification } from '../context/NotificationContext';
+// Import date formatting library
+import { format } from 'date-fns';
 
 const TopBar = () => {
     const { timesheets } = useTimesheets();
@@ -77,20 +79,26 @@ const TopBar = () => {
                         }}
                     >
                         {notifications.length > 0 ? (
-                            [...notifications].reverse().map((notification) => (
-                                <MenuItem
-                                    key={notification.id}
-                                    onClick={() => {
-                                        handleNotificationClose();
-                                        window.location.href = '/announcement';
-                                    }}
-                                >
-                                    <div className="flex flex-col">
-                                        <span>{notification.description}</span>
-                                        <span>{notification.date} - {notification.time}</span>
-                                    </div>
-                                </MenuItem>
-                            ))
+                            [...notifications].reverse().map((notification) => {
+                                // Assuming `date` is the field from API
+                                const date = new Date(notification.date); // Convert API date to JavaScript Date object
+                                const formattedDate = format(date, 'MM/dd/yyyy');
+                                const formattedTime = format(date, 'hh:mm a'); // Updated to include AM/PM without seconds
+                                return (
+                                    <MenuItem
+                                        key={notification.id}
+                                        onClick={() => {
+                                            handleNotificationClose();
+                                            window.location.href = '/announcement';
+                                        }}
+                                    >
+                                        <div className="flex flex-col">
+                                            <span>{notification.description}</span>
+                                            <span>{formattedDate} - {formattedTime}</span>
+                                        </div>
+                                    </MenuItem>
+                                );
+                            })
                         ) : (
                             <MenuItem>
                                 <span>No new notifications</span>

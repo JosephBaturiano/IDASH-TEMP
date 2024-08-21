@@ -47,8 +47,8 @@ export const NotificationProvider = ({ children }) => {
                         return {
                             id: `rule-${rule.id}`,
                             description: `New rule: ${rule.title.rendered}`,
-                            date: new Date().toLocaleDateString(),
-                            time: new Date().toLocaleTimeString(),
+                            date: rule.date, // Use the date from the API
+                            time: rule.date, // Use the time from the API (date and time are combined in WordPress)
                         };
                     });
 
@@ -58,8 +58,8 @@ export const NotificationProvider = ({ children }) => {
                         return {
                             id: `announcement-${announcement.id}`,
                             description: `New announcement: ${announcement.title.rendered}`,
-                            date: new Date().toLocaleDateString(),
-                            time: new Date().toLocaleTimeString(),
+                            date: announcement.date, // Use the date from the API
+                            time: announcement.date, // Use the time from the API (date and time are combined in WordPress)
                         };
                     });
 
