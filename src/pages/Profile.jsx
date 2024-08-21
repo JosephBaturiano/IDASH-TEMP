@@ -5,6 +5,7 @@ import ProfileBadges from '../components/ProfileBadges';
 import ProfileAbout from '../components/ProfileAbout';
 import ProfileDirectory from '../components/ProfileDirectory';
 import EditProfileModal from '../components/EditProfileModal';
+import EditBadgesModal from '../components/EditBadgesModal';
 import Home from './Home';
 
 const Profile = () => {
@@ -20,6 +21,7 @@ const Profile = () => {
     user: '',
   });
   const [modalOpen, setModalOpen] = useState(false);
+  const [editBadgesModalOpen, setEditBadgesModalOpen] = useState(false);
   const ojtTime = "00:00:00";
 
   useEffect(() => {
@@ -41,7 +43,7 @@ const Profile = () => {
         const userUrl = acfData['user'] ? await fetchImageUrl(acfData['user']) : '';
   
         setProfileData({
-          name: acfData.name, // Add this line
+          name: acfData.name,
           university: acfData.university,
           address: acfData.address,
           email: acfData.email,
@@ -69,12 +71,10 @@ const Profile = () => {
       return response.data.source_url;
     } catch (error) {
       console.error(`Error fetching image URL for imageId ${imageId}:`, error.message);
-      // Optional: Return a placeholder image URL on error
       return 'https://via.placeholder.com/90'; // Placeholder image
     }
   };
-  
-  
+
   const handleEditClick = () => {
     setModalOpen(true);
   };
@@ -102,29 +102,59 @@ const Profile = () => {
     });
   };
 
+  const handleEditBadgesClick = () => {
+    setEditBadgesModalOpen(true);
+  };
+
+  const handleCloseEditBadgesModal = () => {
+    setEditBadgesModalOpen(false);
+  };
+
+  const handleSaveBadges = (updatedBadges) => {
+    setProfileData(prevData => ({
+      ...prevData,
+      ...updatedBadges,
+    }));
+    handleCloseEditBadgesModal();
+  };
+
+  const handleDeleteBadge = (badgeType) => {
+    setProfileData(prevData => ({
+      ...prevData,
+      [badgeType]: '', // Set badge URL to an empty string
+    }));
+  };
+
   return (
-    <Home> {/* Wrapping the Profile component content inside the Home component */}
+    <Home>
       <div className="flex justify-center items-start space-x-5">
-        {/* Profile Card on the left side */}
         <ProfileCard profileData={profileData} ojtTime={ojtTime} handleEditClick={handleEditClick} />
 
         <div className="flex flex-col space-y-8">
-          {/* Badges, About Me, and Directory sections on the right side */}
           <ProfileBadges
             badgeOne={profileData.badgeOne}
             badgeTwo={profileData.badgeTwo}
             badgeThree={profileData.badgeThree}
+            onEditClick={handleEditBadgesClick}
+            onDeleteBadge={handleDeleteBadge}
           />
           <ProfileAbout about={profileData.about} />
           <ProfileDirectory />
         </div>
 
-        {/* Modal for editing profile */}
         {modalOpen && (
           <EditProfileModal
             profileData={profileData}
             onClose={handleCloseModal}
             onSave={handleSaveProfile}
+          />
+        )}
+
+        {editBadgesModalOpen && (
+          <EditBadgesModal
+            badges={profileData}
+            onClose={handleCloseEditBadgesModal}
+            onSave={handleSaveBadges}
           />
         )}
       </div>
