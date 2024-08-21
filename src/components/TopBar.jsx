@@ -77,7 +77,7 @@ const TopBar = () => {
                         }}
                     >
                         {notifications.length > 0 ? (
-                            notifications.map((notification) => (
+                            [...notifications].reverse().map((notification) => (
                                 <MenuItem
                                     key={notification.id}
                                     onClick={() => {
