@@ -3,48 +3,20 @@ import Home from './Home'; // Import the Home component
 import TaskCard from '../components/TaskCard'; // Import the TaskCard component
 import IssuesCard from '../components/IssuesCard'; // Import the IssuesCard component
 import ArchiveCard from '../components/ArchiveCard'; // Import the ArchiveCard component
-import axios from 'axios';
+
 
 const TaskDeliverables = () => {
   const [activeTab, setActiveTab] = useState('Task');
-  const [tasks, setTasks] = useState([]);
-  const [issues, setIssues] = useState([]);
-  const [archives, setArchives] = useState([]);
 
-  useEffect(() => {
-    // Fetch tasks
-    axios
-      .get('http://mrs-woo1.local/wp-json/wp/v2/task')
-      .then((response) => {
-        setTasks(response.data);
-      })
-      .catch((error) => console.error('Error fetching tasks:', error));
-
-    // Fetch issues
-    axios
-      .get('http://mrs-woo1.local/wp-json/wp/v2/issues')
-      .then((response) => {
-        setIssues(response.data);
-      })
-      .catch((error) => console.error('Error fetching issues:', error));
-
-    // Fetch archives
-    axios
-      .get('http://mrs-woo1.local/wp-json/wp/v2/archives')
-      .then((response) => {
-        setArchives(response.data);
-      })
-      .catch((error) => console.error('Error fetching archives:', error));
-  }, []);
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'Task':
-        return <TaskCard initialTasks={tasks} />;
+        return <TaskCard />;
       case 'Issues':
-        return <IssuesCard initialIssues={issues} />;
+        return <IssuesCard />;
       case 'Archive':
-        return <ArchiveCard initialArchives={archives} />;
+        return <ArchiveCard />;
       default:
         return null;
     }

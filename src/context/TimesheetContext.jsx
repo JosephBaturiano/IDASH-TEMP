@@ -1,10 +1,55 @@
-// TimesheetContext.js to display Time Rendered to TopBar
-import React, { createContext, useState, useContext } from 'react';
+// TimesheetContext.js
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 
 const TimesheetContext = createContext();
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
+const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
+const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
+const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
+
 export function TimesheetProvider({ children }) {
   const [timesheets, setTimesheets] = useState([]);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    // Fetch the current user ID
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
+      headers: { 'Authorization': AUTH_HEADER }
+    })
+    .then(response => {
+      setUserId(response.data.id);
+    })
+    .catch(error => console.error('Error fetching user info:', error));
+  }, []);
+
+  useEffect(() => {
+    if (userId) {
+      // Fetch timesheets based on user ID
+      axios.get(`${API_BASE_URL}?author=${userId}`, {
+        headers: { 'Authorization': AUTH_HEADER }
+      })
+      .then(response => {
+        if (Array.isArray(response.data)) {
+          const formattedPosts = response.data.map(post => ({
+            id: post.id,
+            taskNumber: post.acf.task_number,
+            description: post.acf.task_description,
+            timeStarted: post.acf.time_started,
+            timeEnded: post.acf.time_ended,
+            withWhom: post.acf.with_whom,
+            deliverables: post.acf.deliverables,
+            date: post.acf.date_created,
+          }));
+          setTimesheets(formattedPosts);
+        } else {
+          console.error('API Response is not an array:', response.data);
+        }
+      })
+      .catch(error => console.error('Error fetching timesheets:', error));
+    }
+  }, [userId]);
 
   return (
     <TimesheetContext.Provider value={{ timesheets, setTimesheets }}>
