@@ -4,9 +4,8 @@ import Home from './Home';
 import ZoomCard from '../components/ZoomCard';
 import ProjectCard from '../components/ProjectCard';
 import Calendar from '../components/Calendar';
-import NotificationCard from '../components/NotificationCard'; // Ensure correct import
-import ReactLogo from '../assets/ReactLogo.png';
-import TensorFlow from '../assets/TensorFlow.png';
+import NotificationCard from '../components/NotificationCard'; 
+
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState([]);

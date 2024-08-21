@@ -5,8 +5,10 @@ import TimeSheetCard from '../components/TimeSheetCard';
 import AddTimesheetModal from '../components/AddTimesheetModal';
 import EditTimesheetModal from '../components/EditTimesheetModal';
 import Home from './Home';
-import TimeRendered from '../components/TimeRendered'; // Import the new component
 import { useTimesheets } from '../context/TimesheetContext'; // Adjust the import path
+import { PictureAsPdf } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
+import WeeklyContent from '../components/WeeklyContent'; 
 
 
 
@@ -34,7 +36,7 @@ const formatTime = (time) => {
   // Format the time to g:i a (12-hour clock without leading zeroes and with lowercase am/pm)
   const options = { hour: 'numeric', minute: 'numeric', hour12: true };
   const formatter = new Intl.DateTimeFormat('en-US', options);
-  
+
   // Get formatted time and convert to lowercase
   const formattedTime = formatter.format(date).toLowerCase();
 
@@ -113,12 +115,12 @@ const TimeSheet = () => {
         'Authorization': AUTH_HEADER,
       },
     })
-    .then(response => {
-      setUserId(response.data.id);
-    })
-    .catch(error => {
-      console.error('Error fetching user info:', error);
-    });
+      .then(response => {
+        setUserId(response.data.id);
+      })
+      .catch(error => {
+        console.error('Error fetching user info:', error);
+      });
   }, []);
 
   useEffect(() => {
@@ -268,6 +270,10 @@ const TimeSheet = () => {
     }
   };
 
+  const handleGeneratePdf = () => {
+    console.log('Generate PDF clicked');
+  };
+
   return (
     <Home>
       <div className="p-4">
@@ -283,6 +289,16 @@ const TimeSheet = () => {
               className="border border-gray-300 rounded-lg px-3 py-2"
             />
           </div>
+
+          <div className="m-4">
+        <Link
+          to="/weekly"
+          className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors duration-300"
+        >
+          <PictureAsPdf />
+          Generate PDF
+        </Link>
+      </div>
 
           {/* Add Timesheet Button */}
           <button
