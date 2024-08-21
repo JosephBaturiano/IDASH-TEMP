@@ -8,10 +8,10 @@ const WeeklyHeader = () => {
         <img
           src={PUPLogo}
           alt="PUP Logo"
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain ml-8"
         />
       </div>
-      <div className="text-left flex-1 ml-4">
+      <div className="text-left flex-1 ml-14">
         <h3 className="text-lg font-semibold">Republic of the Philippines</h3>
         <h3 className="text-lg font-bold">POLYTECHNIC UNIVERSITY OF THE PHILIPPINES</h3>
         <p className="text-base">Office of the Vice President for Academic Affairs</p>
