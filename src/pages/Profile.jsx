@@ -6,6 +6,7 @@ import ProfileAbout from '../components/ProfileAbout';
 import ProfileDirectory from '../components/ProfileDirectory';
 import EditProfileModal from '../components/EditProfileModal';
 import EditBadgesModal from '../components/EditBadgesModal';
+import EditAboutModal from '../components/EditAboutModal'; // Import the EditAboutModal
 import Home from './Home';
 
 const Profile = () => {
@@ -22,6 +23,7 @@ const Profile = () => {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [editBadgesModalOpen, setEditBadgesModalOpen] = useState(false);
+  const [editAboutModalOpen, setEditAboutModalOpen] = useState(false); // State for the EditAboutModal
   const ojtTime = "00:00:00";
 
   useEffect(() => {
@@ -96,6 +98,7 @@ const Profile = () => {
         ...prevData,
         ...updatedProfileData,
       }));
+      handleCloseModal();
     })
     .catch((error) => {
       console.error('Error updating profile:', error);
@@ -125,6 +128,22 @@ const Profile = () => {
     }));
   };
 
+  const handleEditAboutClick = () => {
+    setEditAboutModalOpen(true); // Open the "Edit About Me" modal
+  };
+
+  const handleCloseEditAboutModal = () => {
+    setEditAboutModalOpen(false);
+  };
+
+  const handleSaveAbout = (updatedAbout) => {
+    setProfileData(prevData => ({
+      ...prevData,
+      about: updatedAbout, // Update the "About Me" section
+    }));
+    handleCloseEditAboutModal();
+  };
+
   return (
     <Home>
       <div className="flex justify-center items-start space-x-5">
@@ -138,7 +157,7 @@ const Profile = () => {
             onEditClick={handleEditBadgesClick}
             onDeleteBadge={handleDeleteBadge}
           />
-          <ProfileAbout about={profileData.about} />
+          <ProfileAbout about={profileData.about} onEditClick={handleEditAboutClick} />
           <ProfileDirectory />
         </div>
 
@@ -155,6 +174,14 @@ const Profile = () => {
             badges={profileData}
             onClose={handleCloseEditBadgesModal}
             onSave={handleSaveBadges}
+          />
+        )}
+
+        {editAboutModalOpen && (
+          <EditAboutModal
+            about={profileData.about}
+            onClose={handleCloseEditAboutModal}
+            onSave={handleSaveAbout}
           />
         )}
       </div>
