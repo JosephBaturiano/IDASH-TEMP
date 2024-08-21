@@ -1,6 +1,6 @@
 import React from 'react';
 
-const WeeklyContent = () => {
+const WeeklyContent = ({ description }) => {
   return (
     <div>
       {/* Table */}
@@ -15,23 +15,46 @@ const WeeklyContent = () => {
           <tr className="border border-black">
             <td className="border border-black px-4 py-2">July 24, 2024</td>
             <td className="border border-black px-4 py-2">
-              Completing the Gforms: Application for Unpaid Part-Time IT Internship Program
-              <br />Download and Install Local
-              <br />Read and Understand Markdown
-              <br />Install Screencastify Chrome Extension
-              <br />Install Katalon Recorder Chrome Extension
-            </td>
+              {description || 'No description available'} 
+            </td>   
           </tr>
           <tr className="border border-black">
-            <td className="border border-black px-4 py-2">July 25, 2024</td>
+            <td className="border border-black px-4 py-2">July 24, 2024</td>
             <td className="border border-black px-4 py-2">
-              Daily Meeting
-              <br />Team Meeting
-              <br />Research WordPress and Elementor
-              <br />Watch Basic WordPress and Elementor Pro Tutorial
-            </td>
+              {description || 'No description available'} 
+            </td>   
           </tr>
-          {/* Add more rows as needed */}
+
+          <tr className="border border-black">
+            <td className="border border-black px-4 py-2">July 24, 2024</td>
+            <td className="border border-black px-4 py-2">
+              {description || 'No description available'} 
+            </td>   
+          </tr>
+          <tr className="border border-black">
+            <td className="border border-black px-4 py-2">July 24, 2024</td>
+            <td className="border border-black px-4 py-2">
+              {description || 'No description available'} 
+            </td>   
+          </tr>
+          <tr className="border border-black">
+            <td className="border border-black px-4 py-2">July 24, 2024</td>
+            <td className="border border-black px-4 py-2">
+              {description || 'No description available'} 
+            </td>   
+          </tr>
+          <tr className="border border-black">
+            <td className="border border-black px-4 py-2">July 24, 2024</td>
+            <td className="border border-black px-4 py-2">
+              {description || 'No description available'} 
+            </td>   
+          </tr>
+                    <tr className="border border-black">
+            <td className="border border-black px-4 py-2">July 24, 2024</td>
+            <td className="border border-black px-4 py-2">
+              {description || 'No description available'} 
+            </td>   
+          </tr>
         </tbody>
       </table>
     </div>

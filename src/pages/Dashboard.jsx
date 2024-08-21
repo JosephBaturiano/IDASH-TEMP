@@ -4,8 +4,7 @@ import ZoomCard from '../components/ZoomCard';
 import ProjectCard from '../components/ProjectCard';
 import Calendar from '../components/Calendar';
 import NotificationCard from '../components/NotificationCard';
-import ReactLogo from '../assets/ReactLogo.png';
-import TensorFlow from '../assets/TensorFlow.png';
+
 
 const Dashboard = () => {
   const notifications = [

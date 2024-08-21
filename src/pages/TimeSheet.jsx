@@ -8,6 +8,7 @@ import Home from './Home';
 import { useTimesheets } from '../context/TimesheetContext'; // Adjust the import path
 import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import WeeklyContent from '../components/WeeklyContent'; 
 
 
 
@@ -270,9 +271,7 @@ const TimeSheet = () => {
   };
 
   const handleGeneratePdf = () => {
-    // Logic to generate PDF using Puppeteer or any other method you prefer
     console.log('Generate PDF clicked');
-    // You can either redirect to a PDF generation endpoint or handle it in the frontend
   };
 
   return (
