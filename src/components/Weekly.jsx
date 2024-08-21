@@ -1,11 +1,13 @@
-import React, { useRef } from 'react';
-import WeeklyHeader from '../components/WeeklyHeader';
+import { useTimesheets } from '../context/TimesheetContext';
 import WeeklyContent from '../components/WeeklyContent';
+import WeeklyHeader from '../components/WeeklyHeader';
 import WeeklyFooter from '../components/WeeklyFooter';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import React, { useRef } from 'react';
 
-const Weekly = () => {
+function Weekly() {
+  const { timesheets } = useTimesheets();
   const reportRef = useRef();
 
   const handleDownload = async () => {
@@ -15,7 +17,7 @@ const Weekly = () => {
     const pdf = new jsPDF('p', 'mm', [216, 330]); // 8.5 x 13 inches
     const pdfWidth = pdf.internal.pageSize.width;
     const pdfHeight = pdf.internal.pageSize.height;
-    
+
     // Calculate the scaling ratio to fit the content within the page
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
@@ -30,95 +32,80 @@ const Weekly = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 relative">
-      {/* Download Button */}
+    <div>
+      {/* Download PDF Button */}
       <button
         onClick={handleDownload}
-        className="absolute top-0 right-0 m-4 bg-blue-500 text-white px-4 py-2 rounded shadow"
+        className="absolute top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 z-10"
       >
-        Download
+        Download PDF
       </button>
-      
-      {/* Main Container */}
+
       <div
         ref={reportRef}
-        className="relative bg-white shadow-md rounded-lg"
-        style={{ width: '816px', height: '1248px' }} 
+        className="relative mx-auto bg-white"
+        style={{ width: '8.5in', height: '13in', boxShadow: '0 0 5px rgba(0, 0, 0, 0.1)' }}
       >
-        {/* Header */}
-        
-        <header className="w-full mb-2"> {/* Added margin-bottom */}
+        <div className="flex flex-col h-full">
           <WeeklyHeader />
           <hr className="border-t border-black" />
-        </header>
-        
-        {/* Content */}
-        <main className="w-full px-12 py-40">
-          <div className="space-y-8"> {/* Added space between sections */}
-            <h1 className="text-center text-lg font-bold">
-              CMPE 30213 On-The-Job Training 2 (300 hours)
-            </h1>
-            <h2 className="text-center text-lg mb-8 font-bold">
-              STUDENT’S WEEKLY REPORT ON ACTIVITIES
-            </h2>
-
-            {/* Student Information */}
-            <div className="grid grid-cols-1 gap-2">
+          <div className="flex-1 p-4 overflow-y-auto">
+            <div className="space-y-8">
+              <h1 className="text-center text-lg font-bold">
+                CMPE 30213 On-The-Job Training 2 (300 hours)
+              </h1>
+              <h2 className="text-center text-lg mb-8 font-bold">
+                STUDENT’S WEEKLY REPORT ON ACTIVITIES
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-1 pl-6 pt-2">
               <div className="flex justify-between">
-                <span className="font-bold">Name of Student:</span>
-                {/* Add student name here */}
+                <span className="font-semibold">Name of Student:</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-bold">Company Name:</span>
-                {/* Add company name here */}
+                <span className="font-semibold">Company Name:</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-bold">Company Address:</span>
-                {/* Add company address here */}
+                <span className="font-semibold">Company Address:</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-bold">OJT Adviser/s:</span>
-                {/* Add OJT adviser here */}
+                <span className="font-semibold">OJT Adviser/s:</span>
               </div>
             </div>
-
-            {/* Week Information */}
-            <div className="text-center font-bold text-lg">
+            <div className="text-center font-bold text-lg pt-5 mb-5">
               WEEK 0 (July 24, 2024 – July 26, 2024)
             </div>
+            <div className='px-8'>
+              {timesheets.map((timesheet) => (
+                <WeeklyContent
+                  key={timesheet.id}
+                  description={timesheet.description}
+                  date={timesheet.date}
+                />
 
-            {/* Table */}
-            <WeeklyContent />
+              ))}</div>
+          </div>
+          <div className="flex justify-between mx-14 mb-12">
+            <div className="text-center">
+              <div className="h-24"></div>
+              <p className="italic mb-7">Prepared By:</p>
+              <p className="font-bold">Jonas Brian R. Macacua</p>
+              <p>Trainee/Student</p>
+            </div>
 
-            {/* Signatures */}
-            <div className="flex justify-between mt-12">
-              <div className="text-center">
-                <div className="h-24">
-                  {/* Signature Image can go here */}
-                </div>
-                <p className="font-bold">Jonas Brian R. Macacua</p>
-                <p>Trainee/Student</p>
-              </div>
-
-              <div className="text-center">
-                <div className="h-24">
-                  {/* Signature Image can go here */}
-                </div>
-                <p className="font-bold">Mr. Rene S. Yap</p>
-                <p>Technical Director</p>
-                <p>VisibleTeam Solutions OPC</p>
-              </div>
+            <div className="text-center">
+              <div className="h-24"></div>
+              <p className="italic mb-7">Verified and Certified By:</p>
+              <p className="font-bold">Mr. Rene S. Yap</p>
+              <p>Technical Director</p>
+              <p>VisibleTeam Solutions OPC</p>
             </div>
           </div>
-        </main>
-        
-        {/* Footer */}
-        <footer className="w-full mt-8"> {/* Added margin-top */}
           <WeeklyFooter />
-        </footer>
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default Weekly;
