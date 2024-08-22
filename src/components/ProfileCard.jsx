@@ -3,8 +3,6 @@ import SchoolIcon from '@mui/icons-material/School';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import CallIcon from '@mui/icons-material/Call';
-
-import EditIcon from '@mui/icons-material/Edit';
 import TimeRendered from './TimeRendered';
 import { useTimesheets } from '../context/TimesheetContext';
 
@@ -44,7 +42,7 @@ const ProfileCard = ({ profileData = {}, handleEditClick }) => {
 
         </div>
         <h2 className="text-center text-2xl font-medium mb-5">{name}</h2>
-        )}
+  
       
 
         <div className="flex flex-col items-center bg-[#c3ffc7] font-bold rounded-3xl shadow-md p-2 mb-6 w-[200px] mx-auto">
