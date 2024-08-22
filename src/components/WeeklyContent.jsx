@@ -1,27 +1,34 @@
 import React from 'react';
 
 function TimesheetItem({ description, date }) {
+  const dateObj = new Date(date);
+  const formattedDate = dateObj.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  // Get the weekday
+  const weekday = dateObj.toLocaleDateString('en-US', {
+    weekday: 'long',
+  });
+
   return (
     <div>
-      {/* Table */}
-      <table className="w-full text-left border-collapse border border-black">
-        <thead>
-          <tr className="border border-black">
-            <th className="border border-black px-4 py-2">DAY</th>
-            <th className="border border-black px-4 py-2">ACTIVITIES</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="border border-black">
-            <td className="border border-black px-4 py-2">
-              {date}
-            </td>
-            <td className="border border-black px-4 py-2">
-              {description}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+          
+      <td>
+        {formattedDate}
+        <br />
+        <span className="text-gray-600">({weekday})</span>
+      </td>
+      <td>
+        <ul>
+          {description.map((desc, index) => (
+            <li key={index}>{desc}</li>
+          ))}
+        </ul>
+      </td>
+   
     </div>
   );
 }
