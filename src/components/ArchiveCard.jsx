@@ -65,17 +65,17 @@ const ArchiveCard = () => {
     const year = dateString.substring(0, 4);
     const month = dateString.substring(5, 7);
     const day = dateString.substring(8, 10);
-    return `${month}/${day}/${year}`;
+    return `${year}-${month}-${day}`;
   };
 
-  if (error) return <p>Error: {error}</p>;
+
 
   return (
     <div>
       <table className="w-full border-collapse border border-gray-200">
         <thead className="bg-gray-100">
           <tr>
-            <th className="border px-4 py-2 text-center">#</th>
+            <th className="border px-4 py-2 text-center">Task Number</th>
             <th className="border px-4 py-2 text-center">Task Description</th>
             <th className="border px-4 py-2 text-center">Date Created</th>
             <th className="border px-4 py-2 text-center">Allocated Time</th>

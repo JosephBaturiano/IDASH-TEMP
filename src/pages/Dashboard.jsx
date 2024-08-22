@@ -32,7 +32,10 @@ const Dashboard = () => {
     fetchTasks();
   }, []);
 
-
+  const formatDate = (dateString) => {
+    return new Date(dateString).toISOString().split('T')[0];
+  };
+  
   // Generate notifications from tasks
   const notifications = tasks.map(task => ({
     message: `NEW POST: ${  task.acf.task_description}`,
