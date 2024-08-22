@@ -131,6 +131,7 @@ function Weekly() {
             <WeeklyHeader />
             <hr className="border-t border-black" />
             <div className="flex-1 p-4">
+
               <div className="space-y-3">
                 <h1 className="text-center text-lg font-bold">
                   CMPE 30213 On-The-Job Training 2 (300 hours)
@@ -138,6 +139,7 @@ function Weekly() {
                 <h2 className="text-center text-lg mb-8 font-bold">
                   STUDENT’S WEEKLY REPORT ON ACTIVITIES
                 </h2>
+
               </div>
               <div className="w-10/12 mx-auto pt-4 text-sm font-semibold">
                 <table className="w-full text-left border-collapse">
