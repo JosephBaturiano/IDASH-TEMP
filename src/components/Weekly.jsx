@@ -1,13 +1,14 @@
+import React from 'react';
 import { useTimesheets } from '../context/TimesheetContext';
 import WeeklyContent from '../components/WeeklyContent';
 import WeeklyHeader from '../components/WeeklyHeader';
 import WeeklyFooter from '../components/WeeklyFooter';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 
 function Weekly() {
-  const { timesheets } = useTimesheets();
+  const { timesheets, user } = useTimesheets();
   const reportRef = useRef();
 
   const handleDownload = async () => {
@@ -18,12 +19,10 @@ function Weekly() {
     const pdfWidth = pdf.internal.pageSize.width;
     const pdfHeight = pdf.internal.pageSize.height;
 
-    // Calculate the scaling ratio to fit the content within the page
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
     const scale = Math.min(pdfWidth / canvasWidth, pdfHeight / canvasHeight);
 
-    // Use the scaling ratio to set the dimensions for the PDF image
     const imgWidth = canvasWidth * scale;
     const imgHeight = canvasHeight * scale;
 
@@ -33,7 +32,6 @@ function Weekly() {
 
   return (
     <div>
-      {/* Download PDF Button */}
       <button
         onClick={handleDownload}
         className="absolute top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 z-10"
@@ -59,17 +57,21 @@ function Weekly() {
               </h2>
             </div>
             <div className="grid grid-cols-1 gap-1 pl-6 pt-2">
-              <div className="flex justify-between">
+              <div className="flex justify">
                 <span className="font-semibold">Name of Student:</span>
+                <p className='ml-4'>{user?.name}</p>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify">
                 <span className="font-semibold">Company Name:</span>
+                <p className='ml-4'>VisibleTeam Solutions OPC</p>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify">
                 <span className="font-semibold">Company Address:</span>
+                <p className='ml-4'>447 Broadway 2nd Floor #306 New York, NY 10013</p>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify">
                 <span className="font-semibold">OJT Adviser/s:</span>
+                <p className='ml-4'>{user?.OJTadviser}</p>
               </div>
             </div>
             <div className="text-center font-bold text-lg pt-5 mb-5">
@@ -82,14 +84,14 @@ function Weekly() {
                   description={timesheet.description}
                   date={timesheet.date}
                 />
-
-              ))}</div>
+              ))}
+            </div>
           </div>
           <div className="flex justify-between mx-14 mb-12">
             <div className="text-center">
               <div className="h-24"></div>
               <p className="italic mb-7">Prepared By:</p>
-              <p className="font-bold">Jonas Brian R. Macacua</p>
+              <p className="font-bold">{user?.name}</p>
               <p>Trainee/Student</p>
             </div>
 
