@@ -21,7 +21,9 @@ export function TimesheetProvider({ children }) {
         id: response.data.id,
         name: response.data.acf.name,
         OJTadviser: response.data.acf.ojt_adviser,
+
         subjectCode: response.data.acf.subject_code,
+
       };
       setUser(userInfo);
     })
