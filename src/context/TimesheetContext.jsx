@@ -1,4 +1,3 @@
-// TimesheetContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
@@ -11,23 +10,29 @@ const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
 
 export function TimesheetProvider({ children }) {
   const [timesheets, setTimesheets] = useState([]);
-  const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Fetch the current user ID
     axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
       headers: { 'Authorization': AUTH_HEADER }
     })
     .then(response => {
-      setUserId(response.data.id);
+      const userInfo = {
+        id: response.data.id,
+        name: response.data.acf.name,
+        OJTadviser: response.data.acf.ojt_adviser,
+        subjectCode: response.data.acf.subject_code,
+      };
+      setUser(userInfo);
     })
     .catch(error => console.error('Error fetching user info:', error));
   }, []);
+  
 
   useEffect(() => {
-    if (userId) {
+    if (user && user.id) {
       // Fetch timesheets based on user ID
-      axios.get(`${API_BASE_URL}?author=${userId}`, {
+      axios.get(`${API_BASE_URL}?author=${user.id}`, {
         headers: { 'Authorization': AUTH_HEADER }
       })
       .then(response => {
@@ -49,10 +54,10 @@ export function TimesheetProvider({ children }) {
       })
       .catch(error => console.error('Error fetching timesheets:', error));
     }
-  }, [userId]);
+  }, [user]);
 
   return (
-    <TimesheetContext.Provider value={{ timesheets, setTimesheets }}>
+    <TimesheetContext.Provider value={{ timesheets, setTimesheets, user }}>
       {children}
     </TimesheetContext.Provider>
   );
