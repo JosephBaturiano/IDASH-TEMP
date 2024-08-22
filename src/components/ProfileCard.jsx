@@ -4,7 +4,12 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import CallIcon from '@mui/icons-material/Call';
 
-const ProfileCard = ({ profileData = {}, ojtTime, handleEditClick }) => {
+import EditIcon from '@mui/icons-material/Edit';
+import TimeRendered from './TimeRendered';
+import { useTimesheets } from '../context/TimesheetContext';
+
+
+const ProfileCard = ({ profileData = {}, handleEditClick }) => {
   const {
     user = '',
     name = '',
@@ -13,6 +18,7 @@ const ProfileCard = ({ profileData = {}, ojtTime, handleEditClick }) => {
     email = '',
     telephone = ''
   } = profileData;
+  const { timesheets } = useTimesheets();
 
   return (
     <div className="flex flex-col items-center h-full">
@@ -35,12 +41,15 @@ const ProfileCard = ({ profileData = {}, ojtTime, handleEditClick }) => {
               Edit
             </div>
           </div>
+
         </div>
         <h2 className="text-center text-2xl font-medium mb-5">{name}</h2>
+        )}
+      
 
-        <div className="flex flex-col items-center bg-[#c3ffc7] rounded-3xl shadow-md p-4 mb-5 w-[300px] mx-auto">
-          <span className="text-xs font-semibold text-gray-600">Time Rendered</span>
-          <span className="text-lg font-medium">{ojtTime}</span>
+        <div className="flex flex-col items-center bg-[#c3ffc7] font-bold rounded-3xl shadow-md p-2 mb-6 w-[200px] mx-auto">
+          <span className="text-xs font-semibold text-gray-600 mb-1">Time Rendered</span>
+          <TimeRendered timesheets={timesheets} />
         </div>
         <div className="space-y-3 px-6">
           <div className="flex items-center space-x-4">

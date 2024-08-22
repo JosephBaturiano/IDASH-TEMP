@@ -1,7 +1,13 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const NotificationCard = ({ notifications }) => {
+  const navigate = useNavigate();
+
+  const handleButtonClick = () => {
+    navigate('/taskdeliverables');
+  };
+
   return (
     <div className="bg-white rounded-lg p-4 shadow-md">
       <h3 className="text-lg font-semibold mb-4">Notifications</h3>
@@ -12,7 +18,10 @@ const NotificationCard = ({ notifications }) => {
               <p className="text-sm text-[20px] pb-2">{notification.message}</p>
               <p className="text-xs text-gray-500 pb-2 text-[20px]">{notification.date}</p>
             </div>
-            <button className="bg-yellow-400 text-black text-[15px] px-2 py-1 rounded">
+            <button 
+              className="bg-yellow-400 text-black text-[15px] px-2 py-1 rounded"
+              onClick={handleButtonClick}
+            >
               {notification.action}
             </button>
           </li>
