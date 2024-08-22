@@ -1,9 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useTimesheets } from '../context/TimesheetContext';
 import WeeklyHeader from '../components/WeeklyHeader';
 import WeeklyFooter from '../components/WeeklyFooter';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import TimesheetItem from '../components/WeeklyContent'; // Import TimesheetItem
 
 function Weekly() {
   const { timesheets, user } = useTimesheets();
@@ -16,24 +17,29 @@ function Weekly() {
     return new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
   };
 
-  const sortedTimesheets = timesheets.sort((a, b) => {
-    const dayA = getDayOfWeek(a.date);
-    const dayB = getDayOfWeek(b.date);
-    return dayOrder.indexOf(dayA) - dayOrder.indexOf(dayB);
-  });
-
-  const groupedTimesheets = sortedTimesheets.reduce((acc, curr) => {
-    const date = new Date(curr.date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+  // Memoize sortedTimesheets and groupedTimesheets
+  const sortedTimesheets = useMemo(() => {
+    return timesheets.sort((a, b) => {
+      const dayA = getDayOfWeek(a.date);
+      const dayB = getDayOfWeek(b.date);
+      return dayOrder.indexOf(dayA) - dayOrder.indexOf(dayB);
     });
-    if (!acc[date]) {
-      acc[date] = [];
-    }
-    acc[date].push(curr.description);
-    return acc;
-  }, {});
+  }, [timesheets]);
+
+  const groupedTimesheets = useMemo(() => {
+    return sortedTimesheets.reduce((acc, curr) => {
+      const date = new Date(curr.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push(curr.description);
+      return acc;
+    }, {});
+  }, [sortedTimesheets]);
 
   const handleDownload = async () => {
     const input = reportRef.current;
@@ -53,7 +59,7 @@ function Weekly() {
 
   useEffect(() => {
     const splitContentIntoSections = () => {
-      const sectionHeight = 500;
+      const sectionHeight = 200;
       let currentHeight = 0;
       let currentSection = [];
       const tempSections = [];
@@ -121,57 +127,62 @@ function Weekly() {
           className="relative mx-auto bg-white mb-8"
           style={{ width: '8.5in', height: '13in', boxShadow: '0 0 5px rgba(0, 0, 0, 0.1)' }}
         >
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col mx-auto h-full w-11/12">
             <WeeklyHeader />
             <hr className="border-t border-black" />
             <div className="flex-1 p-4">
-              <h1 className="text-center text-lg font-bold">
-                CMPE 30213 On-The-Job Training 2 (300 hours)
-              </h1>
-              <h2 className="text-center text-lg mb-8 font-bold">
-                STUDENT’S WEEKLY REPORT ON ACTIVITIES
-              </h2>
-              <div className="grid grid-cols-1 gap-1 pl-6 pt-2">
-                <div className="flex justify">
-                  <span className="font-semibold">Name of Student:</span>
-                  <p className="ml-4">{user?.name}</p>
-                </div>
-                <div className="flex justify">
-                  <span className="font-semibold">Company Name:</span>
-                  <p className="ml-4">VisibleTeam Solutions OPC</p>
-                </div>
-                <div className="flex justify">
-                  <span className="font-semibold">Company Address:</span>
-                  <p className="ml-4">447 Broadway 2nd Floor #306 New York, NY 10013</p>
-                </div>
-                <div className="flex justify">
-                  <span className="font-semibold">OJT Adviser/s:</span>
-                  <p className="ml-4">{user?.OJTadviser}</p>
-                </div>
+              <div className="space-y-3">
+                <h1 className="text-center text-lg font-bold">
+                  CMPE 30213 On-The-Job Training 2 (300 hours)
+                </h1>
+                <h2 className="text-center text-lg mb-8 font-bold">
+                  STUDENT’S WEEKLY REPORT ON ACTIVITIES
+                </h2>
               </div>
-              <div className="text-center font-bold text-lg pt-5 mb-5">
+              <div className="w-10/12 mx-auto pt-4 text-sm font-semibold">
+                <table className="w-full text-left border-collapse">
+                  <tbody>
+                    <tr>
+                      <td className="border-collapse border-black">Name of Student:</td>
+                      <td className="border-b border-black ">{user?.name}</td>
+                    </tr>
+                    <tr>
+                      <td className="border-collapse border-black">Company Name:</td>
+                      <td className="border-b border-black">VisibleTeam LLC</td>
+                    </tr>
+                    <tr>
+                      <td className="border-collapse border-black">Company Address:</td>
+                      <td className="border-b border-black">447 Broadway 2nd Floor #306 New York, NY 10013</td>
+                    </tr>
+                    <tr>
+                      <td className="border-collapse border-black">OJT Adviser/s:</td>
+                      <td className="border-b border-black">{user?.OJTadviser}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="text-center font-bold text-lg pt-5 mb-2">
                 WEEK 0 (July 24, 2024 – July 26, 2024)
               </div>
-              <table className="w-full text-left border-collapse border border-black">
-                <thead>
-                  <tr className="border border-black text-center">
-                    <th className="border border-black px-4 w-40">DAY</th>
-                    <th className="border border-black px-4">ACTIVITIES</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {section.map(({ date, descriptions }) => (
-                    <tr key={date}>
-                      <td className="border border-black px-4">{date}</td>
-                      <td className="border border-black px-4">
-                        {descriptions.map((description, index) => (
-                          <p key={index}>{description}</p>
-                        ))}
-                      </td>
+              <div className='px-8'>
+                <table className="w-full text-left border-collapse border border-black">
+                  <thead>
+                    <tr className="border border-black text-center">
+                      <th className="border border-black px-4 w-40">DAY</th>
+                      <th className="border border-black px-4">ACTIVITIES</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {section.map(({ date, descriptions }) => (
+                      <TimesheetItem
+                        key={date}
+                        date={date}
+                        descriptions={descriptions}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               {/* Footer Section */}
               {index === sections.length - 1 && (
                 <div className="flex justify-between mx-14 mb-12">

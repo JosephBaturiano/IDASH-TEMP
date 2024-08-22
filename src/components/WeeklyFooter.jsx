@@ -6,7 +6,7 @@ const WeeklyFooter = () => {
     <div className="w-full bg-white p-4 mt-auto">
       <div className="flex justify-between items-center">
         {/* Left Side */}
-        <div className="text-sm pl-8 pb-2">
+        <div className="text-xs pl-8">
           <p>Second Floor, College of Engineering and Architecture Building,</p>
           <p>PUP A. Mabini Campus, Anonas Street, Sta. Mesa, Manila 1016</p>
           <p>
@@ -21,7 +21,7 @@ const WeeklyFooter = () => {
         </div>
         
         {/* Right Side - Certifications */}
-        <div className="flex items-center pr-8 pb-2">
+        <div className="flex items-center pr-8">
           <img 
             src={FooterImage}
             alt="SOCOTEC ISO 9001" 
