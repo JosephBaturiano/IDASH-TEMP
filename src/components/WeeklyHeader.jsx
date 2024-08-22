@@ -12,11 +12,11 @@ const WeeklyHeader = () => {
         />
       </div>
       <div className="text-left flex-1 ml-14">
-        <h3 className="text-lg font-semibold">Republic of the Philippines</h3>
-        <h3 className="text-lg font-bold">POLYTECHNIC UNIVERSITY OF THE PHILIPPINES</h3>
-        <p className="text-base">Office of the Vice President for Academic Affairs</p>
-        <p className="text-base font-semibold">COMPUTER ENGINEERING DEPARTMENT</p>
-        <p className="text-base font-semibold">OFFICE OF THE CHAIRPERSON</p>
+        <h3 className="text-xs font-semibold">Republic of the Philippines</h3>
+        <h3 className="text-sm font-bold">POLYTECHNIC UNIVERSITY OF THE PHILIPPINES</h3>
+        <p className="text-xs font-semibold">Office of the Vice President for Academic Affairs</p>
+        <p className="text-base font-bold">COMPUTER ENGINEERING DEPARTMENT</p>
+        <p className="text-base font-bold">OFFICE OF THE CHAIRPERSON</p>
       </div>
     </div>
   );
