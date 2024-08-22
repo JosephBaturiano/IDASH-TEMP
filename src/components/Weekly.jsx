@@ -126,7 +126,7 @@ function Weekly() {
             <hr className="border-t border-black" />
             <div className="flex-1 p-4">
               <h1 className="text-center text-lg font-bold">
-                CMPE 30213 On-The-Job Training 2 (300 hours)
+                {user?.subjectCode} On-The-Job Training 2 (300 hours)
               </h1>
               <h2 className="text-center text-lg mb-8 font-bold">
                 STUDENT’S WEEKLY REPORT ON ACTIVITIES
