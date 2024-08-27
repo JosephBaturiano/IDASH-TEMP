@@ -26,13 +26,17 @@ function Weekly() {
     });
   }, [timesheets]);
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   const groupedTimesheets = useMemo(() => {
     return sortedTimesheets.reduce((acc, curr) => {
-      const date = new Date(curr.date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
+      const date = formatDate(curr.date);
       if (!acc[date]) {
         acc[date] = [];
       }
@@ -40,6 +44,18 @@ function Weekly() {
       return acc;
     }, {});
   }, [sortedTimesheets]);
+
+  const calculateWeekNumber = (date) => {
+    const startDate = new Date('2024-07-22');
+    const currentDate = new Date(date);
+    const differenceInTime = currentDate.getTime() - startDate.getTime();
+    const differenceInWeeks = Math.floor(differenceInTime / (1000 * 3600 * 24 * 7));
+    return differenceInWeeks;
+  };
+
+  const firstDate = sortedTimesheets.length > 0 ? formatDate(sortedTimesheets[0].date) : null;
+  const lastDate = sortedTimesheets.length > 0 ? formatDate(sortedTimesheets[sortedTimesheets.length - 1].date) : null;
+  const weekNumber = firstDate ? calculateWeekNumber(firstDate) : 0;
 
   const handleDownload = async () => {
     const input = reportRef.current;
@@ -59,7 +75,7 @@ function Weekly() {
 
   useEffect(() => {
     const splitContentIntoSections = () => {
-      const sectionHeight = 200;
+      const sectionHeight = 500;
       let currentHeight = 0;
       let currentSection = [];
       const tempSections = [];
@@ -164,7 +180,7 @@ function Weekly() {
                 </table>
               </div>
               <div className="text-center font-bold text-lg pt-5 mb-2">
-                WEEK 0 (July 24, 2024 – July 26, 2024)
+                WEEK {weekNumber} ({firstDate} – {lastDate})
               </div>
               <div className='px-8'>
                 <table className="w-full text-left border-collapse border border-black">
