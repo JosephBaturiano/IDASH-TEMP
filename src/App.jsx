@@ -12,12 +12,14 @@ import 'tailwindcss/tailwind.css'
 import Weekly from './components/Weekly'
 import { TimesheetProvider } from './context/TimesheetContext'
 import { NotificationProvider } from './context/NotificationContext'
+import { ProjectProvider } from './context/ProjectContext'
 
 
 const App = () => {
   return (
     <NotificationProvider>
       <TimesheetProvider>
+        <ProjectProvider>
           <BrowserRouter>
             <Routes>
               <Route path='/' element={<Dashboard />} />
@@ -30,6 +32,7 @@ const App = () => {
               <Route path='/weekly' element={<Weekly />} />
             </Routes>
           </BrowserRouter>
+        </ProjectProvider>
       </TimesheetProvider>
     </NotificationProvider>
   )
