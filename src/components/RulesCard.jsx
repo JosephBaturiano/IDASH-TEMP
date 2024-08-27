@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useAnnouncements } from '../context/AnnouncementContext';
+import { useNotification } from '../context/NotificationContext';
 
 const RulesCard = () => {
-    const { rules, loading, error } = useAnnouncements();
+    const { rules, loading, error } = useNotification();
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;

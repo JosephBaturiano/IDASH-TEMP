@@ -1,8 +1,8 @@
 import React from 'react';
-import { useAnnouncements } from '../context/AnnouncementContext';
+import { useNotification } from '../context/NotificationContext';
 
 const AnnouncementCard = () => {
-    const { announcements, loading, error } = useAnnouncements();
+    const { announcements, loading, error } = useNotification();
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
