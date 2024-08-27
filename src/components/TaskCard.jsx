@@ -2,20 +2,23 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ArchiveIcon from '@mui/icons-material/Archive';
 
-
 const TaskCard = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const authUsername = import.meta.env.VITE_AUTH_USERNAME;
+  const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
+
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}task`, {
+        const response = await axios.get(`${apiBaseUrl}task`, {
           auth: {
-            username: import.meta.env.VITE_AUTH_USERNAME,
-            password: import.meta.env.VITE_AUTH_PASSWORD
-          }
+            username: authUsername,
+            password: authPassword,
+          },
         });
         setTasks(response.data);
       } catch (err) {
@@ -25,7 +28,7 @@ const TaskCard = () => {
       }
     };
     fetchTasks();
-  }, []);
+  }, [apiBaseUrl, authUsername, authPassword]);
 
   const handleStatusChange = async (e, taskId) => {
     const newStatus = e.target.value;
@@ -36,56 +39,70 @@ const TaskCard = () => {
     );
     setTasks(updatedTasks);
     try {
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}task/${taskId}`, {
-        acf: { status: newStatus }
+      await axios.post(`${apiBaseUrl}task/${taskId}`, {
+        acf: { status: newStatus },
       }, {
         auth: {
-          username: import.meta.env.VITE_AUTH_USERNAME,
-          password: import.meta.env.VITE_AUTH_PASSWORD
-        }
+          username: authUsername,
+          password: authPassword,
+        },
       });
     } catch (err) {
       setError(`Failed to update status: ${err.message}`);
     }
   };
 
-  const handleArchive = async (taskId) => {
-    if (window.confirm('Are you sure you want to archive this task?')) {
+  const handleArchive = async (taskNumber) => {
+    const isConfirmed = window.confirm('Are you sure you want to archive this task?');
+  
+    if (isConfirmed) {
       try {
-        // Fetch task details to ensure we send correct data (if required by the API)
-        const taskToArchive = tasks.find(task => task.id === taskId);
-
-        // Make sure taskToArchive is not undefined
-        if (!taskToArchive) {
-          throw new Error('Task not found');
-        }
-
-        // Send request to archive the task
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}archive-task/${taskId}`, {
-          acf: taskToArchive.acf // Adjust if additional data is needed
-        }, {
-          auth: {
-            username: import.meta.env.VITE_AUTH_USERNAME,
-            password: import.meta.env.VITE_AUTH_PASSWORD
+        // Prepare the data to be sent to the API
+        const updatedData = {
+          acf: {
+            task_number: taskNumber,
+            status: 'Archived', // Set status to archived
           },
-          headers: {
-            'Content-Type': 'application/json'
+        };
+  
+        // Post the task to the 'archive' endpoint
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}archive`, // Archive endpoint
+          updatedData,
+          {
+            auth: {
+              username: import.meta.env.VITE_AUTH_USERNAME,
+              password: import.meta.env.VITE_AUTH_PASSWORD,
+            },
+            headers: {
+              'Content-Type': 'application/json',
+            },
           }
-        });
-
-        // Remove task from the current list if archiving succeeded
-        setTasks(tasks.filter(task => task.id !== taskId));
+        );
+  
+        console.log('Task archived successfully:', response.data);
+  
       } catch (err) {
-        console.error('Failed to archive task:', err.response ? err.response.data : err.message);
-        setError(`Failed to archive task: ${err.response ? err.response.data.message : err.message}`);
+        console.error('Error Archiving Task:', err);
+        setError(`Failed to archive task: ${err.message}`);
       }
     }
   };
-
+  
+  
+  
+  
+  
+  
   const formatDate = (dateString) => {
     if (dateString.length !== 8) return 'Invalid date';
     return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
   };
+
+  if (loading) {
+    return <p>Loading tasks...</p>;
+  }
+
   return (
     <div>
       <table className="table-auto w-full">
@@ -97,7 +114,7 @@ const TaskCard = () => {
             <th className="px-4 py-2 text-center">Allocated Time</th>
             <th className="px-4 py-2 text-center">Assigned To</th>
             <th className="px-4 py-2 text-center">Status</th>
-            <th className="px-4 py-2 text-center">Actions</th>
+            <th className="px-4 py-2 text-center">Action</th>
           </tr>
         </thead>
         <tbody>
