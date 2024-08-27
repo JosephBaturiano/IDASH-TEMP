@@ -274,6 +274,28 @@ const TimeSheet = () => {
     console.log('Generate PDF clicked');
   };
 
+  const handleDeleteTimesheet = (itemId) => {
+    // Send a DELETE request to the server
+    axios.delete(`${API_BASE_URL}/${itemId}`, {
+      headers: {
+        'Authorization': AUTH_HEADER,
+      },
+    })
+      .then(() => {
+        console.log('Timesheet deleted:', itemId);
+  
+        // Remove the item from local state
+        setTimesheets(timesheets.filter(item => item.id !== itemId));
+  
+        // Close the edit modal
+        setIsEditModalOpen(false);
+      })
+      .catch((error) => {
+        console.error('Error deleting timesheet:', error);
+        alert('There was an error deleting the timesheet.');
+      });
+  };  
+
   return (
     <Home>
       <div className="p-4">
