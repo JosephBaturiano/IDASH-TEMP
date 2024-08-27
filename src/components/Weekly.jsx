@@ -17,7 +17,6 @@ function Weekly() {
     return new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
   };
 
-  // Memoize sortedTimesheets and groupedTimesheets
   const sortedTimesheets = useMemo(() => {
     return timesheets.sort((a, b) => {
       const dayA = getDayOfWeek(a.date);
@@ -64,7 +63,6 @@ function Weekly() {
       let currentSection = [];
       const tempSections = [];
 
-      // Create a container to measure content height
       const container = document.createElement('div');
       container.style.position = 'absolute';
       container.style.visibility = 'hidden';
@@ -79,8 +77,13 @@ function Weekly() {
         dateElem.style.fontWeight = 'bold';
         row.appendChild(dateElem);
 
-        const descElem = document.createElement('div');
-        descElem.textContent = descriptions.join(', ');
+        const descElem = document.createElement('ul'); // Change to unordered list for bullets
+        descriptions.forEach((desc) => {
+          const listItem = document.createElement('li');
+          listItem.textContent = desc;
+          descElem.appendChild(listItem);
+        });
+        descElem.style.marginLeft = '20px'; // Adjust margin for bullets
         row.appendChild(descElem);
 
         container.appendChild(row);
@@ -96,7 +99,6 @@ function Weekly() {
         currentSection.push({ date, descriptions });
         currentHeight += newSectionHeight;
 
-        // Remove row after measurement
         container.removeChild(row);
       });
 
@@ -125,23 +127,27 @@ function Weekly() {
           key={index}
           ref={reportRef}
           className="relative mx-auto bg-white mb-8"
-          style={{ width: '8.5in', height: '13in', boxShadow: '0 0 5px rgba(0, 0, 0, 0.1)' }}
+          style={{
+            width: '8.5in',
+            height: '13in',
+            boxShadow: '0 0 5px rgba(0, 0, 0, 0.1)',
+            fontFamily: 'Times New Roman, serif', // Set font to Times New Roman
+            fontSize: '12pt',
+          }}
         >
           <div className="flex flex-col mx-auto h-full w-11/12">
             <WeeklyHeader />
             <hr className="border-t border-black" />
             <div className="flex-1 p-4">
-
               <div className="space-y-3">
                 <h1 className="text-center text-lg font-bold">
-                  CMPE 30213 On-The-Job Training 2 (300 hours)
+                  CMPE 205 On-The-Job Training 1 (300 hours)
                 </h1>
                 <h2 className="text-center text-lg mb-8 font-bold">
                   STUDENT’S WEEKLY REPORT ON ACTIVITIES
                 </h2>
-
               </div>
-              <div className="w-10/12 mx-auto pt-4 text-sm font-semibold">
+              <div className="w-10/12 mx-auto pt-4 text-base">
                 <table className="w-full text-left border-collapse">
                   <tbody>
                     <tr>
@@ -164,9 +170,9 @@ function Weekly() {
                 </table>
               </div>
               <div className="text-center font-bold text-lg pt-5 mb-2">
-                WEEK 0 (July 24, 2024 – July 26, 2024)
+                WEEK 4 (August 19, 2024 – August 22, 2024)
               </div>
-              <div className='px-8'>
+              <div className="px-8">
                 <table className="w-full text-left border-collapse border border-black">
                   <thead>
                     <tr className="border border-black text-center">
@@ -185,21 +191,20 @@ function Weekly() {
                   </tbody>
                 </table>
               </div>
-              {/* Footer Section */}
               {index === sections.length - 1 && (
                 <div className="flex justify-between mx-14 mb-12">
                   <div className="text-left">
                     <div className="h-24"></div>
                     <p className="italic mb-7">Prepared By:</p>
                     <p className="font-bold">{user?.name}</p>
-                    <p>Trainee/Student</p>
+                    <p className="italic mb-7">Trainee/Student</p>
                   </div>
                   <div className="text-left">
                     <div className="h-24"></div>
                     <p className="italic mb-7">Verified and Certified By:</p>
                     <p className="font-bold">Mr. Rene S. Yap</p>
-                    <p>Technical Director</p>
-                    <p>VisibleTeam Solutions OPC</p>
+                    <p className="italic">Technical Director</p>
+                    <p className="italic">VisibleTeam Solutions OPC</p>
                   </div>
                 </div>
               )}
