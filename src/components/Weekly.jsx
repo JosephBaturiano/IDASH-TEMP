@@ -58,7 +58,7 @@ function Weekly() {
 
   useEffect(() => {
     const splitContentIntoSections = () => {
-      const sectionHeight = 200;
+      const sectionHeight = 1000; // Adjust this height to better fit your content
       let currentHeight = 0;
       let currentSection = [];
       const tempSections = [];
@@ -71,6 +71,7 @@ function Weekly() {
       Object.entries(groupedTimesheets).forEach(([date, descriptions]) => {
         const row = document.createElement('div');
         row.style.margin = '10px 0';
+        row.style.breakInside = 'avoid'; // Prevent row from breaking inside
 
         const dateElem = document.createElement('span');
         dateElem.textContent = date;
@@ -173,7 +174,10 @@ function Weekly() {
                 WEEK 4 (August 19, 2024 – August 22, 2024)
               </div>
               <div className="px-8">
-                <table className="w-full text-left border-collapse border border-black">
+                <table
+                  className="w-full text-left border-collapse border border-black"
+                  style={{ pageBreakInside: 'avoid' }} // Prevent the table from breaking across pages
+                >
                   <thead>
                     <tr className="border border-black text-center">
                       <th className="border border-black px-4 w-40">DAY</th>
@@ -186,6 +190,7 @@ function Weekly() {
                         key={date}
                         date={date}
                         descriptions={descriptions}
+                        style={{ breakInside: 'avoid' }} // Prevent the table rows from breaking across pages
                       />
                     ))}
                   </tbody>
