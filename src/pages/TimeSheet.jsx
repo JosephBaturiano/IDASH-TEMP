@@ -148,8 +148,8 @@ const TimeSheet = () => {
   const handleAddTimesheet = () => {
     if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
       const postData = {
-        title: newTaskNumber,
-        content: newDescription,
+        title: newDescription,
+        content: `Task Number: ${newTaskNumber}`,
         status: 'publish',
         acf: {
           date_created: new Date().toISOString().split('T')[0], // Use the current date or selected date
