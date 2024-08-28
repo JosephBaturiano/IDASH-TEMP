@@ -5,79 +5,16 @@ import TimeSheetCard from '../components/TimeSheetCard';
 import AddTimesheetModal from '../components/AddTimesheetModal';
 import EditTimesheetModal from '../components/EditTimesheetModal';
 import Home from './Home';
-import { useTimesheets } from '../context/TimesheetContext'; // Adjust the import path
+import { useTimesheets, formatTime } from '../context/TimesheetContext'; // Adjust the import path
 import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import WeeklyContent from '../components/WeeklyContent'; 
-
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
 const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
-
-
-const formatTime = (time) => {
-  if (!time) return 'Invalid time'; // Handle empty or null time values
-
-  const [hours, minutes] = time.split(':').map(Number);
-
-  if (isNaN(hours) || isNaN(minutes)) {
-    console.error(`Invalid time format: ${time}`);
-    return 'Invalid time'; // Handle invalid time format
-  }
-
-  // Create a new Date object to set the time
-  const date = new Date();
-  date.setHours(hours);
-  date.setMinutes(minutes);
-
-  // Format the time to g:i a (12-hour clock without leading zeroes and with lowercase am/pm)
-  const options = { hour: 'numeric', minute: 'numeric', hour12: true };
-  const formatter = new Intl.DateTimeFormat('en-US', options);
-
-  // Get formatted time and convert to lowercase
-  const formattedTime = formatter.format(date).toLowerCase();
-
-  return formattedTime;
-};
-
-
-// Fetch the posts from WordPress and update the state
-const fetchTimesheets = async (authorId, setTimesheets) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}?author=${authorId}`, {
-      headers: {
-        'Authorization': AUTH_HEADER,
-      },
-    });
-
-    // Log the response data for debugging
-    console.log('API Response:', response.data);
-
-    // Ensure that response.data is an array
-    if (Array.isArray(response.data)) {
-      const posts = response.data;
-
-      const formattedPosts = posts.map((post) => ({
-        id: post.id,
-        taskNumber: post.acf.task_number,
-        description: post.acf.task_description,
-        timeStarted: formatTime(post.acf.time_started),
-        timeEnded: formatTime(post.acf.time_ended),
-        withWhom: post.acf.with_whom,
-        deliverables: post.acf.deliverables,
-        date: post.acf.date_created,
-      }));
-      setTimesheets(formattedPosts);
-    } else {
-      console.error('API Response is not an array:', response.data);
-    }
-  } catch (error) {
-    console.error('Error fetching timesheets:', error);
-  }
-};
 
 const TimesheetHeader = () => (
   <thead className="bg-gray-50">
@@ -122,12 +59,6 @@ const TimeSheet = () => {
         console.error('Error fetching user info:', error);
       });
   }, []);
-
-  useEffect(() => {
-    if (userId) {
-      fetchTimesheets(userId, setTimesheets);
-    }
-  }, [userId]);
 
   useEffect(() => {
     if (isModalOpen) {
