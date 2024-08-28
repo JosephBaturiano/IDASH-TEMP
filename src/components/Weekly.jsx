@@ -198,19 +198,22 @@ function Weekly() {
                 <th className="border border-black px-4">ACTIVITIES</th>
               </tr>
             </thead>
-<tbody>
-  {section.map(({ date, description }, index) => {
-    const showDate = index === 0 || section[index - 1].date !== date;
+            <tbody>
+  {section.map((item, index) => {
+    const showDate = index === 0 || section[index - 1].date !== item.date;
+
     return (
       <TimesheetItem
-        key={date + description}
-        date={date}
-        description={description}
+        key={item.date + item.description}
+        date={item.date}
+        description={item.description}
         showDate={showDate}
       />
     );
   })}
 </tbody>
+
+
 
 
           </table>

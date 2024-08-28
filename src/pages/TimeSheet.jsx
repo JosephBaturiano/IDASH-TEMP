@@ -47,37 +47,42 @@ const formatTime = (time) => {
 // Fetch the posts from WordPress and update the state
 const fetchTimesheets = async (authorId, setTimesheets) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}?author=${authorId}`, {
-      headers: {
-        'Authorization': AUTH_HEADER,
-      },
-    });
+    let page = 1;
+    let allTimesheets = [];
+    let hasMore = true;
 
-    // Log the response data for debugging
-    console.log('API Response:', response.data);
+    while (hasMore) {
+      const response = await axios.get(`${API_BASE_URL}?author=${authorId}&page=${page}`, {
+        headers: {
+          'Authorization': AUTH_HEADER,
+        },
+      });
 
-    // Ensure that response.data is an array
-    if (Array.isArray(response.data)) {
-      const posts = response.data;
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        const formattedPosts = response.data.map((post) => ({
+          id: post.id,
+          taskNumber: post.acf.task_number,
+          description: post.acf.task_description,
+          timeStarted: formatTime(post.acf.time_started),
+          timeEnded: formatTime(post.acf.time_ended),
+          withWhom: post.acf.with_whom,
+          deliverables: post.acf.deliverables,
+          date: post.acf.date_created,
+        }));
 
-      const formattedPosts = posts.map((post) => ({
-        id: post.id,
-        taskNumber: post.acf.task_number,
-        description: post.acf.task_description,
-        timeStarted: formatTime(post.acf.time_started),
-        timeEnded: formatTime(post.acf.time_ended),
-        withWhom: post.acf.with_whom,
-        deliverables: post.acf.deliverables,
-        date: post.acf.date_created,
-      }));
-      setTimesheets(formattedPosts);
-    } else {
-      console.error('API Response is not an array:', response.data);
+        allTimesheets = [...allTimesheets, ...formattedPosts];
+        page += 1;
+      } else {
+        hasMore = false;
+      }
     }
+
+    setTimesheets(allTimesheets);
   } catch (error) {
     console.error('Error fetching timesheets:', error);
   }
 };
+
 
 const TimesheetHeader = () => (
   <thead className="bg-gray-50">
