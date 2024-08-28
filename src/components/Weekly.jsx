@@ -6,7 +6,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import TimesheetItem from '../components/WeeklyContent';
 
-const SECTION_HEIGHT = 570; // Height of one section
+const SECTION_HEIGHT = 450; // Height of one section
 const FOOTER_HEIGHT = 50; // Height of the footer
 const CONTENT_HEIGHT = SECTION_HEIGHT - FOOTER_HEIGHT; // Available height for content
 
@@ -37,7 +37,7 @@ function Weekly() {
   }, [sortedTimesheets]);
 
   const calculateWeekNumber = (date) => {
-    const startDate = new Date('2024-07-22');
+    const startDate = new Date('2024-07-15');
     const currentDate = new Date(date);
     const differenceInTime = currentDate - startDate;
     return Math.floor(differenceInTime / (1000 * 3600 * 24 * 7));
@@ -52,46 +52,50 @@ function Weekly() {
     container.style.position = 'absolute';
     container.style.visibility = 'hidden';
     document.body.appendChild(container);
-
+  
     let currentHeight = 0;
     let currentSection = [];
     const tempSections = [];
-
+  
     Object.entries(groupedTimesheets).forEach(([date, descriptions]) => {
       const row = document.createElement('div');
       row.style.margin = '10px 0';
-
+  
       const dateElem = document.createElement('span');
       dateElem.textContent = date;
       dateElem.style.fontWeight = 'bold';
       row.appendChild(dateElem);
-
+  
       const descElem = document.createElement('div');
       descElem.innerHTML = descriptions.map(desc => `<div>${desc}</div>`).join('');
       row.appendChild(descElem);
-
+  
       container.appendChild(row);
       const rowHeight = row.scrollHeight;
-
+  
+      // Check if adding this row would exceed the available content height
       if (currentHeight + rowHeight > CONTENT_HEIGHT) {
+        // If yes, start a new section
         tempSections.push(currentSection);
         currentSection = [{ date, descriptions }];
-        currentHeight = rowHeight;
+        currentHeight = rowHeight; // Reset current height for new section
       } else {
+        // Otherwise, add the row to the current section
         currentSection.push({ date, descriptions });
         currentHeight += rowHeight;
       }
-
+  
       container.removeChild(row);
     });
-
+  
     if (currentSection.length > 0) {
       tempSections.push(currentSection);
     }
-
+  
     document.body.removeChild(container);
     setSections(tempSections);
   }
+  
 
   useEffect(() => {
     splitContentIntoSections();
@@ -175,10 +179,10 @@ function Weekly() {
                   </table>
                 </div>
               )}
-              <div className={`text-center font-bold text-lg pt-5 mb-2 ${index !== 0 ? 'mt-10' : ''}`}>
+              <div className={`text-center font-bold text-lg pt-5 mb-2  ${index !== 0 ? 'mt-10' : ''}`}>
                 WEEK {weekNumber} ({firstDate} – {lastDate})
               </div>
-              <div className="px-8">
+              <div className="px-8 ">
                 <table className="w-full text-left border-collapse border border-black">
                   <thead>
                     <tr className="border border-black text-center">
