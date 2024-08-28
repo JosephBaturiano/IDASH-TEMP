@@ -10,13 +10,10 @@ import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import WeeklyContent from '../components/WeeklyContent'; 
 
-
-
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
 const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
-
 
 const formatTime = (time) => {
   if (!time) return 'Invalid time'; // Handle empty or null time values
@@ -394,6 +391,7 @@ const TimeSheet = () => {
             setWithWhom={setNewWithWhom}
             deliverables={newDeliverables}
             setDeliverables={setNewDeliverables}
+            onDelete={handleDeleteTimesheet}
           />
         )}
       </div>
