@@ -93,7 +93,7 @@ const ProjectProvider = ({ children }) => {
             project_title: project.title.rendered,
             project_created: project.date,
             assigned_to: project.acf.assigned_to,
-            progress: Math.floor(Math.random() * 100),
+            progress: project.acf.progress,
             link: project.link,
             color: predefinedColors[index % predefinedColors.length], // Assign color based on index
           };
