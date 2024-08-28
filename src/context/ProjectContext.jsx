@@ -62,7 +62,7 @@ const ProjectProvider = ({ children }) => {
         console.error('Error fetching user teams:', error);
       }
     };
-
+  
     const fetchProjects = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}project`, {
@@ -70,7 +70,7 @@ const ProjectProvider = ({ children }) => {
             'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`),
           },
         });
-
+  
         const getLogoUrl = async (id) => {
           try {
             const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}media/${id}`, {
@@ -84,7 +84,7 @@ const ProjectProvider = ({ children }) => {
             return '';
           }
         };
-
+  
         const data = await Promise.all(response.data.map(async (project, index) => {
           const logoUrl = project.acf.logo ? await getLogoUrl(project.acf.logo) : '';
           return {
@@ -98,23 +98,24 @@ const ProjectProvider = ({ children }) => {
             color: predefinedColors[index % predefinedColors.length], // Assign color based on index
           };
         }));
-
+  
         setProjects(data);
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
     };
-
+  
     fetchUserTeams();
     fetchProjects();
-
+  
     const intervalId = setInterval(() => {
       fetchUserTeams();
       fetchProjects();
-    }, 1000); // Poll every 1 second
-
+    }, 600000); // Poll every 10 minutes (600000 ms)
+  
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, []);
+  
 
   return (
     <ProjectContext.Provider value={{ projects, userTeams }}>
