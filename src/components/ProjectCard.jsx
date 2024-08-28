@@ -13,11 +13,15 @@ const ProjectCard = ({ logo, project_title, project_created, assigned_to, progre
         <p className="text-[18px] text-gray-800">{formatDate(project_created)}</p>
         <p className="text-[16px] text-gray-800">Assigned: {Array.isArray(assigned_to) ? assigned_to.join(', ') : assigned_to}</p>
         <a href={link} className="text-blue-500" target="_blank" rel="noopener noreferrer">View Project</a>
-        <div className="w-full bg-gray-300 rounded-full h-2.5 mt-2">
-          <div
-            className="h-2.5 rounded-full bg-blue-500"
-            style={{ width: `${progress}%` }}
-          ></div>
+        <div className="flex items-center">
+          <div className="w-full bg-gray-300 rounded-full dark:bg-gray-700 flex items-center">
+            <div
+              className={`text-xs font-medium text-white bg-slate-700 text-left p-1.5 leading-none rounded-full`}
+              style={{width: `${progress}%` }}
+            >
+            </div>
+          </div>
+          <div className="ml-6 text-slate-900 font-bold">{progress}%</div>
         </div>
       </div>
     </div>
