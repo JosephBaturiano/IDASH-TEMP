@@ -25,23 +25,17 @@ const formatTime = (time) => {
     return 'Invalid time'; // Handle invalid time format
   }
 
-  // Create a new Date object to set the time
   const date = new Date();
   date.setHours(hours);
   date.setMinutes(minutes);
 
-  // Format the time to g:i a (12-hour clock without leading zeroes and with lowercase am/pm)
   const options = { hour: 'numeric', minute: 'numeric', hour12: true };
   const formatter = new Intl.DateTimeFormat('en-US', options);
-
-  // Get formatted time and convert to lowercase
   const formattedTime = formatter.format(date).toLowerCase();
 
   return formattedTime;
 };
 
-
-// Fetch the posts from WordPress and update the state
 const fetchTimesheets = async (authorId, setTimesheets) => {
   try {
     const response = await axios.get(`${API_BASE_URL}?author=${authorId}`, {
@@ -50,13 +44,10 @@ const fetchTimesheets = async (authorId, setTimesheets) => {
       },
     });
 
-    // Log the response data for debugging
     console.log('API Response:', response.data);
 
-    // Ensure that response.data is an array
     if (Array.isArray(response.data)) {
       const posts = response.data;
-
       const formattedPosts = posts.map((post) => ({
         id: post.id,
         taskNumber: post.acf.task_number,
@@ -90,7 +81,6 @@ const TimesheetHeader = () => (
   </thead>
 );
 
-
 const TimeSheet = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const { timesheets, setTimesheets } = useTimesheets();
@@ -106,7 +96,6 @@ const TimeSheet = () => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    // Fetch the current user ID from WordPress
     axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
       headers: {
         'Authorization': AUTH_HEADER,
@@ -128,7 +117,6 @@ const TimeSheet = () => {
 
   useEffect(() => {
     if (isModalOpen) {
-      // Reset input fields when the modal opens
       setNewTaskNumber('');
       setNewDescription('');
       setNewTimeStarted('');
@@ -149,7 +137,7 @@ const TimeSheet = () => {
         content: newDescription,
         status: 'publish',
         acf: {
-          date_created: new Date().toISOString().split('T')[0], // Use the current date or selected date
+          date_created: new Date().toISOString().split('T')[0],
           task_number: newTaskNumber,
           task_description: newDescription,
           time_started: newTimeStarted,
@@ -162,35 +150,24 @@ const TimeSheet = () => {
       axios.post(API_BASE_URL, postData, {
         headers: {
           'Authorization': AUTH_HEADER,
-          'Content-Type': 'application/json', // Set Content-Type to application/json
+          'Content-Type': 'application/json',
         },
       })
         .then((response) => {
           console.log('Timesheet added:', response.data);
 
-          // Add to local state with formatted time
           const newTimesheet = {
-            id: response.data.id, // Use the ID returned from the API response
+            id: response.data.id,
             taskNumber: newTaskNumber,
             description: newDescription,
             timeStarted: formatTime(newTimeStarted),
             timeEnded: formatTime(newTimeEnded),
             withWhom: newWithWhom,
             deliverables: newDeliverables,
-            date: selectedDate || new Date().toISOString().split('T')[0], // Default to today if no date selected
+            date: selectedDate || new Date().toISOString().split('T')[0],
           };
 
           setTimesheets([...timesheets, newTimesheet]);
-
-          // Clear input fields
-          setNewTaskNumber('');
-          setNewDescription('');
-          setNewTimeStarted('');
-          setNewTimeEnded('');
-          setNewWithWhom('');
-          setNewDeliverables('');
-
-          // Close modal
           setIsModalOpen(false);
         })
         .catch((error) => {
@@ -233,13 +210,12 @@ const TimeSheet = () => {
       axios.post(`${API_BASE_URL}/${currentEditingItem.id}`, updatedPostData, {
         headers: {
           'Authorization': AUTH_HEADER,
-          'Content-Type': 'application/json', // Set Content-Type to application/json
+          'Content-Type': 'application/json',
         },
       })
         .then((response) => {
           console.log('Timesheet updated:', response.data);
 
-          // Update local state
           const updatedTimesheets = timesheets.map((item) =>
             item.id === currentEditingItem.id
               ? {
@@ -254,8 +230,6 @@ const TimeSheet = () => {
               : item
           );
           setTimesheets(updatedTimesheets);
-
-          // Close modal
           setIsEditModalOpen(false);
         })
         .catch((error) => {
@@ -267,12 +241,7 @@ const TimeSheet = () => {
     }
   };
 
-  const handleGeneratePdf = () => {
-    console.log('Generate PDF clicked');
-  };
-
   const handleDeleteTimesheet = (itemId) => {
-    // Send a DELETE request to the server
     axios.delete(`${API_BASE_URL}/${itemId}`, {
       headers: {
         'Authorization': AUTH_HEADER,
@@ -280,24 +249,19 @@ const TimeSheet = () => {
     })
       .then(() => {
         console.log('Timesheet deleted:', itemId);
-  
-        // Remove the item from local state
         setTimesheets(timesheets.filter(item => item.id !== itemId));
-  
-        // Close the edit modal
         setIsEditModalOpen(false);
       })
       .catch((error) => {
         console.error('Error deleting timesheet:', error);
         alert('There was an error deleting the timesheet.');
       });
-  };  
+  };
 
   return (
     <Home>
       <div className="p-4">
         <div className="flex justify-between items-center mb-4">
-          {/* Date filter */}
           <label htmlFor="date" className="block text-gray-700 font-medium mr-2">Filter by Date:</label>
           <div className="flex-grow">
             <input
@@ -310,16 +274,15 @@ const TimeSheet = () => {
           </div>
 
           <div className="m-4">
-        <Link
-          to="/weekly"
-          className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors duration-300"
-        >
-          <PictureAsPdf />
-          Generate PDF
-        </Link>
-      </div>
+            <Link
+              to="/weekly"
+              className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors duration-300"
+            >
+              <PictureAsPdf />
+              Generate PDF
+            </Link>
+          </div>
 
-          {/* Add Timesheet Button */}
           <button
             onClick={() => setIsModalOpen(true)}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300"
@@ -329,7 +292,6 @@ const TimeSheet = () => {
           </button>
         </div>
 
-        {/* Timesheet Table */}
         <div className="overflow-x-auto mb-4">
           <table className="min-w-full bg-gray-50 border border-gray-200">
             <TimesheetHeader />
@@ -349,10 +311,6 @@ const TimeSheet = () => {
           </table>
         </div>
 
-        {/* Time Rendered Component 
-        <TimeRendered timesheets={timesheets} />*/}
-
-        {/* Add Timesheet Modal */}
         {isModalOpen && (
           <AddTimesheetModal
             isOpen={isModalOpen}
@@ -373,7 +331,6 @@ const TimeSheet = () => {
           />
         )}
 
-        {/* Edit Timesheet Modal */}
         {isEditModalOpen && (
           <EditTimesheetModal
             isOpen={isEditModalOpen}
@@ -391,7 +348,7 @@ const TimeSheet = () => {
             setWithWhom={setNewWithWhom}
             deliverables={newDeliverables}
             setDeliverables={setNewDeliverables}
-            onDelete={handleDeleteTimesheet}
+            onDelete={() => handleDeleteTimesheet(currentEditingItem.id)}
           />
         )}
       </div>
