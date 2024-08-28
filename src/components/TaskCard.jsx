@@ -52,44 +52,58 @@ const TaskCard = () => {
     }
   };
 
-  const handleArchive = async (taskNumber) => {
+  const handleArchive = async (taskId) => {
     const isConfirmed = window.confirm('Are you sure you want to archive this task?');
-  
+    
     if (isConfirmed) {
       try {
-        // Prepare the data to be sent to the API
+        // Fetch the existing task details
+        const response = await axios.get(`${apiBaseUrl}task/${taskId}`, {
+          auth: {
+            username: authUsername,
+            password: authPassword,
+          },
+        });
+
+        const taskToArchive = response.data;
+
+        if (!taskToArchive) {
+          throw new Error('Task not found');
+        }
+
+        // Update the task status to 'Archived'
         const updatedData = {
+          ...taskToArchive,
           acf: {
-            task_number: taskNumber,
-            status: 'Archived', // Set status to archived
+            ...taskToArchive.acf,
+            status: 'Archived',
           },
         };
-  
-        // Post the task to the 'archive' endpoint
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}archive`, // Archive endpoint
+
+        // Post the updated data to the 'archive' endpoint to update the task
+        await axios.post(
+          `${apiBaseUrl}archive/${taskId}`,
           updatedData,
           {
             auth: {
-              username: import.meta.env.VITE_AUTH_USERNAME,
-              password: import.meta.env.VITE_AUTH_PASSWORD,
+              username: authUsername,
+              password: authPassword,
             },
             headers: {
               'Content-Type': 'application/json',
             },
           }
         );
-  
-        console.log('Task archived successfully:', response.data);
-  
+
+        // Remove the archived task from the current list
+        setTasks(tasks.filter(task => task.id !== taskId));
+
       } catch (err) {
-        console.error('Error Archiving Task:', err);
-        setError(`Failed to archive task: ${err.message}`);
+        setError(`Failed to archive: ${err.message}`);
       }
     }
   };
   
-
   const formatDate = (dateString) => {
     if (dateString.length !== 8) return 'Invalid date';
     return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
