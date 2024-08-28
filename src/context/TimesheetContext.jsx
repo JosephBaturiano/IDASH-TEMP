@@ -82,7 +82,7 @@ export function TimesheetProvider({ children }) {
           timeEnded: formatTime(post.acf.time_ended),
           withWhom: post.acf.with_whom,
           deliverables: post.acf.deliverables,
-          date: post.acf.date_created,
+          date: post.date,
         }));
 
         console.log('Formatted timesheets:', formattedPosts);
