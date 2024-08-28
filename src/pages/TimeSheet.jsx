@@ -5,84 +5,16 @@ import TimeSheetCard from '../components/TimeSheetCard';
 import AddTimesheetModal from '../components/AddTimesheetModal';
 import EditTimesheetModal from '../components/EditTimesheetModal';
 import Home from './Home';
-import { useTimesheets } from '../context/TimesheetContext'; // Adjust the import path
+import { useTimesheets, formatTime } from '../context/TimesheetContext'; // Adjust the import path
 import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import WeeklyContent from '../components/WeeklyContent'; 
-
 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
 const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
-
-
-const formatTime = (time) => {
-  if (!time) return 'Invalid time'; // Handle empty or null time values
-
-  const [hours, minutes] = time.split(':').map(Number);
-
-  if (isNaN(hours) || isNaN(minutes)) {
-    console.error(`Invalid time format: ${time}`);
-    return 'Invalid time'; // Handle invalid time format
-  }
-
-  // Create a new Date object to set the time
-  const date = new Date();
-  date.setHours(hours);
-  date.setMinutes(minutes);
-
-  // Format the time to g:i a (12-hour clock without leading zeroes and with lowercase am/pm)
-  const options = { hour: 'numeric', minute: 'numeric', hour12: true };
-  const formatter = new Intl.DateTimeFormat('en-US', options);
-
-  // Get formatted time and convert to lowercase
-  const formattedTime = formatter.format(date).toLowerCase();
-
-  return formattedTime;
-};
-
-
-// Fetch the posts from WordPress and update the state
-const fetchTimesheets = async (authorId, setTimesheets) => {
-  try {
-    let page = 1;
-    let allTimesheets = [];
-    let hasMore = true;
-
-    while (hasMore) {
-      const response = await axios.get(`${API_BASE_URL}?author=${authorId}&page=${page}`, {
-        headers: {
-          'Authorization': AUTH_HEADER,
-        },
-      });
-
-      if (Array.isArray(response.data) && response.data.length > 0) {
-        const formattedPosts = response.data.map((post) => ({
-          id: post.id,
-          taskNumber: post.acf.task_number,
-          description: post.acf.task_description,
-          timeStarted: formatTime(post.acf.time_started),
-          timeEnded: formatTime(post.acf.time_ended),
-          withWhom: post.acf.with_whom,
-          deliverables: post.acf.deliverables,
-          date: post.acf.date_created,
-        }));
-
-        allTimesheets = [...allTimesheets, ...formattedPosts];
-        page += 1;
-      } else {
-        hasMore = false;
-      }
-    }
-
-    setTimesheets(allTimesheets);
-  } catch (error) {
-    console.error('Error fetching timesheets:', error);
-  }
-};
-
 
 const TimesheetHeader = () => (
   <thead className="bg-gray-50">
@@ -129,12 +61,6 @@ const TimeSheet = () => {
   }, []);
 
   useEffect(() => {
-    if (userId) {
-      fetchTimesheets(userId, setTimesheets);
-    }
-  }, [userId]);
-
-  useEffect(() => {
     if (isModalOpen) {
       // Reset input fields when the modal opens
       setNewTaskNumber('');
@@ -153,8 +79,8 @@ const TimeSheet = () => {
   const handleAddTimesheet = () => {
     if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
       const postData = {
-        title: newTaskNumber,
-        content: newDescription,
+        title: newDescription,
+        content: `Task Number: ${newTaskNumber}`,
         status: 'publish',
         acf: {
           date_created: new Date().toISOString().split('T')[0], // Use the current date or selected date
