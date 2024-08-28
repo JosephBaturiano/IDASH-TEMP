@@ -89,11 +89,7 @@ const TaskCard = () => {
     }
   };
   
-  
-  
-  
-  
-  
+
   const formatDate = (dateString) => {
     if (dateString.length !== 8) return 'Invalid date';
     return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
