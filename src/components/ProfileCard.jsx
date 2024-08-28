@@ -9,7 +9,7 @@ import { useTimesheets } from '../context/TimesheetContext';
 
 const ProfileCard = ({ profileData = {}, handleEditClick }) => {
   const {
-    user = '',
+    user_profile = '',
     name = '',
     university = '',
     address = '',
@@ -23,9 +23,9 @@ const ProfileCard = ({ profileData = {}, handleEditClick }) => {
       <div className="bg-white rounded-lg shadow-md w-[400px] p-6 mb-10 h-full relative">
         <div className="relative group">
           <div className="h-[250px] w-[225px] rounded-3xl bg-gray-100 flex items-center justify-center mb-2 mx-auto">
-            {user ? (
+            {user_profile ? (
               <img
-                src={user}
+                src={user_profile}
                 alt="Profile"
                 className="rounded-3xl h-full w-full object-cover"
               />
