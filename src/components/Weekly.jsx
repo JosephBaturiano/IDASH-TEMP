@@ -68,31 +68,33 @@ function Weekly() {
     const tempSections = [];
   
     Object.entries(groupedTimesheets).forEach(([date, descriptions]) => {
-      const row = document.createElement('div');
-      row.style.margin = '10px 0';
+      descriptions.forEach((desc) => {
+        const row = document.createElement('div');
+        row.style.margin = '10px 0';
   
-      const dateElem = document.createElement('span');
-      dateElem.textContent = date;
-      dateElem.style.fontWeight = 'bold';
-      row.appendChild(dateElem);
+        const dateElem = document.createElement('span');
+        dateElem.textContent = date;
+        dateElem.style.fontWeight = 'bold';
+        row.appendChild(dateElem);
   
-      const descElem = document.createElement('div');
-      descElem.textContent = descriptions.join(', ');
-      row.appendChild(descElem);
+        const descElem = document.createElement('div');
+        descElem.textContent = desc;
+        row.appendChild(descElem);
   
-      container.appendChild(row);
-      const rowHeight = row.scrollHeight;
+        container.appendChild(row);
+        const rowHeight = row.scrollHeight;
   
-      if (currentHeight + rowHeight > sectionHeight) {
-        tempSections.push(currentSection);
-        currentSection = [];
-        currentHeight = 0;
-      }
+        if (currentHeight + rowHeight > sectionHeight) {
+          tempSections.push(currentSection);
+          currentSection = [];
+          currentHeight = 0;
+        }
   
-      currentSection.push({ date, descriptions });
-      currentHeight += rowHeight;
+        currentSection.push({ date, description: desc });
+        currentHeight += rowHeight;
   
-      container.removeChild(row);
+        container.removeChild(row);
+      });
     });
   
     if (currentSection.length > 0) {
@@ -102,7 +104,7 @@ function Weekly() {
     document.body.removeChild(container);
     setSections(tempSections);
   }
-
+  
   useEffect(() => {
     splitContentIntoSections();
   }, [groupedTimesheets]);
@@ -196,15 +198,21 @@ function Weekly() {
                 <th className="border border-black px-4">ACTIVITIES</th>
               </tr>
             </thead>
-            <tbody>
-              {section.map(({ date, descriptions }) => (
-                <TimesheetItem
-                  key={date}
-                  date={date}
-                  descriptions={descriptions}
-                />
-              ))}
-            </tbody>
+<tbody>
+  {section.map(({ date, description }, index) => {
+    const showDate = index === 0 || section[index - 1].date !== date;
+    return (
+      <TimesheetItem
+        key={date + description}
+        date={date}
+        description={description}
+        showDate={showDate}
+      />
+    );
+  })}
+</tbody>
+
+
           </table>
         </div>
         {index === sections.length - 1 && (
