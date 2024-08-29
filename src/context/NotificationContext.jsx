@@ -96,7 +96,7 @@ export const NotificationProvider = ({ children }) => {
         fetchData();
 
         // Polling for new notifications every 1 second
-        const id = setInterval(fetchData, 1000);
+        const id = setInterval(fetchData, 600000);
 
         // Cleanup the interval on unmount
         return () => clearInterval(id);

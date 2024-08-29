@@ -16,58 +16,6 @@ const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
 
 
-const formatTime = (time) => {
-  if (!time) return 'Invalid time'; // Handle empty or null time values
-
-  const [hours, minutes] = time.split(':').map(Number);
-
-  if (isNaN(hours) || isNaN(minutes)) {
-    console.error(`Invalid time format: ${time}`);
-    return 'Invalid time'; // Handle invalid time format
-  }
-
-  const date = new Date();
-  date.setHours(hours);
-  date.setMinutes(minutes);
-
-  const options = { hour: 'numeric', minute: 'numeric', hour12: true };
-  const formatter = new Intl.DateTimeFormat('en-US', options);
-  const formattedTime = formatter.format(date).toLowerCase();
-
-  return formattedTime;
-};
-
-const fetchTimesheets = async (authorId, setTimesheets) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}?author=${authorId}`, {
-      headers: {
-        'Authorization': AUTH_HEADER,
-      },
-    });
-
-    console.log('API Response:', response.data);
-
-    if (Array.isArray(response.data)) {
-      const posts = response.data;
-      const formattedPosts = posts.map((post) => ({
-        id: post.id,
-        taskNumber: post.acf.task_number,
-        description: post.acf.task_description,
-        timeStarted: formatTime(post.acf.time_started),
-        timeEnded: formatTime(post.acf.time_ended),
-        withWhom: post.acf.with_whom,
-        deliverables: post.acf.deliverables,
-        date: post.acf.date_created,
-      }));
-      setTimesheets(formattedPosts);
-    } else {
-      console.error('API Response is not an array:', response.data);
-    }
-  } catch (error) {
-    console.error('Error fetching timesheets:', error);
-  }
-};
-
 const TimesheetHeader = () => (
   <thead className="bg-gray-50">
     <tr className="text-gray-700 font-semibold text-center">
