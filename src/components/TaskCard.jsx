@@ -64,26 +64,35 @@ const TaskCard = () => {
             password: authPassword,
           },
         });
-
+    
         const taskToArchive = response.data;
-
+    
         if (!taskToArchive) {
           throw new Error('Task not found');
         }
-
-        // Update the task status to 'Archived'
-        const updatedData = {
-          ...taskToArchive,
+    
+        // Log the task data to verify its structure
+        console.log('Task to Archive:', taskToArchive);
+    
+        // Ensure that 'acf' is structured correctly and set status to 'publish'
+        const postData = {
           acf: {
-            ...taskToArchive.acf,
-            status: 'Archived',
+            task_number: taskToArchive.acf.task_number,
+            task_description: taskToArchive.acf.task_description,
+            date_created: taskToArchive.acf.date_created,
+            allocated_time: taskToArchive.acf.allocated_time,
+            assigned_to: taskToArchive.acf.assigned_to,
+            status: taskToArchive.acf.status, // Ensure this is correct and check if 'publish' is required
           },
+          status: 'publish', // Add this if necessary to publish the task
         };
-
-        // Post the updated data to the 'archive' endpoint to update the task
-        await axios.post(
-          `${apiBaseUrl}archive/${taskId}`,
-          updatedData,
+    
+        console.log('Post Data:', JSON.stringify(postData, null, 2));
+    
+        // Post the data to the archive endpoint
+        const postResponse = await axios.post(
+          `${apiBaseUrl}archive/`,
+          postData,
           {
             auth: {
               username: authUsername,
@@ -94,15 +103,30 @@ const TaskCard = () => {
             },
           }
         );
-
+    
+        console.log('Post Response:', postResponse.data);
+    
+        // Delete the task from the 'task' endpoint
+        await axios.delete(`${apiBaseUrl}task/${taskId}`, {
+          auth: {
+            username: authUsername,
+            password: authPassword,
+          },
+        });
+    
+        console.log(`Task ${taskId} has been deleted from the task list.`);
+    
         // Remove the archived task from the current list
-        setTasks(tasks.filter(task => task.id !== taskId));
-
+        setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+    
       } catch (err) {
+        console.error('Error details:', err.response ? err.response.data : err.message);
         setError(`Failed to archive: ${err.message}`);
       }
     }
   };
+  
+  
   
   const formatDate = (dateString) => {
     if (dateString.length !== 8) return 'Invalid date';
