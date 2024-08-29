@@ -34,7 +34,7 @@ const ojtDocsData = {
         { name: 'UJE', url: 'https://drive.google.com/drive/folders/1FVrZxe_EHkC9e7CkSxKISbDcYCfmo2WM?usp=drive_link' }
       ],
     Templates: [
-        { name: 'TEMPLATES', url: 'https://drive.google.com/drive/folders/1KkWEUTPE-fqLVTYUBIEDsFP6gWznvF_l?usp=drive_link' },
+        { name: 'TEMPLATES', url: 'https://drive.google.com/drive/folders/1PdM4AX-DOswQEenAlyVe2zXrju8vYAMw' },
         
     ]
 };
@@ -53,62 +53,86 @@ const mediaData = [
   { name: 'RTL', url: 'https://drive.google.com/drive/folders/1rlEMOBOqIsyS9LN0JVAjtpkHDT58sH5D?usp=drive_link' },
   { name: 'UJE', url: 'https://drive.google.com/drive/folders/1xDLARpzYg6A3W6RZEuZ1nOqtmCrzLeel?usp=drive_link' }
 ];
-
+  
 const Files = () => {
-  const [activeTab, setActiveTab] = useState('Signed'); // Default tab
+  const [activeTab, setActiveTab] = useState('Signed'); 
 
   const handleTabClick = (tabName) => {
-      setActiveTab(tabName);
+    setActiveTab(tabName);
   };
 
-  return (
+return (
     <Home>
-        <div className="p-5 bg-[#E8F2FA]">
-            <div className="mb-5">
-                <h2 className="text-2xl font-bold mb-4 text-black">OJT Documents</h2>
-                <div className="flex gap-5 mb-5 mx-auto w-3/4 max-w-4xl">
-                    {['Signed', 'Unsigned', 'Templates'].map((tab) => (
-                        <div
-                            key={tab}
-                            className="relative flex items-center cursor-pointer"
-                            onClick={() => handleTabClick(tab)}
-                        >
-                            <img src={folderImage} alt={tab} className="w-21 h-21 object-cover" />
-                            <span className="absolute bottom-2 left-2 text-black font-bold p-1 rounded">{tab}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <hr className="border-t border-gray-400 my-5" />
-            
-            <div>
-                {activeTab && (
-                    <div className="mx-auto mt-8 mb-8 max-w-4xl">
-                        <h2 className="text-lg mb-2 text-black">{activeTab} </h2>
-                        <div className="grid grid-cols-3 gap-4">
-                            {ojtDocsData[activeTab].map((item, index) => (
-                                <OJTDocsCard key={index} name={item.name} url={item.url} />
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            <hr className="border-t border-gray-400 my-5" />
-            <h2 className="text-2xl font-bold mb-4 text-black">Media</h2>
-            <div className="mx-auto mt-8 mb-8 max-w-4xl"> {/* Increased max-width */}
-                
-                <div className="grid grid-cols-3 gap-4 justify-items-center">
-                    {mediaData.map((item, index) => (
-                        <div key={index} className="w-72"> {/* Example: increased width of each item */}
-                            <MediaCard name={item.name} url={item.url} />
-                        </div>
-                    ))}
-                </div>
-            </div>
+      <div className="p-5 bg-[#E8F2FA]">
+        <div className="mb-5">
+          <h2 className="text-2xl font-bold mb-4 text-black">OJT Documents</h2>
+          <div className="flex gap-5 mb-5 mx-auto w-3/4 max-w-4xl">
+            {['Signed', 'Unsigned', 'Templates'].map((tab) => (
+            <div
+            key={tab}
+            className={`relative flex items-center cursor-pointer p-2 rounded-lg overflow-hidden transition-all duration-300 ${
+              activeTab === tab
+                ? 'bg-gray-200' 
+                : 'hover:bg-gray-100'
+            }`}
+            onClick={() => handleTabClick(tab)}
+          >
+            <img src={folderImage} alt={tab} className="w-18 h-18 object-cover" />
+            <span
+              className={`absolute bottom-3 left-5 text-black font-bold p-2 rounded w-full h-full flex items-end text-xl ${
+                activeTab === tab ? 'text-blue-600' : ''
+              }`}
+              style={{ fontSize: '1rem', lineHeight: '1rem' }}
+            >
+              {tab}
+            </span>
+            <div
+              className={`absolute bottom-0 left-0 w-full h-1 transition-transform duration-300 ${
+                activeTab === tab ? 'bg-blue-600' : 'bg-transparent'
+              } ${
+                activeTab === tab ? 'transform scale-x-100' : 'transform scale-x-0'
+              }`}
+            />
+          </div>
           
+            ))}
+          </div>
         </div>
+
+        <hr className="border-t border-gray-400 my-5" />
+        <h2 className="text-2xl font-bold mb-4 text-black">{activeTab} </h2>
+        <div>
+          {activeTab && (
+            <div className="mx-auto mt-8 mb-8 max-w-4xl ">
+              <div className="grid grid-cols-3 gap-4">
+                {ojtDocsData[activeTab].map((item, index) => (
+                  <OJTDocsCard 
+                    key={index} 
+                    name={item.name} 
+                    url={item.url}
+                    className="transition-transform duration-200 hover:scale-105 hover:bg-gray-100" 
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <hr className="border-t border-gray-400 my-5" />
+        <h2 className="text-2xl font-bold mb-4 text-black">Media</h2>
+        <div className="mx-auto mt-8 mb-8 max-w-4xl"> {/* Increased max-width */}
+          <div className="grid grid-cols-3 gap-4 justify-items-center">
+            {mediaData.map((item, index) => (
+              <div 
+                key={index} 
+                className="w-72 transition-transform duration-200 hover:scale-105 hover:bg-gray-100" 
+              >
+                <MediaCard name={item.name} url={item.url} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </Home>
   );
 };
