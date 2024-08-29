@@ -11,6 +11,7 @@ import Home from './Home';
 
 const Profile = () => {
   const [profileData, setProfileData] = useState({
+    full_name: '',
     university: '',
     address: '',
     email: '',
@@ -49,7 +50,7 @@ const Profile = () => {
       const userProfileUrl = acfData['user_profile'] ? await fetchImageUrl(acfData['user_profile']) : '';
 
       setProfileData({
-        name: acfData.name,
+        full_name: acfData.full_name,
         university: acfData.university,
         address: acfData.address,
         email: acfData.email,

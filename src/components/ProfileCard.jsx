@@ -10,7 +10,7 @@ import { useTimesheets } from '../context/TimesheetContext';
 const ProfileCard = ({ profileData = {}, handleEditClick }) => {
   const {
     user_profile = '',
-    name = '',
+    full_name = '',
     university = '',
     address = '',
     email = '',
@@ -41,7 +41,7 @@ const ProfileCard = ({ profileData = {}, handleEditClick }) => {
           </div>
 
         </div>
-        <h2 className="text-center text-2xl font-medium mb-5">{name}</h2>
+        <h2 className="text-center text-2xl font-medium mb-5">{full_name}</h2>
   
       
 

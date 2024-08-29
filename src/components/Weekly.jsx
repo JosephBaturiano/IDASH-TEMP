@@ -133,7 +133,7 @@ function Weekly() {
     }
 
     // Define the name of the PDF file
-    const studentName = user?.name || 'Student';
+    const studentName = user?.full_name || 'Student';
     const fileName = `${studentName} - Week ${weekNumber}.pdf`;
 
     // Save the PDF with the custom name
@@ -181,7 +181,7 @@ function Weekly() {
                     <tbody>
                       <tr>
                         <td className="border-collapse border-black">Name of Student:</td>
-                        <td className="border-b border-black">{user?.name}</td>
+                        <td className="border-b border-black">{user?.full_name}</td>
                       </tr>
                       <tr>
                         <td className="border-collapse border-black">Company Name:</td>
@@ -233,7 +233,7 @@ function Weekly() {
                   <div className="text-left">
                     <div className="h-9"></div>
                     <p className="italic mb-2">Prepared By:</p>
-                    <p className="font-bold">{user?.name}</p>
+                    <p className="font-bold">{user?.full_name}</p>
                     <p className="italic mb-7">Trainee/Student</p>
                   </div>
                   <div className="text-left">

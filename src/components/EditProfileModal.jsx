@@ -14,7 +14,7 @@ const AUTH_HEADER = `Basic ${credentials}`;
 
 const EditProfileModal = ({ onClose, profileData, onSave }) => {
   const [formData, setFormData] = useState({
-    name: profileData.name || '',
+    full_name: profileData.full_name || '',
     university: profileData.university || '',
     address: profileData.address || '',
     email: profileData.email || '',
@@ -43,7 +43,7 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
       url: `${BASE_URL}media`,
       headers: {
         'Authorization': AUTH_HEADER,
-        'Content-Disposition': `attachment; filename=${file.name}`,
+        'Content-Disposition': `attachment; filename=${file.full_name}`,
       },
       data: mediaData,
     };
@@ -66,7 +66,7 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
       }
 
       const data = new FormData();
-      data.append('acf[name]', formData.name);
+      data.append('acf[full_name]', formData.full_name);
       data.append('acf[university]', formData.university);
       data.append('acf[email]', formData.email);
       data.append('acf[address]', formData.address);
@@ -122,9 +122,9 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
         <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
         <form className="space-y-4">
           <TextField
-            label="Name"
-            name="name"
-            value={formData.name}
+            label="Full Name"
+            name="full_name"
+            value={formData.full_name}
             onChange={handleChange}
             fullWidth
             margin="normal"

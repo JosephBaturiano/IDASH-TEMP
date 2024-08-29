@@ -38,7 +38,7 @@ export function TimesheetProvider({ children }) {
     .then(response => {
       const userInfo = {
         id: response.data.id,
-        name: response.data.acf.name,
+        full_name: response.data.acf.full_name,
         OJTadviser: response.data.acf.ojt_adviser,
         subjectCode: response.data.acf.subject_code,
       };
