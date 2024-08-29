@@ -6,7 +6,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import TimesheetItem from '../components/WeeklyContent';
 
-const SECTION_HEIGHT = 450; // Height of one section
+const SECTION_HEIGHT = 700; // Height of one section
 const FOOTER_HEIGHT = 50; // Height of the footer
 const CONTENT_HEIGHT = SECTION_HEIGHT - FOOTER_HEIGHT; // Available height for content
 
@@ -39,7 +39,7 @@ function Weekly() {
   }, [sortedTimesheets]);
 
   const calculateWeekNumber = (date) => {
-    const startDate = new Date('2024-07-15');
+    const startDate = new Date('2024-07-22');
     const currentDate = new Date(date);
     const differenceInTime = currentDate - startDate;
     return Math.floor(differenceInTime / (1000 * 3600 * 24 * 7));
@@ -199,7 +199,7 @@ function Weekly() {
               <div className={`text-center font-bold text-md pt-5 mb-2 ${index !== 0 ? 'mt-10' : ''}`}>
                 WEEK {weekNumber} ({firstDate} – {lastDate})
               </div>
-              <div className="px-8 ">
+              <div className="px-8">
                 <table className="w-full text-left border-collapse border border-black">
 
                   <thead>
