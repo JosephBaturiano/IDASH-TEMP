@@ -5,7 +5,7 @@ import TimeSheetCard from '../components/TimeSheetCard';
 import AddTimesheetModal from '../components/AddTimesheetModal';
 import EditTimesheetModal from '../components/EditTimesheetModal';
 import Home from './Home';
-import { useTimesheets } from '../context/TimesheetContext'; // Adjust the import path
+import { useTimesheets, formatTime } from '../context/TimesheetContext'; // Adjust the import path
 import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import WeeklyContent from '../components/WeeklyContent'; 
@@ -14,6 +14,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
 const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
+
 
 const formatTime = (time) => {
   if (!time) return 'Invalid time'; // Handle empty or null time values
@@ -110,12 +111,6 @@ const TimeSheet = () => {
   }, []);
 
   useEffect(() => {
-    if (userId) {
-      fetchTimesheets(userId, setTimesheets);
-    }
-  }, [userId]);
-
-  useEffect(() => {
     if (isModalOpen) {
       setNewTaskNumber('');
       setNewDescription('');
@@ -133,8 +128,8 @@ const TimeSheet = () => {
   const handleAddTimesheet = () => {
     if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
       const postData = {
-        title: newTaskNumber,
-        content: newDescription,
+        title: newDescription,
+        content: `Task Number: ${newTaskNumber}`,
         status: 'publish',
         acf: {
           date_created: new Date().toISOString().split('T')[0],
