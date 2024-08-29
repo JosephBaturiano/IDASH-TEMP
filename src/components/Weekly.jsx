@@ -152,7 +152,7 @@ function Weekly() {
                 </h2>
               </div>
               {index === 0 && (
-                <div className="w-10/12 mx-auto pt-4 text-base font-semibold">
+                <div className="w-10/12 mx-auto pt-4 text-sm font-semibold">
                   <table className="w-full text-left border-collapse">
                     <tbody>
                       <tr>
@@ -175,15 +175,15 @@ function Weekly() {
                   </table>
                 </div>
               )}
-              <div className={`text-center font-bold text-lg pt-5 mb-2 ${index !== 0 ? 'mt-10' : ''}`}>
+              <div className={`text-center font-bold text-md pt-5 mb-2 ${index !== 0 ? 'mt-10' : ''}`}>
                 WEEK {weekNumber} ({firstDate} – {lastDate})
               </div>
               <div className="px-8">
                 <table className="w-full text-left border-collapse border border-black">
                   <thead>
                     <tr className="border border-black text-center">
-                      <th className="border border-black px-4 w-40">DAY</th>
-                      <th className="border border-black px-4">ACTIVITIES</th>
+                      <th className="border border-black px-4 w-40 text-md">DAY</th>
+                      <th className="border border-black px-4 text-md">ACTIVITIES</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -200,7 +200,7 @@ function Weekly() {
                 </table>
               </div>
               {index === sections.length - 1 && (
-                <div className="flex justify-between mx-14">
+                <div className="flex justify-between mx-14 text-sm">
                   <div className="text-left">
                     <div className="h-9"></div>
                     <p className="italic mb-2">Prepared By:</p>
