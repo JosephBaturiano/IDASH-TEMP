@@ -77,8 +77,19 @@ const TimeSheet = () => {
     }
   }, [isModalOpen]);
 
+  const normalizeDate = (dateString) => {
+    // Normalize date to midnight in local time zone
+    const date = new Date(dateString);
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate()).toISOString().split('T')[0];
+  };
+
   const filteredTimesheets = selectedDate
-    ? timesheets.filter((item) => item.date === selectedDate)
+    ? timesheets.filter((item) => {
+        // Normalize both selectedDate and item.date to YYYY-MM-DD format
+        const itemDate = normalizeDate(item.date);
+        const formattedSelectedDate = normalizeDate(selectedDate);
+        return itemDate === formattedSelectedDate;
+      })
     : timesheets;
 
   const handleAddTimesheet = () => {
