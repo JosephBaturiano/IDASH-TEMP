@@ -19,11 +19,13 @@ function Weekly() {
 
   const getDayOfWeek = (date) => new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
 
+
   const sortedTimesheets = useMemo(() => 
     timesheets.sort((a, b) => dayOrder.indexOf(getDayOfWeek(a.date)) - dayOrder.indexOf(getDayOfWeek(b.date)))
   , [timesheets]);
 
   const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
 
   const groupedTimesheets = useMemo(() => {
     return sortedTimesheets.reduce((acc, curr) => {
@@ -42,6 +44,8 @@ function Weekly() {
     const differenceInTime = currentDate - startDate;
     return Math.floor(differenceInTime / (1000 * 3600 * 24 * 7));
   };
+
+
 
   const firstDate = sortedTimesheets.length > 0 ? formatDate(sortedTimesheets[0].date) : null;
   const lastDate = sortedTimesheets.length > 0 ? formatDate(sortedTimesheets[sortedTimesheets.length - 1].date) : null;
@@ -76,6 +80,7 @@ function Weekly() {
       // Check if adding this row would exceed the available content height
       if (currentHeight + rowHeight > CONTENT_HEIGHT) {
         // If yes, start a new section
+
         tempSections.push(currentSection);
         currentSection = [{ date, descriptions }];
         currentHeight = rowHeight; // Reset current height for new section
@@ -145,7 +150,13 @@ function Weekly() {
           key={index}
           ref={el => (reportRefs.current[index] = el)}
           className="relative mx-auto bg-white mb-8"
-          style={{ width: '8.5in', height: '13in', boxShadow: '0 0 5px rgba(0, 0, 0, 0.1)' }}
+          style={{
+            width: '8.5in',
+            height: '13in',
+            boxShadow: '0 0 5px rgba(0, 0, 0, 0.1)',
+            fontFamily: 'Times New Roman, serif', // Set font to Times New Roman
+            fontSize: '12pt',
+          }}
         >
           <div className="flex flex-col mx-auto h-full w-11/12">
             <WeeklyHeader />
@@ -153,12 +164,13 @@ function Weekly() {
             <div className="flex-1 p-4">
               <div className="space-y-3">
                 <h1 className="text-center text-lg font-bold">
-                  CMPE 30213 On-The-Job Training 2 (300 hours)
+                  CMPE 205 On-The-Job Training 1 (300 hours)
                 </h1>
                 <h2 className="text-center text-lg mb-8 font-bold">
                   STUDENT’S WEEKLY REPORT ON ACTIVITIES
                 </h2>
               </div>
+
               {index === 0 && (
                 <div className="w-10/12 mx-auto pt-4 text-sm font-semibold">
                   <table className="w-full text-left border-collapse">
@@ -189,6 +201,7 @@ function Weekly() {
               </div>
               <div className="px-8 ">
                 <table className="w-full text-left border-collapse border border-black">
+
                   <thead>
                     <tr className="border border-black text-center">
                       <th className="border border-black px-4 w-40 text-md">DAY</th>
@@ -198,11 +211,13 @@ function Weekly() {
                   <tbody>
                     {section.map((item, itemIndex) => (
                       <TimesheetItem
+
                         key={item.date}
                         date={item.date}
                         descriptions={item.descriptions}
                         showDate={itemIndex >= 0}
                         isLastInGroup={itemIndex === section.length - 1}
+
                       />
                     ))}
                   </tbody>
@@ -214,14 +229,14 @@ function Weekly() {
                     <div className="h-9"></div>
                     <p className="italic mb-2">Prepared By:</p>
                     <p className="font-bold">{user?.name}</p>
-                    <p>Trainee/Student</p>
+                    <p className="italic mb-7">Trainee/Student</p>
                   </div>
                   <div className="text-left">
                     <div className="h-9"></div>
                     <p className="italic mb-2">Verified and Certified By:</p>
                     <p className="font-bold">Mr. Rene S. Yap</p>
-                    <p>Technical Director</p>
-                    <p>VisibleTeam Solutions OPC</p>
+                    <p className="italic">Technical Director</p>
+                    <p className="italic">VisibleTeam Solutions OPC</p>
                   </div>
                 </div>
               )}

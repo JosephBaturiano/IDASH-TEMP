@@ -4,6 +4,7 @@ const EditTimesheetModal = ({
     isOpen,
     onClose,
     onSubmit,
+    onDelete, // Add onDelete prop
     taskNumber,
     setTaskNumber,
     description,
@@ -106,6 +107,16 @@ const EditTimesheetModal = ({
                         className="bg-red-500 text-white py-2 px-4 rounded-lg"
                     >
                         Cancel
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (window.confirm("Are you sure you want to delete this entry?")) {
+                                onDelete();
+                            }
+                        }}
+                        className="bg-red-700 text-white py-2 px-4 rounded-lg"
+                    >
+                        Delete
                     </button>
                 </div>
             </div>
