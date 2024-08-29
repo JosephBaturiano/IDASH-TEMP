@@ -20,9 +20,9 @@ function Weekly() {
   const getDayOfWeek = (date) => new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
 
 
-  const sortedTimesheets = useMemo(() => 
+  const sortedTimesheets = useMemo(() =>
     timesheets.sort((a, b) => dayOrder.indexOf(getDayOfWeek(a.date)) - dayOrder.indexOf(getDayOfWeek(b.date)))
-  , [timesheets]);
+    , [timesheets]);
 
   const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -56,27 +56,27 @@ function Weekly() {
     container.style.position = 'absolute';
     container.style.visibility = 'hidden';
     document.body.appendChild(container);
-  
+
     let currentHeight = 0;
     let currentSection = [];
     const tempSections = [];
-  
+
     Object.entries(groupedTimesheets).forEach(([date, descriptions]) => {
       const row = document.createElement('div');
       row.style.margin = '10px 0';
-  
+
       const dateElem = document.createElement('span');
       dateElem.textContent = date;
       dateElem.style.fontWeight = 'bold';
       row.appendChild(dateElem);
-  
+
       const descElem = document.createElement('div');
       descElem.innerHTML = descriptions.map(desc => `<div>${desc}</div>`).join('');
       row.appendChild(descElem);
-  
+
       container.appendChild(row);
       const rowHeight = row.scrollHeight;
-  
+
       // Check if adding this row would exceed the available content height
       if (currentHeight + rowHeight > CONTENT_HEIGHT) {
         // If yes, start a new section
@@ -89,18 +89,18 @@ function Weekly() {
         currentSection.push({ date, descriptions });
         currentHeight += rowHeight;
       }
-  
+
       container.removeChild(row);
     });
-  
+
     if (currentSection.length > 0) {
       tempSections.push(currentSection);
     }
-  
+
     document.body.removeChild(container);
     setSections(tempSections);
   }
-  
+
 
   useEffect(() => {
     splitContentIntoSections();
@@ -110,7 +110,7 @@ function Weekly() {
     const pdf = new jsPDF('p', 'mm', [216, 330]);
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-  
+
     for (let i = 0; i < sections.length; i++) {
       const canvas = await html2canvas(reportRefs.current[i], {
         scale: 2,
@@ -121,18 +121,18 @@ function Weekly() {
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = pageWidth;
       const imgHeight = canvas.height * (imgWidth / canvas.width);
-  
+
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-  
+
       if (i < sections.length - 1) {
         pdf.addPage();
       }
     }
-  
+
     // Define the name of the PDF file
     const studentName = user?.name || 'Student';
     const fileName = `${studentName} - Week ${weekNumber}.pdf`;
-  
+
     // Save the PDF with the custom name
     pdf.save(fileName);
   }
@@ -162,15 +162,16 @@ function Weekly() {
             <WeeklyHeader />
             <hr className="border-t border-black" />
             <div className="flex-1 p-4">
-              <div className="space-y-3">
-                <h1 className="text-center text-lg font-bold">
-                  CMPE 205 On-The-Job Training 1 (300 hours)
-                </h1>
-                <h2 className="text-center text-lg mb-8 font-bold">
-                  STUDENT’S WEEKLY REPORT ON ACTIVITIES
-                </h2>
-              </div>
-
+              {index === 0 && (
+                <div className="space-y-3">
+                  <h1 className="text-center text-lg font-bold">
+                    {user?.subjectCode} (300 hours)
+                  </h1>
+                  <h2 className="text-center text-lg mb-8 font-bold">
+                    STUDENT’S WEEKLY REPORT ON ACTIVITIES
+                  </h2>
+                </div>
+              )}
               {index === 0 && (
                 <div className="w-10/12 mx-auto pt-4 text-sm font-semibold">
                   <table className="w-full text-left border-collapse">
@@ -195,11 +196,12 @@ function Weekly() {
                   </table>
                 </div>
               )}
-
-              <div className={`text-center font-bold text-md pt-5 mb-2 ${index !== 0 ? 'mt-10' : ''}`}>
-                WEEK {weekNumber} ({firstDate} – {lastDate})
-              </div>
-              <div className="px-8">
+              {index === 0 && (
+                <div className={`text-center font-bold text-md pt-5 mb-2 ${index !== 0 ? 'mt-10' : ''}`}>
+                  WEEK {weekNumber} ({firstDate} – {lastDate})
+                </div>
+              )}
+              <div className="px-8 ">
                 <table className="w-full text-left border-collapse border border-black">
 
                   <thead>
