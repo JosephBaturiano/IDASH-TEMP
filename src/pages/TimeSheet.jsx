@@ -8,37 +8,49 @@ import Home from './Home';
 import { useTimesheets, formatTime } from '../context/TimesheetContext'; // Adjust the import path
 import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
-import WeeklyContent from '../components/WeeklyContent';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
 const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
 
-const TimesheetHeader = ({ onSelectAll, isAllSelected }) => (
-  <thead className="bg-gray-50">
-    <tr className="text-gray-700 font-semibold text-center">
-      <th className="px-2 py-2 text-gray-900">Task #</th>
-      <th className="px-2 py-2 text-gray-900">Task Description</th>
-      <th className="px-2 py-2 text-gray-900">Time Started</th>
-      <th className="px-2 py-2 text-gray-900">Time Ended</th>
-      <th className="px-2 py-2 text-gray-900">With Whom</th>
-      <th className="px-2 py-2 text-gray-900">Deliverables</th>
-      <th className="px-2 py-2 text-gray-900">
-        Action
-        <input
-          type="checkbox"
-          checked={isAllSelected}
-          onChange={onSelectAll}
-          className="ml-2"
-        />
-      </th>
-    </tr>
-  </thead>
+const TimesheetHeader = ({ onSelectAll, isAllSelected, onWeekSelect, selectedWeek }) => (
+<thead className="bg-gray-50">
+  <tr className="text-gray-700 font-semibold text-center">
+    <th className="px-2 py-2 text-gray-900">Task #</th>
+    <th className="px-2 py-2 text-gray-900">Task Description</th>
+    <th className="px-2 py-2 text-gray-900">Time Started</th>
+    <th className="px-2 py-2 text-gray-900">Time Ended</th>
+    <th className="px-2 py-2 text-gray-900">With Whom</th>
+    <th className="px-2 py-2 text-gray-900">Deliverables</th>
+    <th className="px-2 py-2 text-gray-900 flex items-center justify-center">
+      <select
+        value={selectedWeek}
+        onChange={(e) => onWeekSelect(Number(e.target.value))}
+        className="mr-2 bg-white border border-gray-300 rounded px-2 py-1"
+      >
+        {[...Array(10).keys()].map(week => (
+          <option key={week} value={week}>Week {week}</option>
+        ))}
+      </select>
+      Action
+      <input
+        type="checkbox"
+        checked={isAllSelected}
+        onChange={onSelectAll}
+        className="ml-2"
+      />
+    </th>
+  </tr>
+</thead>
+
+
 );
+
 
 const TimeSheet = () => {
   const [selectedDate, setSelectedDate] = useState('');
+  const [selectedWeek, setSelectedWeek] = useState(null);
   const { timesheets, setTimesheets } = useTimesheets();
   const [newTaskNumber, setNewTaskNumber] = useState('');
   const [newDescription, setNewDescription] = useState('');
@@ -77,6 +89,8 @@ const TimeSheet = () => {
     }
   }, [isModalOpen]);
 
+
+
   const normalizeDate = (dateString) => {
     // Normalize date to midnight in local time zone
     const date = new Date(dateString);
@@ -85,11 +99,11 @@ const TimeSheet = () => {
 
   const filteredTimesheets = selectedDate
     ? timesheets.filter((item) => {
-        // Normalize both selectedDate and item.date to YYYY-MM-DD format
-        const itemDate = normalizeDate(item.date);
-        const formattedSelectedDate = normalizeDate(selectedDate);
-        return itemDate === formattedSelectedDate;
-      })
+      // Normalize both selectedDate and item.date to YYYY-MM-DD format
+      const itemDate = normalizeDate(item.date);
+      const formattedSelectedDate = normalizeDate(selectedDate);
+      return itemDate === formattedSelectedDate;
+    })
     : timesheets;
 
   const handleAddTimesheet = () => {
@@ -220,6 +234,32 @@ const TimeSheet = () => {
       });
   };
 
+  const getWeekRange = (weekNumber) => {
+    const startDate = new Date('2024-07-22');
+    startDate.setDate(startDate.getDate() + 7 * weekNumber); // Move to the start of the desired week
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 4); // Move to the end of the week (5 days later)
+  
+    const start = startDate.toISOString().split('T')[0];
+    const end = endDate.toISOString().split('T')[0];
+  
+    return { start, end };
+  };
+
+  const handleWeekSelect = (weekNumber) => {
+    setSelectedWeek(weekNumber);
+
+    const { start, end } = getWeekRange(weekNumber);
+
+    setTimesheets(prevTimesheets =>
+      prevTimesheets.map(item => ({
+        ...item,
+        includeInReport: item.date >= start && item.date <= end,
+      }))
+    );
+  };
+
+
   const handleSelectAll = () => {
     setIsAllSelected(!isAllSelected);
     setTimesheets(prevTimesheets =>
@@ -263,6 +303,7 @@ const TimeSheet = () => {
               <PictureAsPdf />
               Generate PDF
             </Link>
+
           </div>
 
           <button
@@ -279,6 +320,8 @@ const TimeSheet = () => {
             <TimesheetHeader
               onSelectAll={handleSelectAll}
               isAllSelected={isAllSelected}
+              onWeekSelect={handleWeekSelect}
+              selectedWeek={selectedWeek}
             />
             <tbody>
               {filteredTimesheets.length === 0 ? (
