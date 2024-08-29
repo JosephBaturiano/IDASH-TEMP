@@ -101,7 +101,7 @@ function Weekly() {
     const pdf = new jsPDF('p', 'mm', [216, 330]);
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-
+  
     for (let i = 0; i < sections.length; i++) {
       const canvas = await html2canvas(reportRefs.current[i], {
         scale: 2,
@@ -112,17 +112,21 @@ function Weekly() {
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = pageWidth;
       const imgHeight = canvas.height * (imgWidth / canvas.width);
-
+  
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-
+  
       if (i < sections.length - 1) {
         pdf.addPage();
       }
     }
-
-    pdf.save('weekly-report.pdf');
+  
+    // Define the name of the PDF file
+    const studentName = user?.name || 'Student';
+    const fileName = `${studentName} - Week ${weekNumber}.pdf`;
+  
+    // Save the PDF with the custom name
+    pdf.save(fileName);
   }
-
   return (
     <div>
       <button
