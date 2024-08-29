@@ -21,8 +21,11 @@ function Weekly() {
 
 
   const sortedTimesheets = useMemo(() =>
-    timesheets.sort((a, b) => dayOrder.indexOf(getDayOfWeek(a.date)) - dayOrder.indexOf(getDayOfWeek(b.date)))
-    , [timesheets]);
+    timesheets
+      .filter(timesheet => timesheet.includeInReport)  // Filter only included timesheets
+      .sort((a, b) => dayOrder.indexOf(getDayOfWeek(a.date)) - dayOrder.indexOf(getDayOfWeek(b.date))),
+    [timesheets]
+  );
 
   const formatDate = (date) => new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 

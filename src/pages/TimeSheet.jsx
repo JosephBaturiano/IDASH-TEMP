@@ -8,15 +8,14 @@ import Home from './Home';
 import { useTimesheets, formatTime } from '../context/TimesheetContext'; // Adjust the import path
 import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
-import WeeklyContent from '../components/WeeklyContent'; 
+import WeeklyContent from '../components/WeeklyContent';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
 const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
 
-
-const TimesheetHeader = () => (
+const TimesheetHeader = ({ onSelectAll, isAllSelected }) => (
   <thead className="bg-gray-50">
     <tr className="text-gray-700 font-semibold text-center">
       <th className="px-2 py-2 text-gray-900">Task #</th>
@@ -25,7 +24,15 @@ const TimesheetHeader = () => (
       <th className="px-2 py-2 text-gray-900">Time Ended</th>
       <th className="px-2 py-2 text-gray-900">With Whom</th>
       <th className="px-2 py-2 text-gray-900">Deliverables</th>
-      <th className="px-2 py-2 text-gray-900">Action</th>
+      <th className="px-2 py-2 text-gray-900">
+        Action
+        <input
+          type="checkbox"
+          checked={isAllSelected}
+          onChange={onSelectAll}
+          className="ml-2"
+        />
+      </th>
     </tr>
   </thead>
 );
@@ -43,6 +50,7 @@ const TimeSheet = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentEditingItem, setCurrentEditingItem] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [isAllSelected, setIsAllSelected] = useState(false);
 
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
@@ -201,6 +209,26 @@ const TimeSheet = () => {
       });
   };
 
+  const handleSelectAll = () => {
+    setIsAllSelected(!isAllSelected);
+    setTimesheets(prevTimesheets =>
+      prevTimesheets.map(item => ({
+        ...item,
+        includeInReport: !isAllSelected,
+      }))
+    );
+  };
+
+  const handleToggleInclude = (id) => {
+    setTimesheets(prev =>
+      prev.map(item =>
+        item.id === id
+          ? { ...item, includeInReport: !item.includeInReport }
+          : item
+      )
+    );
+  };
+
   return (
     <Home>
       <div className="p-4">
@@ -237,7 +265,10 @@ const TimeSheet = () => {
 
         <div className="overflow-x-auto mb-4">
           <table className="min-w-full bg-gray-50 border border-gray-200">
-            <TimesheetHeader />
+            <TimesheetHeader
+              onSelectAll={handleSelectAll}
+              isAllSelected={isAllSelected}
+            />
             <tbody>
               {filteredTimesheets.length === 0 ? (
                 <tr>
@@ -247,7 +278,7 @@ const TimeSheet = () => {
                 </tr>
               ) : (
                 filteredTimesheets.map((item) => (
-                  <TimeSheetCard key={item.id} item={item} onEdit={handleEditTimesheet} />
+                  <TimeSheetCard key={item.id} item={item} onEdit={handleEditTimesheet} onToggleInclude={handleToggleInclude} />
                 ))
               )}
             </tbody>
