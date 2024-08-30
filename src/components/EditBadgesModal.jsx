@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
-import Button from '@mui/material/Button'; // Import the Button component
+import Button from '@mui/material/Button';
+import axios from 'axios';
 
 const EditBadgesModal = ({ badges, onClose, onSave }) => {
-  const [newBadges, setNewBadges] = useState({
-    badgeOne: badges.badgeOne,
-    badgeTwo: badges.badgeTwo,
-    badgeThree: badges.badgeThree,
-  });
   const [files, setFiles] = useState({
     badgeOne: null,
     badgeTwo: null,
@@ -14,66 +10,76 @@ const EditBadgesModal = ({ badges, onClose, onSave }) => {
   });
 
   const handleFileChange = (e) => {
-    const { name, files: selectedFiles } = e.target;
-    if (selectedFiles.length > 0) {
-      const file = selectedFiles[0];
-      const fileUrl = URL.createObjectURL(file);
-      setNewBadges((prevBadges) => ({
-        ...prevBadges,
-        [name]: fileUrl,
-      }));
-      setFiles((prevFiles) => ({
-        ...prevFiles,
-        [name]: file,
-      }));
+    const { name, files: fileList } = e.target;
+    if (fileList.length > 0) {
+      setFiles(prevFiles => ({ ...prevFiles, [name]: fileList[0] }));
+    }
+  };
+
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}media`,
+        formData,
+        {
+          headers: {
+            'Authorization': 'Basic ' + btoa(import.meta.env.VITE_AUTH_USERNAME + ':' + import.meta.env.VITE_AUTH_PASSWORD),
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      console.log('Upload response:', response.data); // Log the full response
+      return response.data.id;
+    } catch (error) {
+      console.error('Error uploading image:', error.response ? error.response.data : error.message); // Log detailed error
+      return '';
     }
   };
 
   const handleSubmit = async () => {
-    const uploadPromises = Object.keys(files).map(async (key) => {
-      if (files[key]) {
-        const uploadedUrl = await uploadFile(files[key]);
-        return { [key]: uploadedUrl };
-      }
-      return {};
-    });
+    try {
+      // Initialize badge media IDs
+      let badgeOneId = badges.badgeOne;
+      let badgeTwoId = badges.badgeTwo;
+      let badgeThreeId = badges.badgeThree;
 
-    const uploadedBadges = await Promise.all(uploadPromises);
-    const updatedBadges = uploadedBadges.reduce(
-      (acc, badge) => ({ ...acc, ...badge }),
-      {}
-    );
+      if (files.badgeOne) badgeOneId = await uploadImage(files.badgeOne);
+      if (files.badgeTwo) badgeTwoId = await uploadImage(files.badgeTwo);
+      if (files.badgeThree) badgeThreeId = await uploadImage(files.badgeThree);
 
-    onSave({
-      badgeOne:
-        newBadges.badgeOne || updatedBadges.badgeOne || badges.badgeOne,
-      badgeTwo:
-        newBadges.badgeTwo || updatedBadges.badgeTwo || badges.badgeTwo,
-      badgeThree:
-        newBadges.badgeThree || updatedBadges.badgeThree || badges.badgeThree,
-    });
-    onClose();
-  };
+      // Prepare FormData with ACF badge fields only if they have new IDs
+      const data = new FormData();
+      if (files.badgeOne) data.append('acf[badge-one]', badgeOneId);
+      if (files.badgeTwo) data.append('acf[badge-two]', badgeTwoId);
+      if (files.badgeThree) data.append('acf[badge-three]', badgeThreeId);
 
-  const uploadFile = async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
+      // Update the badges in WordPress
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${import.meta.env.VITE_API_BASE_URL}users/me`,
+        headers: {
+          'Authorization': 'Basic ' + btoa(import.meta.env.VITE_AUTH_USERNAME + ':' + import.meta.env.VITE_AUTH_PASSWORD),
+          // 'Content-Type' will be automatically set by the browser when using FormData
+        },
+        data: data,
+      };
 
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}upload`, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        Authorization:
-          'Basic ' +
-          btoa(
-            import.meta.env.VITE_AUTH_USERNAME +
-              ':' +
-              import.meta.env.VITE_AUTH_PASSWORD
-          ),
-      },
-    });
-    const result = await response.json();
-    return result.source_url;
+      const response = await axios.request(config);
+      console.log('Response:', response.data);
+
+      onSave({
+        badgeOne: badgeOneId,
+        badgeTwo: badgeTwoId,
+        badgeThree: badgeThreeId,
+      });
+      onClose();
+    } catch (error) {
+      console.error('Error saving badges:', error.response ? error.response.data : error.message);
+    }
   };
 
   return (
