@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import Modal from 'react-modal';
 import { TextField, Button } from '@mui/material';
 
+// API Base URLs and Credentials
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const USERNAME = import.meta.env.VITE_AUTH_USERNAME;
+const PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
+
+// Base64 Encode credentials
+const credentials = btoa(`${USERNAME}:${PASSWORD}`);
+const AUTH_HEADER = `Basic ${credentials}`;
+
 const EditProfileModal = ({ onClose, profileData, onSave }) => {
   const [formData, setFormData] = useState({
-    name: profileData.name || '',
+    full_name: profileData.full_name || '',
     university: profileData.university || '',
     address: profileData.address || '',
     email: profileData.email || '',
     telephone: profileData.telephone || '',
-    user: profileData.user || '',
+    user_profile: profileData.user_profile || '',
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -22,19 +32,68 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setSelectedFile(file);
-    setFormData({ ...formData, user: URL.createObjectURL(file) });
   };
 
-  const handleSubmit = () => {
-    const updatedData = { ...formData };
+  const uploadProfilePicture = async (file) => {
+    const mediaData = new FormData();
+    mediaData.append('file', file);
 
-    if (selectedFile) {
-      // Handle file upload here if needed before saving
-      // You may need to add logic to upload the file to the server and get the URL
+    const config = {
+      method: 'post',
+      url: `${BASE_URL}media`,
+      headers: {
+        'Authorization': AUTH_HEADER,
+        'Content-Disposition': `attachment; filename=${file.full_name}`,
+      },
+      data: mediaData,
+    };
+
+    try {
+      const response = await axios.request(config);
+      return response.data.id; // Return the media ID
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      throw error;
     }
+  };
 
-    onSave(updatedData);
-    onClose();
+  const handleSubmit = async () => {
+    try {
+      let mediaId;
+      if (selectedFile) {
+        mediaId = await uploadProfilePicture(selectedFile);
+        setFormData({ ...formData, user_profile: mediaId });
+      }
+
+      const data = new FormData();
+      data.append('acf[full_name]', formData.full_name);
+      data.append('acf[university]', formData.university);
+      data.append('acf[email]', formData.email);
+      data.append('acf[address]', formData.address);
+      data.append('acf[telephone]', formData.telephone);
+
+      if (mediaId) {
+        data.append('acf[user_profile]', mediaId); // Use the media ID to update the profile picture
+      }
+
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${BASE_URL}users/me`,
+        headers: {
+          'Authorization': AUTH_HEADER,
+          // 'Content-Type' will be automatically set by the browser when using FormData
+        },
+        data: data,
+      };
+
+      const response = await axios.request(config);
+      console.log('Response:', response.data);
+      onSave(formData);
+      onClose();
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
   };
 
   const customStyles = {
@@ -63,9 +122,9 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
         <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
         <form className="space-y-4">
           <TextField
-            label="Name"
-            name="name"
-            value={formData.name}
+            label="Full Name"
+            name="full_name"
+            value={formData.full_name}
             onChange={handleChange}
             fullWidth
             margin="normal"

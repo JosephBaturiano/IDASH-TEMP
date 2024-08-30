@@ -11,6 +11,7 @@ import Home from './Home';
 
 const Profile = () => {
   const [profileData, setProfileData] = useState({
+    full_name: '',
     university: '',
     address: '',
     email: '',
@@ -19,7 +20,7 @@ const Profile = () => {
     badgeTwo: '',
     badgeThree: '',
     about: '',
-    user: '',
+    user_profile: '',
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [editBadgesModalOpen, setEditBadgesModalOpen] = useState(false);
@@ -27,6 +28,10 @@ const Profile = () => {
   const ojtTime = "00:00:00";
 
   useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  const fetchProfileData = async () => {
     const config = {
       method: 'get',
       url: import.meta.env.VITE_API_BASE_URL + 'users/me',
@@ -34,33 +39,32 @@ const Profile = () => {
         'Authorization': 'Basic ' + btoa(import.meta.env.VITE_AUTH_USERNAME + ':' + import.meta.env.VITE_AUTH_PASSWORD),
       },
     };
-  
-    axios.request(config)
-      .then(async (response) => {
-        const acfData = response.data.acf;
-  
-        const badgeOneUrl = acfData['badge-one'] ? await fetchImageUrl(acfData['badge-one']) : '';
-        const badgeTwoUrl = acfData['badge-two'] ? await fetchImageUrl(acfData['badge-two']) : '';
-        const badgeThreeUrl = acfData['badge-three'] ? await fetchImageUrl(acfData['badge-three']) : '';
-        const userUrl = acfData['user'] ? await fetchImageUrl(acfData['user']) : '';
-  
-        setProfileData({
-          name: acfData.name,
-          university: acfData.university,
-          address: acfData.address,
-          email: acfData.email,
-          telephone: acfData.telephone,
-          badgeOne: badgeOneUrl,
-          badgeTwo: badgeTwoUrl,
-          badgeThree: badgeThreeUrl,
-          user: userUrl,
-          about: acfData.about,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
+
+    try {
+      const response = await axios.request(config);
+      const acfData = response.data.acf;
+
+      const badgeOneUrl = acfData['badge-one'] ? await fetchImageUrl(acfData['badge-one']) : '';
+      const badgeTwoUrl = acfData['badge-two'] ? await fetchImageUrl(acfData['badge-two']) : '';
+      const badgeThreeUrl = acfData['badge-three'] ? await fetchImageUrl(acfData['badge-three']) : '';
+      const userProfileUrl = acfData['user_profile'] ? await fetchImageUrl(acfData['user_profile']) : '';
+
+      setProfileData({
+        full_name: acfData.full_name,
+        university: acfData.university,
+        address: acfData.address,
+        email: acfData.email,
+        telephone: acfData.telephone,
+        badgeOne: badgeOneUrl,
+        badgeTwo: badgeTwoUrl,
+        badgeThree: badgeThreeUrl,
+        user_profile: userProfileUrl,
+        about: acfData.about,
       });
-  }, []);
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+  };
 
   const fetchImageUrl = async (imageId) => {
     if (!imageId) return '';
@@ -92,12 +96,9 @@ const Profile = () => {
         'Content-Type': 'application/json',
       },
     })
-    .then((response) => {
+    .then(() => {
       console.log('Profile updated successfully');
-      setProfileData(prevData => ({
-        ...prevData,
-        ...updatedProfileData,
-      }));
+      fetchProfileData(); // Refetch profile data to get the updated user_profile URL
       handleCloseModal();
     })
     .catch((error) => {
