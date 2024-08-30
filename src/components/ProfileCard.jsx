@@ -3,6 +3,7 @@ import SchoolIcon from '@mui/icons-material/School';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import CallIcon from '@mui/icons-material/Call';
+import EditIcon from '@mui/icons-material/Edit';
 import TimeRendered from './TimeRendered';
 import { useTimesheets } from '../context/TimesheetContext';
 
@@ -34,9 +35,9 @@ const ProfileCard = ({ profileData = {}, handleEditClick }) => {
             )}
             <div
               onClick={handleEditClick}
-              className="absolute top-2 right-2 p-2 cursor-pointer text-white group-hover:text-blue-400 transition-colors duration-300"
+              className="absolute top-2 right-2 p-2 cursor-pointer text-gray-600 hover:text-blue-400 transition-colors duration-300"
             >
-              Edit
+              <EditIcon />
             </div>
           </div>
 
