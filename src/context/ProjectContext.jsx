@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
 // Define a set of colors
-const predefinedColors = [
+const lightModeColors = [
     '#FFDDDD', // Light Pink
     '#DDFFDD', // Light Green
     '#DDDDFF', // Light Blue
@@ -21,7 +21,9 @@ const predefinedColors = [
     '#D3FFD3', // Honeydew
     '#E0FFFF', // Light Cyan
     '#F5F5F5', // White Smoke
-  ];
+];
+
+const darkModeColor = '#333333'; // Dark mode color
 
 const ProjectContext = createContext();
 
@@ -48,6 +50,7 @@ const formatDate = (dateStr) => {
 const ProjectProvider = ({ children }) => {
   const [projects, setProjects] = useState([]);
   const [userTeams, setUserTeams] = useState([]);
+  const [theme, setTheme] = useState('light'); // Manage theme state
 
   useEffect(() => {
     const fetchUserTeams = async () => {
@@ -62,7 +65,7 @@ const ProjectProvider = ({ children }) => {
         console.error('Error fetching user teams:', error);
       }
     };
-  
+
     const fetchProjects = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}project`, {
@@ -70,7 +73,7 @@ const ProjectProvider = ({ children }) => {
             'Authorization': 'Basic ' + btoa(`${import.meta.env.VITE_AUTH_USERNAME}:${import.meta.env.VITE_AUTH_PASSWORD}`),
           },
         });
-  
+
         const getLogoUrl = async (id) => {
           try {
             const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}media/${id}`, {
@@ -84,7 +87,7 @@ const ProjectProvider = ({ children }) => {
             return '';
           }
         };
-  
+
         const data = await Promise.all(response.data.map(async (project, index) => {
           const logoUrl = project.acf.logo ? await getLogoUrl(project.acf.logo) : '';
           return {
@@ -95,30 +98,33 @@ const ProjectProvider = ({ children }) => {
             assigned_to: project.acf.assigned_to,
             progress: project.acf.progress,
             link: project.link,
-            color: predefinedColors[index % predefinedColors.length], // Assign color based on index
+            color: theme === 'dark' ? darkModeColor : lightModeColors[index % lightModeColors.length], // Assign color based on theme
           };
         }));
-  
+
         setProjects(data);
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
     };
-  
+
     fetchUserTeams();
     fetchProjects();
-  
+
     const intervalId = setInterval(() => {
       fetchUserTeams();
       fetchProjects();
     }, 600000); // Poll every 10 minutes (600000 ms)
-  
+
     return () => clearInterval(intervalId); // Cleanup on unmount
-  }, []);
-  
+  }, [theme]); // Re-fetch projects when theme changes
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
 
   return (
-    <ProjectContext.Provider value={{ projects, userTeams }}>
+    <ProjectContext.Provider value={{ projects, userTeams, toggleTheme, theme }}>
       {children}
     </ProjectContext.Provider>
   );

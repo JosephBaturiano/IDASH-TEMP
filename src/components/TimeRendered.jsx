@@ -1,6 +1,5 @@
-// src/components/TimeRendered.js
-
 import React from 'react';
+import { useTheme } from '../context/ThemeContext'; // Import useTheme from your context
 
 // Function to convert 12-hour time format to 24-hour format
 const convertTo24HourFormat = (time) => {
@@ -66,6 +65,8 @@ const calculateTotalTime = (timesheets) => {
 
 // TimeRendered component
 const TimeRendered = ({ timesheets }) => {
+  const { theme } = useTheme(); // Get the current theme from the context
+
   const totalMinutes = calculateTotalTime(timesheets);
 
   // Check if totalMinutes is a valid number
@@ -77,9 +78,13 @@ const TimeRendered = ({ timesheets }) => {
   const totalHours = Math.floor(totalMinutes / 60);
   const remainingMinutes = Math.round(totalMinutes % 60);
 
+  // Define text and background color based on the current theme
+  const textColor = theme === 'light' ? 'text-gray-700' : 'text-white';
+  const backgroundColor = theme === 'light' ? 'bg-gray-100' : 'bg-gray-800';
+
   return (
-    <div className="p-2 bg-gray-100 rounded-lg shadow-md text-center">
-      <p className="text-gray-700">
+    <div className={`p-2 ${backgroundColor} rounded-lg shadow-md text-center`}>
+      <p className={`${textColor}`}>
         {totalHours} : {remainingMinutes} : 00
       </p>
     </div>

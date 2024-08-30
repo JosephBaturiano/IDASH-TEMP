@@ -1,4 +1,4 @@
-// TopBar.js
+// src/components/TopBar.js
 import React, { useState } from 'react';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Menu, MenuItem, IconButton, ListItemIcon } from '@mui/material';
@@ -8,11 +8,14 @@ import FullName from '../components/FullName';
 import TimeRendered from './TimeRendered';
 import { useTimesheets } from '../context/TimesheetContext';
 import { useNotification } from '../context/NotificationContext';
+import { useTheme } from '../context/ThemeContext'; // Import useTheme
 import { format } from 'date-fns';
 
 const TopBar = () => {
   const { timesheets } = useTimesheets();
   const notificationContext = useNotification();
+  const { theme, toggleTheme } = useTheme(); // Use theme and toggleTheme from context
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationEl, setNotificationEl] = useState(null);
 
@@ -28,7 +31,7 @@ const TopBar = () => {
   const handleNotificationClose = () => setNotificationEl(null);
 
   return (
-    <div className="bg-white text-gray-900 py-4 px-6 flex items-center justify-between shadow-md">
+    <div className={`bg-${theme === 'light' ? 'white' : 'gray-800'} text-${theme === 'light' ? 'gray-900' : 'white'} py-4 px-6 flex items-center justify-between shadow-md`}>
       <div className="flex items-center">
         <h1 className="text-2xl font-bold">Welcome Intern!</h1>
       </div>
@@ -47,7 +50,7 @@ const TopBar = () => {
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">{unreadCount}</span>
           )}
           <IconButton onClick={handleNotificationClick} className="p-0">
-            <NotificationsIcon className="w-8 h-8 text-gray-900 cursor-pointer transition-transform duration-300 hover:scale-110" />
+            <NotificationsIcon className={`w-8 h-8 text-${theme === 'light' ? 'gray-900' : 'white'} cursor-pointer transition-transform duration-300 hover:scale-110`} />
           </IconButton>
           <Menu
             anchorEl={notificationEl}
@@ -59,6 +62,8 @@ const TopBar = () => {
                 maxHeight: '400px',
                 overflow: 'auto',
                 padding: '10px',
+                backgroundColor: theme === 'light' ? 'white' : '#333',
+                color: theme === 'light' ? 'black' : 'white',
               },
             }}
           >
@@ -113,6 +118,8 @@ const TopBar = () => {
               style: {
                 width: '200px',
                 padding: '10px',
+                backgroundColor: theme === 'light' ? 'white' : '#333',
+                color: theme === 'light' ? 'black' : 'white',
               },
             }}
           >
@@ -122,7 +129,7 @@ const TopBar = () => {
               </ListItemIcon>
               Profile
             </MenuItem>
-            <MenuItem onClick={handleProfileClose}>
+            <MenuItem onClick={handleProfileClose} component={Link} to="/settings">
               <ListItemIcon>
                 <Settings fontSize="small" />
               </ListItemIcon>
