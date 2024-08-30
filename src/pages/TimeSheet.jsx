@@ -8,6 +8,7 @@ import Home from './Home';
 import { useTimesheets, formatTime } from '../context/TimesheetContext'; // Adjust the import path
 import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext'; 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
