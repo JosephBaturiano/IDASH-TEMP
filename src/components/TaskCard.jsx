@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ArchiveIcon from '@mui/icons-material/Archive';
+import { useTheme } from '../context/ThemeContext'; // Import useTheme to get the theme
 
 const TaskCard = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { theme } = useTheme(); // Get the current theme
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const authUsername = import.meta.env.VITE_AUTH_USERNAME;
@@ -57,24 +59,19 @@ const TaskCard = () => {
     
     if (isConfirmed) {
       try {
-        // Fetch the existing task details
         const response = await axios.get(`${apiBaseUrl}task/${taskId}`, {
           auth: {
             username: authUsername,
             password: authPassword,
           },
         });
-    
+
         const taskToArchive = response.data;
-    
+
         if (!taskToArchive) {
           throw new Error('Task not found');
         }
-    
-        // Log the task data to verify its structure
-        console.log('Task to Archive:', taskToArchive);
-    
-        // Ensure that 'acf' is structured correctly and set status to 'publish'
+
         const postData = {
           acf: {
             task_number: taskToArchive.acf.task_number,
@@ -82,15 +79,12 @@ const TaskCard = () => {
             date_created: taskToArchive.acf.date_created,
             allocated_time: taskToArchive.acf.allocated_time,
             assigned_to: taskToArchive.acf.assigned_to,
-            status: taskToArchive.acf.status, // Ensure this is correct and check if 'publish' is required
+            status: taskToArchive.acf.status,
           },
-          status: 'publish', // Add this if necessary to publish the task
+          status: 'publish',
         };
-    
-        console.log('Post Data:', JSON.stringify(postData, null, 2));
-    
-        // Post the data to the archive endpoint
-        const postResponse = await axios.post(
+
+        await axios.post(
           `${apiBaseUrl}archive/`,
           postData,
           {
@@ -103,31 +97,23 @@ const TaskCard = () => {
             },
           }
         );
-    
-        console.log('Post Response:', postResponse.data);
-    
-        // Delete the task from the 'task' endpoint
+
         await axios.delete(`${apiBaseUrl}task/${taskId}`, {
           auth: {
             username: authUsername,
             password: authPassword,
           },
         });
-    
-        console.log(`Task ${taskId} has been deleted from the task list.`);
-    
-        // Remove the archived task from the current list
+
         setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-    
+
       } catch (err) {
         console.error('Error details:', err.response ? err.response.data : err.message);
         setError(`Failed to archive: ${err.message}`);
       }
     }
   };
-  
-  
-  
+
   const formatDate = (dateString) => {
     if (dateString.length !== 8) return 'Invalid date';
     return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
@@ -138,9 +124,10 @@ const TaskCard = () => {
   }
 
   return (
-    <div>
-      <table className="table-auto w-full">
-        <thead>
+    <div className={`p-6 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+      {error && <p className="text-red-500">Error: {error}</p>}
+      <table className={`table-auto w-full border-collapse border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+        <thead className={theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}>
           <tr>
             <th className="px-4 py-2 text-center">Task Number</th>
             <th className="px-4 py-2 text-center">Description</th>
@@ -163,7 +150,7 @@ const TaskCard = () => {
                 <select
                   value={task.acf ? task.acf.status : 'Not Started'}
                   onChange={(e) => handleStatusChange(e, task.id)}
-                  className="w-full border border-gray-300 rounded p-2"
+                  className={`w-full border rounded p-2 ${theme === 'dark' ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'}`}
                 >
                   <option value="Not Started">Not Started</option>
                   <option value="Pending">Pending</option>
