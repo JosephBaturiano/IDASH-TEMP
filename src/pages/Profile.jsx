@@ -21,6 +21,9 @@ const Profile = () => {
     badgeThree: '',
     about: '',
     user_profile: '',
+    team: [],
+    ojtAdviser: '',
+    subjectCode: '',
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [editBadgesModalOpen, setEditBadgesModalOpen] = useState(false);
@@ -59,7 +62,10 @@ const Profile = () => {
         badgeTwo: badgeTwoUrl,
         badgeThree: badgeThreeUrl,
         user_profile: userProfileUrl,
-        about: acfData.about,
+        about: acfData.about,  // Fetch about data
+        team: acfData.team || [],  // Fetch team data
+        ojtAdviser: acfData.ojt_adviser || '',  // Fetch OJT adviser data
+        subjectCode: acfData.subject_code || '',  // Fetch subject code data
       });
     } catch (error) {
       console.error('Error fetching profile data:', error);
@@ -96,14 +102,14 @@ const Profile = () => {
         'Content-Type': 'application/json',
       },
     })
-    .then(() => {
-      console.log('Profile updated successfully');
-      fetchProfileData(); // Refetch profile data to get the updated user_profile URL
-      handleCloseModal();
-    })
-    .catch((error) => {
-      console.error('Error updating profile:', error);
-    });
+      .then(() => {
+        console.log('Profile updated successfully');
+        fetchProfileData(); // Refetch profile data to get the updated user_profile URL
+        handleCloseModal();
+      })
+      .catch((error) => {
+        console.error('Error updating profile:', error);
+      });
   };
 
   const handleEditBadgesClick = () => {
@@ -146,11 +152,29 @@ const Profile = () => {
   };
 
   const handleSaveAbout = (updatedAbout) => {
-    setProfileData(prevData => ({
-      ...prevData,
-      about: updatedAbout, // Update the "About Me" section
-    }));
-    handleCloseEditAboutModal();
+    const updatedProfileData = {
+      acf: {
+        about: updatedAbout.aboutText,
+        team: updatedAbout.team,
+        ojt_adviser: updatedAbout.ojtAdviser,
+        subject_code: updatedAbout.subjectCode,
+      }
+    };
+
+    axios.post(import.meta.env.VITE_API_BASE_URL + 'users/me', updatedProfileData, {
+      headers: {
+        'Authorization': 'Basic ' + btoa(import.meta.env.VITE_AUTH_USERNAME + ':' + import.meta.env.VITE_AUTH_PASSWORD),
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(() => {
+        console.log('About section updated successfully');
+        fetchProfileData(); // Refetch profile data to get the updated about section
+        handleCloseEditAboutModal();
+      })
+      .catch((error) => {
+        console.error('Error updating about section:', error);
+      });
   };
 
   return (
@@ -166,7 +190,13 @@ const Profile = () => {
             onEditClick={handleEditBadgesClick}
             onDeleteBadge={handleDeleteBadge}
           />
-          <ProfileAbout about={profileData.about} onEditClick={handleEditAboutClick} />
+          <ProfileAbout
+            about={profileData.about}
+            ojtAdviser={profileData.ojtAdviser}
+            subjectCode={profileData.subjectCode}
+            team={profileData.team}
+            onEditClick={handleEditAboutClick}
+          />
           <ProfileDirectory />
         </div>
 
@@ -188,7 +218,12 @@ const Profile = () => {
 
         {editAboutModalOpen && (
           <EditAboutModal
-            about={profileData.about}
+            aboutData={{
+              team: profileData.team || [],
+              ojtAdviser: profileData.ojtAdviser || '',
+              subjectCode: profileData.subjectCode || '',
+              aboutText: profileData.about || '',
+            }}
             onClose={handleCloseEditAboutModal}
             onSave={handleSaveAbout}
           />
