@@ -21,6 +21,9 @@ const Profile = () => {
     badgeThree: '',
     about: '',
     user_profile: '',
+    team: [],
+    ojtAdviser: '',
+    subjectCode: '',
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [editBadgesModalOpen, setEditBadgesModalOpen] = useState(false);
@@ -60,6 +63,9 @@ const Profile = () => {
         badgeThree: badgeThreeUrl,
         user_profile: userProfileUrl,
         about: acfData.about,
+        team: acfData.team || [],
+        ojtAdviser: acfData.ojt_adviser || '',
+        subjectCode: acfData.subject_code || '',
       });
     } catch (error) {
       console.error('Error fetching profile data:', error);
@@ -96,14 +102,14 @@ const Profile = () => {
         'Content-Type': 'application/json',
       },
     })
-    .then(() => {
-      console.log('Profile updated successfully');
-      fetchProfileData(); // Refetch profile data to get the updated user_profile URL
-      handleCloseModal();
-    })
-    .catch((error) => {
-      console.error('Error updating profile:', error);
-    });
+      .then(() => {
+        console.log('Profile updated successfully');
+        fetchProfileData(); // Refetch profile data to get the updated user_profile URL
+        handleCloseModal();
+      })
+      .catch((error) => {
+        console.error('Error updating profile:', error);
+      });
   };
 
   const handleEditBadgesClick = () => {
@@ -140,7 +146,10 @@ const Profile = () => {
   const handleSaveAbout = (updatedAbout) => {
     setProfileData(prevData => ({
       ...prevData,
-      about: updatedAbout, // Update the "About Me" section
+      about: updatedAbout.aboutText, // Update about text
+      team: updatedAbout.team,
+      ojtAdviser: updatedAbout.ojtAdviser,
+      subjectCode: updatedAbout.subjectCode,
     }));
     handleCloseEditAboutModal();
   };
@@ -149,7 +158,7 @@ const Profile = () => {
     <Home>
       <div className="flex justify-center items-start space-x-5">
         <ProfileCard profileData={profileData} ojtTime={ojtTime} handleEditClick={handleEditClick} />
-
+ 
         <div className="flex flex-col space-y-8">
           <ProfileBadges
             badgeOne={profileData.badgeOne}
@@ -158,10 +167,16 @@ const Profile = () => {
             onEditClick={handleEditBadgesClick}
             onDeleteBadge={handleDeleteBadge}
           />
-          <ProfileAbout about={profileData.about} onEditClick={handleEditAboutClick} />
+          <ProfileAbout
+            about={profileData.about}
+            ojtAdviser={profileData.ojtAdviser}
+            subjectCode={profileData.subjectCode}
+            team={profileData.team}
+            onEditClick={handleEditAboutClick}
+          />
           <ProfileDirectory />
         </div>
-
+ 
         {modalOpen && (
           <EditProfileModal
             profileData={profileData}
@@ -169,7 +184,7 @@ const Profile = () => {
             onSave={handleSaveProfile}
           />
         )}
-
+ 
         {editBadgesModalOpen && (
           <EditBadgesModal
             badges={profileData}
@@ -177,17 +192,22 @@ const Profile = () => {
             onSave={handleSaveBadges}
           />
         )}
-
+ 
         {editAboutModalOpen && (
           <EditAboutModal
-            about={profileData.about}
+            aboutData={{
+              team: profileData.team || [],
+              ojtAdviser: profileData.ojtAdviser || '',
+              subjectCode: profileData.subjectCode || '',
+              aboutText: profileData.about || '',
+            }}
             onClose={handleCloseEditAboutModal}
             onSave={handleSaveAbout}
           />
         )}
       </div>
     </Home>
-  );
+  );  
 };
 
 export default Profile;
