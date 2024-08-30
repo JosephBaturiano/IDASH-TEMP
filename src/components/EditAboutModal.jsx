@@ -17,6 +17,7 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'aboutText' && value.length > 400) return;
     setFormData({ ...formData, [name]: value });
   };
 
@@ -114,6 +115,7 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
           onChange={handleInputChange}
           placeholder="About Me"
           className="w-full h-40 p-2 border border-gray-300 rounded"
+          maxLength="400"
         />
 
         <div className="flex justify-end mt-4 space-x-2">
