@@ -16,14 +16,15 @@ const ProfileAbout = ({ about, ojtAdviser, subjectCode, team, onEditClick }) => 
           <span>|</span>
           <div><strong>Code: </strong>{subjectCode || 'N/A'}</div>
         </div>
-      <div
-        onClick={onEditClick}
-        className="absolute top-2 right-2 p-2 cursor-pointer text-gray-600 hover:text-blue-400 transition-colors duration-300"
-      >
-        <EditIcon />
+        <div
+          onClick={onEditClick}
+          className="absolute top-2 right-2 p-2 cursor-pointer text-gray-600 hover:text-blue-400 transition-colors duration-300"
+        >
+          <EditIcon />
+        </div>
       </div>
     </div>
   );
 };
-
+      
 export default ProfileAbout;
