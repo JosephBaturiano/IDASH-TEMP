@@ -229,7 +229,7 @@ const TimeSheet = () => {
     const startDate = new Date('2024-07-22');
     startDate.setDate(startDate.getDate() + 7 * weekNumber); // Move to the start of the desired week
     const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 4); // Move to the end of the week (5 days later)
+    endDate.setDate(startDate.getDate() + 5);
 
     const start = startDate.toISOString().split('T')[0];
     const end = endDate.toISOString().split('T')[0];
