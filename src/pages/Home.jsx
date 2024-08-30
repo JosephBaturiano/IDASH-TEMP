@@ -8,7 +8,7 @@ function Home({ children }) {
 
   // Define background colors based on the current theme
   const sidebarBgColor = theme === 'light' ? '#DBEDFF' : '#1F2937';
-  const mainContentBgColor = theme === 'light' ? '#F0F8FF' : '#2D3748';
+  const mainContentBgColor = theme === 'light' ? '#F0F8FF' : '#1a202c';
   
   return (
     <main className="flex h-screen w-full">
