@@ -24,7 +24,10 @@ export const NotificationProvider = ({ children }) => {
     const [seenPostIds, setSeenPostIds] = useState(new Set());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [notificationsEnabled, setNotificationsEnabled] = useState(true); // Notification preference
+    const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
+        const saved = localStorage.getItem('notificationsEnabled');
+        return saved !== null ? JSON.parse(saved) : true;
+    }); // Notification preference
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -99,6 +102,10 @@ export const NotificationProvider = ({ children }) => {
         return () => clearInterval(id);
     }, [seenPostIds, notificationsEnabled]);
 
+    useEffect(() => {
+        localStorage.setItem('notificationsEnabled', JSON.stringify(notificationsEnabled));
+    }, [notificationsEnabled]);
+
     const markAllAsRead = () => {
         setUnreadCount(0);
     };
@@ -113,4 +120,3 @@ export const NotificationProvider = ({ children }) => {
         </NotificationContext.Provider>
     );
 };
-    

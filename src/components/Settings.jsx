@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Home from '../pages/Home';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme
 import { useNotification } from '../context/NotificationContext'; // Import useNotification
@@ -6,8 +6,19 @@ import { useNotification } from '../context/NotificationContext'; // Import useN
 const Settings = () => {
   const { theme, toggleTheme } = useTheme(); // Use theme and toggleTheme from context
   const { notificationsEnabled, toggleNotifications } = useNotification(); // Use notification settings from context
-  const [notifications, setNotifications] = useState(notificationsEnabled);
+
+  // Read notification setting from localStorage
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem('notificationsEnabled');
+    return saved ? JSON.parse(saved) : notificationsEnabled;
+  });
+
   const [language, setLanguage] = useState('en');
+
+  // Update localStorage when notifications state changes
+  useEffect(() => {
+    localStorage.setItem('notificationsEnabled', JSON.stringify(notifications));
+  }, [notifications]);
 
   const handleNotificationToggle = () => {
     const newValue = !notifications;
