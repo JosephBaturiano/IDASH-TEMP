@@ -1,7 +1,6 @@
-// src/components/TopBar.js
 import React, { useState } from 'react';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { Menu, MenuItem, IconButton, ListItemIcon } from '@mui/material';
+import { Menu, MenuItem, IconButton, ListItemIcon, Switch } from '@mui/material';
 import { Logout, Person, Settings } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import FullName from '../components/FullName';
@@ -13,13 +12,18 @@ import { format } from 'date-fns';
 
 const TopBar = () => {
   const { timesheets } = useTimesheets();
-  const notificationContext = useNotification();
-  const { theme, toggleTheme } = useTheme(); // Use theme and toggleTheme from context
+  const {
+    user = {},
+    notifications = [],
+    unreadCount = 0,
+    markAllAsRead = () => {},
+    notificationsEnabled,
+    toggleNotifications
+  } = useNotification();
+  const { theme } = useTheme(); // Use theme from context
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationEl, setNotificationEl] = useState(null);
-
-  const { user = {}, notifications = [], unreadCount = 0, markAllAsRead = () => {} } = notificationContext || {};
 
   const handleProfileClick = (event) => setAnchorEl(event.currentTarget);
   const handleNotificationClick = (event) => {
@@ -45,52 +49,54 @@ const TopBar = () => {
         </div>
 
         {/* Notifications */}
-        <div className="relative">
-          {unreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">{unreadCount}</span>
-          )}
-          <IconButton onClick={handleNotificationClick} className="p-0">
-            <NotificationsIcon className={`w-8 h-8 text-${theme === 'light' ? 'gray-900' : 'white'} cursor-pointer transition-transform duration-300 hover:scale-110`} />
-          </IconButton>
-          <Menu
-            anchorEl={notificationEl}
-            open={Boolean(notificationEl)}
-            onClose={handleNotificationClose}
-            PaperProps={{
-              style: {
-                width: '300px',
-                maxHeight: '400px',
-                overflow: 'auto',
-                padding: '10px',
-                backgroundColor: theme === 'light' ? 'white' : '#333',
-                color: theme === 'light' ? 'black' : 'white',
-              },
-            }}
-          >
-            {notifications.length > 0 ? (
-              [...notifications].reverse().map(notification => {
-                const date = new Date(notification.date);
-                const formattedDate = format(date, 'MM/dd/yyyy');
-                const formattedTime = format(date, 'hh:mm a');
-                return (
-                  <MenuItem key={notification.id} onClick={() => {
-                    handleNotificationClose();
-                    window.location.href = '/announcement';
-                  }}>
-                    <div className="flex flex-col">
-                      <span>{notification.description}</span>
-                      <span>{formattedDate} - {formattedTime}</span>
-                    </div>
-                  </MenuItem>
-                );
-              })
-            ) : (
-              <MenuItem>
-                <span>No new notifications</span>
-              </MenuItem>
+        {notificationsEnabled && (
+          <div className="relative">
+            {unreadCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">{unreadCount}</span>
             )}
-          </Menu>
-        </div>
+            <IconButton onClick={handleNotificationClick} className="p-0">
+              <NotificationsIcon className={`w-8 h-8 text-${theme === 'light' ? 'gray-900' : 'white'} cursor-pointer transition-transform duration-300 hover:scale-110`} />
+            </IconButton>
+            <Menu
+              anchorEl={notificationEl}
+              open={Boolean(notificationEl)}
+              onClose={handleNotificationClose}
+              PaperProps={{
+                style: {
+                  width: '300px',
+                  maxHeight: '400px',
+                  overflow: 'auto',
+                  padding: '10px',
+                  backgroundColor: theme === 'light' ? 'white' : '#333',
+                  color: theme === 'light' ? 'black' : 'white',
+                },
+              }}
+            >
+              {notifications.length > 0 ? (
+                [...notifications].reverse().map(notification => {
+                  const date = new Date(notification.date);
+                  const formattedDate = format(date, 'MM/dd/yyyy');
+                  const formattedTime = format(date, 'hh:mm a');
+                  return (
+                    <MenuItem key={notification.id} onClick={() => {
+                      handleNotificationClose();
+                      window.location.href = '/announcement';
+                    }}>
+                      <div className="flex flex-col">
+                        <span>{notification.description}</span>
+                        <span>{formattedDate} - {formattedTime}</span>
+                      </div>
+                    </MenuItem>
+                  );
+                })
+              ) : (
+                <MenuItem>
+                  <span>No new notifications</span>
+                </MenuItem>
+              )}
+            </Menu>
+          </div>
+        )}
 
         {/* User Profile */}
         <div className="flex items-center space-x-4">
@@ -141,6 +147,7 @@ const TopBar = () => {
               </ListItemIcon>
               Logout
             </MenuItem>
+
           </Menu>
         </div>
       </div>

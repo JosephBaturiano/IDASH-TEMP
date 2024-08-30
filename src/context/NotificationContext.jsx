@@ -20,10 +20,11 @@ export const NotificationProvider = ({ children }) => {
     const [announcements, setAnnouncements] = useState([]);
     const [rules, setRules] = useState([]);
     const [notifications, setNotifications] = useState([]);
-    const [unreadCount, setUnreadCount] = useState(0); // Track number of new unread notifications
-    const [seenPostIds, setSeenPostIds] = useState(new Set()); // Track seen post IDs
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [seenPostIds, setSeenPostIds] = useState(new Set());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(true); // Notification preference
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -40,22 +41,20 @@ export const NotificationProvider = ({ children }) => {
         };
 
         const fetchData = async () => {
+            if (!notificationsEnabled) return; // Skip fetching if notifications are disabled
+
             try {
-                // Fetch announcements and rules
                 const [announcementsResponse, rulesResponse] = await Promise.all([
                     axios.get(`${BASE_URL}announcement`, { headers: { 'Authorization': AUTH_HEADER } }),
                     axios.get(`${BASE_URL}rule`, { headers: { 'Authorization': AUTH_HEADER } }),
                 ]);
 
-                // Process announcements
                 const fetchedAnnouncements = announcementsResponse.data;
                 setAnnouncements(fetchedAnnouncements);
 
-                // Process rules
                 const fetchedRules = rulesResponse.data;
                 setRules(fetchedRules);
 
-                // Filter new notifications
                 const newRules = fetchedRules.filter(rule => !seenPostIds.has(`rule-${rule.id}`))
                     .map(rule => {
                         seenPostIds.add(`rule-${rule.id}`);
@@ -95,20 +94,23 @@ export const NotificationProvider = ({ children }) => {
         fetchUserData();
         fetchData();
 
-        // Polling for new notifications every 1 second
         const id = setInterval(fetchData, 600000);
 
-        // Cleanup the interval on unmount
         return () => clearInterval(id);
-    }, [seenPostIds]);
+    }, [seenPostIds, notificationsEnabled]);
 
     const markAllAsRead = () => {
-        setUnreadCount(0); // Reset unread count to zero when all notifications are marked as read
+        setUnreadCount(0);
+    };
+
+    const toggleNotifications = () => {
+        setNotificationsEnabled(prev => !prev);
     };
 
     return (
-        <NotificationContext.Provider value={{ user, announcements, rules, notifications, unreadCount, markAllAsRead, loading, error }}>
+        <NotificationContext.Provider value={{ user, announcements, rules, notifications, unreadCount, markAllAsRead, loading, error, notificationsEnabled, toggleNotifications }}>
             {children}
         </NotificationContext.Provider>
     );
 };
+    
