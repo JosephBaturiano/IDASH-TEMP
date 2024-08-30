@@ -62,10 +62,10 @@ const Profile = () => {
         badgeTwo: badgeTwoUrl,
         badgeThree: badgeThreeUrl,
         user_profile: userProfileUrl,
-        about: acfData.about,
-        team: acfData.team || [],
-        ojtAdviser: acfData.ojt_adviser || '',
-        subjectCode: acfData.subject_code || '',
+        about: acfData.about,  // Fetch about data
+        team: acfData.team || [],  // Fetch team data
+        ojtAdviser: acfData.ojt_adviser || '',  // Fetch OJT adviser data
+        subjectCode: acfData.subject_code || '',  // Fetch subject code data
       });
     } catch (error) {
       console.error('Error fetching profile data:', error);
@@ -144,21 +144,36 @@ const Profile = () => {
   };
 
   const handleSaveAbout = (updatedAbout) => {
-    setProfileData(prevData => ({
-      ...prevData,
-      about: updatedAbout.aboutText, // Update about text
-      team: updatedAbout.team,
-      ojtAdviser: updatedAbout.ojtAdviser,
-      subjectCode: updatedAbout.subjectCode,
-    }));
-    handleCloseEditAboutModal();
+    const updatedProfileData = {
+      acf: {
+        about: updatedAbout.aboutText,
+        team: updatedAbout.team,
+        ojt_adviser: updatedAbout.ojtAdviser,
+        subject_code: updatedAbout.subjectCode,
+      }
+    };
+
+    axios.post(import.meta.env.VITE_API_BASE_URL + 'users/me', updatedProfileData, {
+      headers: {
+        'Authorization': 'Basic ' + btoa(import.meta.env.VITE_AUTH_USERNAME + ':' + import.meta.env.VITE_AUTH_PASSWORD),
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(() => {
+        console.log('About section updated successfully');
+        fetchProfileData(); // Refetch profile data to get the updated about section
+        handleCloseEditAboutModal();
+      })
+      .catch((error) => {
+        console.error('Error updating about section:', error);
+      });
   };
 
   return (
     <Home>
       <div className="flex justify-center items-start space-x-5">
         <ProfileCard profileData={profileData} ojtTime={ojtTime} handleEditClick={handleEditClick} />
- 
+
         <div className="flex flex-col space-y-8">
           <ProfileBadges
             badgeOne={profileData.badgeOne}
@@ -176,7 +191,7 @@ const Profile = () => {
           />
           <ProfileDirectory />
         </div>
- 
+
         {modalOpen && (
           <EditProfileModal
             profileData={profileData}
@@ -184,7 +199,7 @@ const Profile = () => {
             onSave={handleSaveProfile}
           />
         )}
- 
+
         {editBadgesModalOpen && (
           <EditBadgesModal
             badges={profileData}
@@ -192,7 +207,7 @@ const Profile = () => {
             onSave={handleSaveBadges}
           />
         )}
- 
+
         {editAboutModalOpen && (
           <EditAboutModal
             aboutData={{
@@ -207,7 +222,7 @@ const Profile = () => {
         )}
       </div>
     </Home>
-  );  
+  );
 };
 
 export default Profile;
