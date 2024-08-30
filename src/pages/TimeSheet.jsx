@@ -8,35 +8,38 @@ import Home from './Home';
 import { useTimesheets, formatTime } from '../context/TimesheetContext'; // Adjust the import path
 import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
 const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
 
-const TimesheetHeader = ({ onSelectAll, isAllSelected }) => (
-  <thead className="bg-gray-50">
-    <tr className="text-gray-700 font-semibold text-center">
-      <th className="px-2 py-2 text-gray-900">Task #</th>
-      <th className="px-2 py-2 text-gray-900">Task Description</th>
-      <th className="px-2 py-2 text-gray-900">Time Started</th>
-      <th className="px-2 py-2 text-gray-900">Time Ended</th>
-      <th className="px-2 py-2 text-gray-900">With Whom</th>
-      <th className="px-2 py-2 text-gray-900">Deliverables</th>
-      <th className="px-2 py-2 text-gray-900 flex items-center justify-center">
-        Action
-        <input
-          type="checkbox"
-          checked={isAllSelected}
-          onChange={onSelectAll}
-          className="ml-2"
-        />
-      </th>
-    </tr>
-  </thead>
+const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
+  const { theme } = useTheme(); // Get the current theme
 
-
-);
+  return (
+    <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
+      <tr className={`text-gray-700 font-semibold text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+        <th className="px-2 py-2">{`Task #`}</th>
+        <th className="px-2 py-2">{`Task Description`}</th>
+        <th className="px-2 py-2">{`Time Started`}</th>
+        <th className="px-2 py-2">{`Time Ended`}</th>
+        <th className="px-2 py-2">{`With Whom`}</th>
+        <th className="px-2 py-2">{`Deliverables`}</th>
+        <th className="px-2 py-2 flex items-center justify-center">
+          Action
+          <input
+            type="checkbox"
+            checked={isAllSelected}
+            onChange={onSelectAll}
+            className="ml-2"
+          />
+        </th>
+      </tr>
+    </thead>
+  );
+};
 
 
 const TimeSheet = () => {
@@ -54,6 +57,7 @@ const TimeSheet = () => {
   const [currentEditingItem, setCurrentEditingItem] = useState(null);
   const [userId, setUserId] = useState(null);
   const [isAllSelected, setIsAllSelected] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
@@ -273,27 +277,38 @@ const TimeSheet = () => {
 
   return (
     <Home>
-      <div className="p-4">
+      <div className={`container mx-auto px-4 py-6 ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
         <div className="flex justify-between items-center mb-4">
-          <label htmlFor="date" className="block text-gray-700 font-medium mr-2">Filter by Date:</label>
+          <label
+            htmlFor="date"
+            className={`block font-medium mr-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}
+          >
+            Filter by Date:
+          </label>
           <div className="flex-grow">
             <input
               type="date"
               id="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2"
+              className={`border rounded-lg px-3 py-2 ${theme === 'dark' ? 'bg-gray-800 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
+                }`}
             />
           </div>
+
 
           <div>
             <select
               value={selectedWeek}
               onChange={(e) => handleWeekSelect(Number(e.target.value))}
-              className="mr-2 bg-white border border-gray-300 rounded-lg px-4 py-2 h-[40px] flex items-center"
+              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
+                }`}
             >
               {[...Array(10).keys()].map(week => (
-                <option key={week} value={week}>Week {week}</option>
+                <option key={week} value={week} className={`${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
+                  Week {week}
+                </option>
               ))}
             </select>
 
