@@ -70,14 +70,10 @@ const IssuesCard = () => {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'No date';
-    const year = dateString.substring(0, 4);
-    const month = dateString.substring(5, 7);
-    const day = dateString.substring(8, 10);
-    const shortYear = year.substring(2, 4);
-    return `${month}/${day}/${shortYear}`;
+    if (dateString.length !== 8) return 'Invalid date';
+    return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
   };
-
+  
   return (
     <div>
       {error && <p className="text-red-500">Error: {error}</p>}
