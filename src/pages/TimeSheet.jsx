@@ -14,35 +14,26 @@ const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
 const AUTH_PASSWORD = import.meta.env.VITE_AUTH_PASSWORD;
 const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
 
-const TimesheetHeader = ({ onSelectAll, isAllSelected, onWeekSelect, selectedWeek }) => (
-<thead className="bg-gray-50">
-  <tr className="text-gray-700 font-semibold text-center">
-    <th className="px-2 py-2 text-gray-900">Task #</th>
-    <th className="px-2 py-2 text-gray-900">Task Description</th>
-    <th className="px-2 py-2 text-gray-900">Time Started</th>
-    <th className="px-2 py-2 text-gray-900">Time Ended</th>
-    <th className="px-2 py-2 text-gray-900">With Whom</th>
-    <th className="px-2 py-2 text-gray-900">Deliverables</th>
-    <th className="px-2 py-2 text-gray-900 flex items-center justify-center">
-      <select
-        value={selectedWeek}
-        onChange={(e) => onWeekSelect(Number(e.target.value))}
-        className="mr-2 bg-white border border-gray-300 rounded px-2 py-1"
-      >
-        {[...Array(10).keys()].map(week => (
-          <option key={week} value={week}>Week {week}</option>
-        ))}
-      </select>
-      Action
-      <input
-        type="checkbox"
-        checked={isAllSelected}
-        onChange={onSelectAll}
-        className="ml-2"
-      />
-    </th>
-  </tr>
-</thead>
+const TimesheetHeader = ({ onSelectAll, isAllSelected }) => (
+  <thead className="bg-gray-50">
+    <tr className="text-gray-700 font-semibold text-center">
+      <th className="px-2 py-2 text-gray-900">Task #</th>
+      <th className="px-2 py-2 text-gray-900">Task Description</th>
+      <th className="px-2 py-2 text-gray-900">Time Started</th>
+      <th className="px-2 py-2 text-gray-900">Time Ended</th>
+      <th className="px-2 py-2 text-gray-900">With Whom</th>
+      <th className="px-2 py-2 text-gray-900">Deliverables</th>
+      <th className="px-2 py-2 text-gray-900 flex items-center justify-center">
+        Action
+        <input
+          type="checkbox"
+          checked={isAllSelected}
+          onChange={onSelectAll}
+          className="ml-2"
+        />
+      </th>
+    </tr>
+  </thead>
 
 
 );
@@ -238,11 +229,11 @@ const TimeSheet = () => {
     const startDate = new Date('2024-07-22');
     startDate.setDate(startDate.getDate() + 7 * weekNumber); // Move to the start of the desired week
     const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 4); // Move to the end of the week (5 days later)
-  
+    endDate.setDate(startDate.getDate() + 5);
+
     const start = startDate.toISOString().split('T')[0];
     const end = endDate.toISOString().split('T')[0];
-  
+
     return { start, end };
   };
 
@@ -293,6 +284,20 @@ const TimeSheet = () => {
               onChange={(e) => setSelectedDate(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2"
             />
+          </div>
+
+          <div>
+            <select
+              value={selectedWeek}
+              onChange={(e) => handleWeekSelect(Number(e.target.value))}
+              className="mr-2 bg-white border border-gray-300 rounded-lg px-4 py-2 h-[40px] flex items-center"
+            >
+              {[...Array(10).keys()].map(week => (
+                <option key={week} value={week}>Week {week}</option>
+              ))}
+            </select>
+
+
           </div>
 
           <div className="m-4">

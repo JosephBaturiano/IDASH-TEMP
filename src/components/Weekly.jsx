@@ -44,10 +44,27 @@ function Weekly() {
   const calculateWeekNumber = (date) => {
     const startDate = new Date('2024-07-22');
     const currentDate = new Date(date);
-    const differenceInTime = currentDate - startDate;
-    return Math.floor(differenceInTime / (1000 * 3600 * 24 * 7));
+  
+    const countWeekdays = (start, end) => {
+      let count = 0;
+      let day = new Date(start);
+      
+      while (day <= end) {
+        const dayOfWeek = day.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Exclude weekends (0 = Sunday, 6 = Saturday)
+          count++;
+        }
+        day.setDate(day.getDate() + 1);
+      }
+      
+      return count;
+    };
+  
+    const totalWeekdays = countWeekdays(startDate, currentDate);
+    return Math.floor(totalWeekdays / 5); // 5 weekdays in a week
   };
-
+  
+  
 
 
   const firstDate = sortedTimesheets.length > 0 ? formatDate(sortedTimesheets[0].date) : null;

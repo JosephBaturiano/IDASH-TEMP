@@ -3,6 +3,7 @@ import Home from './Home'; // Ensure Home is correctly imported
 import MediaCard from '../components/MediaCard';
 import OJTDocsCard from '../components/OJTDocsCard';
 import folderImage from '../assets/folder.png'; // Path to your folder image
+import { useTheme } from '../context/ThemeContext'; 
 
 const ojtDocsData = {
     Unsigned: [
@@ -56,61 +57,59 @@ const mediaData = [
   
 const Files = () => {
   const [activeTab, setActiveTab] = useState('Signed'); 
+  const { theme } = useTheme();
+
+  const backgroundColor = theme === 'light' ? 'bg-[#E8F2FA]' : 'bg-gray-800';
+  const textColor = theme === 'light' ? 'text-black' : 'text-white';
+  const tabActiveBgColor = theme === 'light' ? 'bg-gray-200' : 'bg-gray-700';
+  const tabHoverBgColor = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-gray-800';
+  const borderColor = theme === 'light' ? 'border-gray-400' : 'border-gray-600';
+  const cardHoverBgColor = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-gray-800';
+
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
   };
 
-return (
+  return (
     <Home>
-      <div className="p-5 bg-[#E8F2FA]">
+      <div className={`p-5 ${backgroundColor}`}>
         <div className="mb-5">
-          <h2 className="text-2xl font-bold mb-4 text-black">OJT Documents</h2>
+          <h2 className={`text-2xl font-bold mb-4 ${textColor}`}>OJT Documents</h2>
           <div className="flex gap-5 mb-5 mx-auto w-3/4 max-w-4xl">
             {['Signed', 'Unsigned', 'Templates'].map((tab) => (
-            <div
-            key={tab}
-            className={`relative flex items-center cursor-pointer p-2 rounded-lg overflow-hidden transition-all duration-300 ${
-              activeTab === tab
-                ? 'bg-gray-200' 
-                : 'hover:bg-gray-100'
-            }`}
-            onClick={() => handleTabClick(tab)}
-          >
-            <img src={folderImage} alt={tab} className="w-18 h-18 object-cover" />
-            <span
-              className={`absolute bottom-3 left-5 text-black font-bold p-2 rounded w-full h-full flex items-end text-xl ${
-                activeTab === tab ? 'text-blue-600' : ''
-              }`}
-              style={{ fontSize: '1rem', lineHeight: '1rem' }}
-            >
-              {tab}
-            </span>
-            <div
-              className={`absolute bottom-0 left-0 w-full h-1 transition-transform duration-300 ${
-                activeTab === tab ? 'bg-blue-600' : 'bg-transparent'
-              } ${
-                activeTab === tab ? 'transform scale-x-100' : 'transform scale-x-0'
-              }`}
-            />
-          </div>
-          
+              <div
+                key={tab}
+                className={`relative flex items-center cursor-pointer p-2 rounded-lg overflow-hidden transition-all duration-300 ${activeTab === tab ? tabActiveBgColor : tabHoverBgColor}`}
+                onClick={() => handleTabClick(tab)}
+              >
+                <img src={folderImage} alt={tab} className="w-18 h-18 object-cover" />
+                <span
+                  className={`absolute bottom-3 left-5 ${textColor} font-bold p-2 rounded w-full h-full flex items-end text-xl ${activeTab === tab ? 'text-blue-600' : ''}`}
+                  style={{ fontSize: '1rem', lineHeight: '1rem' }}
+                >
+                  {tab}
+                </span>
+                <div
+                  className={`absolute bottom-0 left-0 w-full h-1 transition-transform duration-300 ${activeTab === tab ? 'bg-blue-600' : 'bg-transparent'} ${activeTab === tab ? 'transform scale-x-100' : 'transform scale-x-0'}`}
+                />
+              </div>
             ))}
           </div>
         </div>
 
-        <hr className="border-t border-gray-400 my-5" />
-        <h2 className="text-2xl font-bold mb-4 text-black">{activeTab} </h2>
+        <hr className={`border-t ${borderColor} my-5`} />
+        <h2 className={`text-2xl font-bold mb-4 ${textColor}`}>{activeTab}</h2>
         <div>
           {activeTab && (
-            <div className="mx-auto mt-8 mb-8 max-w-4xl ">
+            <div className="mx-auto mt-8 mb-8 max-w-4xl">
               <div className="grid grid-cols-3 gap-4">
                 {ojtDocsData[activeTab].map((item, index) => (
                   <OJTDocsCard 
                     key={index} 
                     name={item.name} 
                     url={item.url}
-                    className="transition-transform duration-200 hover:scale-105 hover:bg-gray-100" 
+                    className={`transition-transform duration-200 hover:scale-105 ${cardHoverBgColor}`} 
                   />
                 ))}
               </div>
@@ -118,14 +117,14 @@ return (
           )}
         </div>
 
-        <hr className="border-t border-gray-400 my-5" />
-        <h2 className="text-2xl font-bold mb-4 text-black">Media</h2>
-        <div className="mx-auto mt-8 mb-8 max-w-4xl"> {/* Increased max-width */}
+        <hr className={`border-t ${borderColor} my-5`} />
+        <h2 className={`text-2xl font-bold mb-4 ${textColor}`}>Media</h2>
+        <div className="mx-auto mt-8 mb-8 max-w-4xl">
           <div className="grid grid-cols-3 gap-4 justify-items-center">
             {mediaData.map((item, index) => (
               <div 
                 key={index} 
-                className="w-72 transition-transform duration-200 hover:scale-105 hover:bg-gray-100" 
+                className={`w-72 transition-transform duration-200 hover:scale-105 ${cardHoverBgColor}`}
               >
                 <MediaCard name={item.name} url={item.url} />
               </div>

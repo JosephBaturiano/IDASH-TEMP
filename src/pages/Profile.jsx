@@ -120,12 +120,20 @@ const Profile = () => {
     setEditBadgesModalOpen(false);
   };
 
-  const handleSaveBadges = (updatedBadges) => {
-    setProfileData(prevData => ({
-      ...prevData,
-      ...updatedBadges,
-    }));
-    handleCloseEditBadgesModal();
+  const handleSaveBadges = async (updatedBadges) => {
+    try {
+      await axios.post(import.meta.env.VITE_API_BASE_URL + 'users/me', updatedBadges, {
+        headers: {
+          'Authorization': 'Basic ' + btoa(import.meta.env.VITE_AUTH_USERNAME + ':' + import.meta.env.VITE_AUTH_PASSWORD),
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Badges updated successfully');
+      await fetchProfileData(); // Fetch latest data
+      handleCloseEditBadgesModal();
+    } catch (error) {
+      console.error('Error updating badges:', error);
+    }
   };
 
   const handleDeleteBadge = (badgeType) => {

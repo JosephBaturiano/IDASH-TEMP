@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import EditIcon from '@mui/icons-material/Edit'; // Import EditIcon from MUI or your icon library
+import { useTheme } from '../context/ThemeContext'; // Import useTheme to get the theme
 
 const IssuesCard = () => {
   const [issues, setIssues] = useState([]);
   const [error, setError] = useState(null);
   const [editingIssue, setEditingIssue] = useState(null);
   const [updatedIssue, setUpdatedIssue] = useState({});
+  const { theme } = useTheme(); // Get the current theme
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -75,15 +77,15 @@ const IssuesCard = () => {
   };
   
   return (
-    <div>
+    <div className={`p-6 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
       {error && <p className="text-red-500">Error: {error}</p>}
       {editingIssue && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-4 rounded shadow-lg w-1/3">
+          <div className={`p-4 rounded shadow-lg w-1/3 ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
             <h2 className="text-xl mb-2">Edit Issue</h2>
             <form onSubmit={handleEditSubmit}>
               <div className="mb-2">
-                <label className="block text-gray-700">Task Number</label>
+                <label className="block">Task Number</label>
                 <input
                   type="text"
                   name="task_number"
@@ -93,7 +95,7 @@ const IssuesCard = () => {
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-gray-700">Description</label>
+                <label className="block">Description</label>
                 <textarea
                   name="description"
                   value={updatedIssue.description}
@@ -103,7 +105,7 @@ const IssuesCard = () => {
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-gray-700">Date</label>
+                <label className="block">Date</label>
                 <input
                   type="date"
                   name="date"
@@ -113,7 +115,7 @@ const IssuesCard = () => {
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-gray-700">Who</label>
+                <label className="block">Who</label>
                 <input
                   type="text"
                   name="who"
@@ -123,7 +125,7 @@ const IssuesCard = () => {
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-gray-700">Issue Number</label>
+                <label className="block">Issue Number</label>
                 <input
                   type="text"
                   name="issue_number"
@@ -133,7 +135,7 @@ const IssuesCard = () => {
                 />
               </div>
               <div className="mb-2">
-                <label className="block text-gray-700">Status</label>
+                <label className="block">Status</label>
                 <select
                   name="status"
                   value={updatedIssue.status}
@@ -162,8 +164,8 @@ const IssuesCard = () => {
           </div>
         </div>
       )}
-      <table className="w-full border-collapse border border-gray-200">
-        <thead className="bg-gray-100">
+      <table className={`w-full border-collapse border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+        <thead className={theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}>
           <tr>
             <th className="border px-4 py-2 text-center">Date</th>
             <th className="border px-4 py-2 text-center">Task Number</th>
