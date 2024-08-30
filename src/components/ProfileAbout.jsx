@@ -1,4 +1,6 @@
 import React from 'react';
+import EditIcon from '@mui/icons-material/Edit';
+
 
 const ProfileAbout = ({ about, onEditClick }) => {
   return (
@@ -9,9 +11,9 @@ const ProfileAbout = ({ about, onEditClick }) => {
       </div>
       <div
         onClick={onEditClick}
-        className="absolute top-2 right-2 p-2 cursor-pointer text-[#dbedff] hover:text-white transition-colors duration-300"
+        className="absolute top-2 right-2 p-2 cursor-pointer text-gray-600 hover:text-blue-400 transition-colors duration-300"
       >
-        Edit
+        <EditIcon />
       </div>
     </div>
   );
