@@ -9,6 +9,7 @@ import TaskDeliverables from './pages/TaskDeliverables'
 import Files from './pages/Files'
 import 'tailwindcss/tailwind.css'
 import Weekly from './components/Weekly'
+import Login from './pages/Login'
 import { TimesheetProvider } from './context/TimesheetContext'
 import { NotificationProvider } from './context/NotificationContext'
 import { ProjectProvider } from './context/ProjectContext'
@@ -25,6 +26,7 @@ const App = () => {
             <BrowserRouter>
               <Routes>
                 <Route path='/' element={<Dashboard />} />
+                <Route path='/login' element={<Login />} />
                 <Route path='/announcement' element={<Announcement />} />
                 <Route path='/profile' element={<Profile />} />
                 <Route path='/teamtask' element={<TeamTask />} />

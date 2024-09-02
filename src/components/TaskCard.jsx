@@ -7,72 +7,49 @@ const TaskCard = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isGroupLeader, setIsGroupLeader] = useState(false); // State to track if the user is a Group Leader
+  const [currentPage, setCurrentPage] = useState(1); // Add state for pagination
+  const [totalPages, setTotalPages] = useState(1); // Add state for total pages
   const { theme } = useTheme(); // Get the current theme
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const authUsername = import.meta.env.VITE_AUTH_USERNAME;
   const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
 
-  // Function to check if the user is a Group Leader
-  const checkIfGroupLeader = async () => {
+  const fetchTasks = async (page = 1) => {
     try {
-      const response = await axios.get(`${apiBaseUrl}users/me`, {
+      const response = await axios.get(`${apiBaseUrl}task`, {
         auth: {
           username: authUsername,
           password: authPassword,
         },
+        params: {
+          page,
+          per_page: 50, // Adjust based on API capabilities
+        },
       });
 
-      // Extract the group_leader field from ACF
-      return response.data.acf.group_leader;
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      return false;
+      // Sort tasks by task number in ascending order
+      const sortedTasks = response.data.sort((a, b) => {
+        const taskNumberA = a.acf ? parseFloat(a.acf.task_number) : 0;
+        const taskNumberB = b.acf ? parseFloat(b.acf.task_number) : 0;
+        return taskNumberA - taskNumberB;
+      });
+
+      setTasks(prevTasks => page === 1 ? sortedTasks : [...prevTasks, ...sortedTasks]);
+      setCurrentPage(page);
+      setTotalPages(parseInt(response.headers['x-wp-totalpages'], 10)); // Update total pages from response headers
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get(`${apiBaseUrl}task`, {
-          auth: {
-            username: authUsername,
-            password: authPassword,
-          },
-        });
-  
-        // Sort the tasks by task number in ascending order, considering decimals
-        const sortedTasks = response.data.sort((a, b) => {
-          const taskNumberA = a.acf ? parseFloat(a.acf.task_number) : 0;
-          const taskNumberB = b.acf ? parseFloat(b.acf.task_number) : 0;
-          return taskNumberA - taskNumberB;
-        });
-  
-        setTasks(sortedTasks);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    const checkGroupLeaderStatus = async () => {
-      const isLeader = await checkIfGroupLeader();
-      setIsGroupLeader(isLeader);
-    };
-  
     fetchTasks();
-    checkGroupLeaderStatus();
   }, [apiBaseUrl, authUsername, authPassword]);
-  
 
   const handleStatusChange = async (e, taskId) => {
-    if (!isGroupLeader) {
-      alert('Only the Group Leader can change the status.');
-      return; // Prevent status change if the user is not a Group Leader
-    }
-
     const newStatus = e.target.value;
     const updatedTasks = tasks.map(task =>
       task.id === taskId
@@ -95,11 +72,6 @@ const TaskCard = () => {
   };
 
   const handleArchive = async (taskId) => {
-    if (!isGroupLeader) {
-      alert('Only the Group Leader can archive a task.');
-      return; // Prevent archiving if the user is not a Group Leader
-    }
-
     const isConfirmed = window.confirm('Are you sure you want to archive this task?');
     
     if (isConfirmed) {
@@ -164,6 +136,12 @@ const TaskCard = () => {
     return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
   };
 
+  const loadMoreTasks = () => {
+    if (currentPage < totalPages) {
+      fetchTasks(currentPage + 1);
+    }
+  };
+
   if (loading) {
     return <p>Loading tasks...</p>;
   }
@@ -194,7 +172,7 @@ const TaskCard = () => {
               <td className="border px-4 py-2 text-center">
                 <select
                   value={task.acf ? task.acf.status : 'Not Started'}
-                  onChange={(e) => isGroupLeader ? handleStatusChange(e, task.id) : alert('Only the Group Leader can change the status.')}
+                  onChange={(e) => handleStatusChange(e, task.id)}
                   className={`w-full border rounded p-2 ${theme === 'dark' ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'}`}
                 >
                   <option value="Not Started">Not Started</option>
@@ -205,14 +183,23 @@ const TaskCard = () => {
               <td className="border px-4 py-2 text-center">
                 <ArchiveIcon
                   onClick={() => handleArchive(task.id)}
-                  className={`cursor-pointer text-blue-500 hover:text-blue-600 ${!isGroupLeader && 'opacity-50 cursor-not-allowed'}`}
-                  onMouseEnter={() => !isGroupLeader && alert('Only the Group Leader can archive a task.')} // Show prompt on hover if not a Group Leader
+                  className="cursor-pointer text-blue-500 hover:text-blue-600"
                 />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      {tasks.length > 0 && currentPage < totalPages && (
+        <div className="mt-4 text-center">
+          <button
+            onClick={loadMoreTasks}
+            className={`px-4 py-2 border rounded ${theme === 'dark' ? 'bg-gray-700 text-white border-gray-600' : 'bg-blue-500 text-white border-blue-400'} hover:bg-blue-600`}
+          >
+            Load More
+          </button>
+        </div>
+      )}
     </div>
   );
 };
