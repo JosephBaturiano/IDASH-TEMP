@@ -5,7 +5,6 @@ import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
-import FormHelperText from '@mui/material/FormHelperText';
 
 const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -13,6 +12,7 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
     ojtAdviser: aboutData.ojtAdviser || '',
     subjectCode: aboutData.subjectCode || '',
     aboutText: aboutData.aboutText || '',
+    groupLeader: aboutData.groupLeader || false, // Added groupLeader field
   });
 
   const handleInputChange = (e) => {
@@ -31,14 +31,20 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
     }));
   };
 
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+    setFormData({ ...formData, [name]: checked });
+  };
+
   const handleSave = () => {
     onSave({
       team: formData.team,
       ojtAdviser: formData.ojtAdviser,
       subjectCode: formData.subjectCode,
       aboutText: formData.aboutText,
+      groupLeader: formData.groupLeader, // Include groupLeader in the save data
     });
-  };  
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -117,6 +123,20 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
           className="w-full h-40 p-2 border border-gray-300 rounded"
           maxLength="400"
         />
+
+        <div className="border p-3 rounded mb-4">
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formData.groupLeader}
+                onChange={handleCheckboxChange}
+                name="groupLeader"
+                size="small"
+              />
+            }
+            label={<span style={{ fontSize: '0.8rem' }}>Group Leader</span>}
+          />
+        </div>
 
         <div className="flex justify-end mt-4 space-x-2">
           <Button
