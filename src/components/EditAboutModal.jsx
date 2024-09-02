@@ -14,6 +14,7 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
     ojtAdviser: aboutData.ojtAdviser || '',
     subjectCode: aboutData.subjectCode || '',
     aboutText: aboutData.aboutText || '',
+    groupLeader: aboutData.groupLeader || false, // Added groupLeader field
   });
 
   const handleInputChange = (e) => {
@@ -32,12 +33,18 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
     }));
   };
 
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+    setFormData({ ...formData, [name]: checked });
+  };
+
   const handleSave = () => {
     onSave({
       team: formData.team,
       ojtAdviser: formData.ojtAdviser,
       subjectCode: formData.subjectCode,
       aboutText: formData.aboutText,
+      groupLeader: formData.groupLeader, // Include groupLeader in the save data
     });
   };
 
@@ -164,6 +171,20 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
             maxLength="400"
           />
         </FormControl>
+
+        <div className="border p-3 rounded mb-4">
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formData.groupLeader}
+                onChange={handleCheckboxChange}
+                name="groupLeader"
+                size="small"
+              />
+            }
+            label={<span style={{ fontSize: '0.8rem' }}>Group Leader</span>}
+          />
+        </div>
 
         <div className="flex justify-end mt-4 space-x-2">
           <Button
