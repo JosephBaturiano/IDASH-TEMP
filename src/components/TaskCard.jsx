@@ -7,28 +7,45 @@ const TaskCard = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // Add state for pagination
+  const [totalPages, setTotalPages] = useState(1); // Add state for total pages
   const { theme } = useTheme(); // Get the current theme
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const authUsername = import.meta.env.VITE_AUTH_USERNAME;
   const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
 
+  const fetchTasks = async (page = 1) => {
+    try {
+      const response = await axios.get(`${apiBaseUrl}task`, {
+        auth: {
+          username: authUsername,
+          password: authPassword,
+        },
+        params: {
+          page,
+          per_page: 50, // Adjust based on API capabilities
+        },
+      });
+
+      // Sort tasks by task number in ascending order
+      const sortedTasks = response.data.sort((a, b) => {
+        const taskNumberA = a.acf ? parseFloat(a.acf.task_number) : 0;
+        const taskNumberB = b.acf ? parseFloat(b.acf.task_number) : 0;
+        return taskNumberA - taskNumberB;
+      });
+
+      setTasks(prevTasks => page === 1 ? sortedTasks : [...prevTasks, ...sortedTasks]);
+      setCurrentPage(page);
+      setTotalPages(parseInt(response.headers['x-wp-totalpages'], 10)); // Update total pages from response headers
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get(`${apiBaseUrl}task`, {
-          auth: {
-            username: authUsername,
-            password: authPassword,
-          },
-        });
-        setTasks(response.data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchTasks();
   }, [apiBaseUrl, authUsername, authPassword]);
 
@@ -119,6 +136,12 @@ const TaskCard = () => {
     return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
   };
 
+  const loadMoreTasks = () => {
+    if (currentPage < totalPages) {
+      fetchTasks(currentPage + 1);
+    }
+  };
+
   if (loading) {
     return <p>Loading tasks...</p>;
   }
@@ -167,6 +190,16 @@ const TaskCard = () => {
           ))}
         </tbody>
       </table>
+      {tasks.length > 0 && currentPage < totalPages && (
+        <div className="mt-4 text-center">
+          <button
+            onClick={loadMoreTasks}
+            className={`px-4 py-2 border rounded ${theme === 'dark' ? 'bg-gray-700 text-white border-gray-600' : 'bg-blue-500 text-white border-blue-400'} hover:bg-blue-600`}
+          >
+            Load More
+          </button>
+        </div>
+      )}
     </div>
   );
 };
