@@ -23,9 +23,10 @@ const ProfileCard = ({ profileData = {}, handleEditClick }) => {
 
   // Determine the styles based on the theme
   const containerClass = `bg-${theme === 'dark' ? 'gray-800' : 'white'} rounded-lg shadow-md w-[400px] p-6 mb-10 h-full relative`;
+  const timeColorClass = `text-${theme === 'dark' ? 'black' : 'black'}`;
   const textColorClass = `text-${theme === 'dark' ? 'white' : 'black'}`;
   const iconColorClass = `text-${theme === 'dark' ? 'gray-300' : 'black'}`;
-  const bgColorClass = `bg-${theme === 'dark' ? 'gray-900' : '#c3ffc7'}`;
+  const bgColorClass = `bg-${theme === 'dark' ? 'gray-200' : '#c3ffc7'}`;
 
   return (
     <div className="flex flex-col items-center h-full">
@@ -51,7 +52,7 @@ const ProfileCard = ({ profileData = {}, handleEditClick }) => {
         </div>
         <h2 className={`text-center text-2xl font-medium mb-5 ${textColorClass}`}>{full_name}</h2>
         <div className={`flex flex-col items-center ${bgColorClass} font-bold rounded-3xl shadow-md p-2 mb-6 w-[200px] mx-auto`}>
-          <span className={`text-xs font-semibold ${textColorClass} mb-1`}>Time Rendered</span>
+          <span className={`text-xs font-semibold ${timeColorClass} mb-1`}>Time Rendered</span>
           <TimeRendered timesheets={timesheets} />
         </div>
         <div className="space-y-3 px-6">

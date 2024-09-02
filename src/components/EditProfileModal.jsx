@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
 import { TextField, Button } from '@mui/material';
+import { useTheme } from '../context/ThemeContext'; // Import useTheme
 
 // API Base URLs and Credentials
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -13,6 +14,7 @@ const credentials = btoa(`${USERNAME}:${PASSWORD}`);
 const AUTH_HEADER = `Basic ${credentials}`;
 
 const EditProfileModal = ({ onClose, profileData, onSave }) => {
+  const { theme } = useTheme(); // Get the current theme
   const [formData, setFormData] = useState({
     full_name: profileData.full_name || '',
     university: profileData.university || '',
@@ -43,7 +45,7 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
       url: `${BASE_URL}media`,
       headers: {
         'Authorization': AUTH_HEADER,
-        'Content-Disposition': `attachment; filename=${file.full_name}`,
+        'Content-Disposition': `attachment; filename=${file.name}`,
       },
       data: mediaData,
     };
@@ -98,7 +100,7 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
 
   const customStyles = {
     content: {
-      maxWidth: '700px',
+      maxWidth: '448px',
       maxHeight: '100vh',
       margin: 'auto',
       top: '50%',
@@ -106,8 +108,13 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
       right: 'auto',
       bottom: 'auto',
       transform: 'translate(-50%, -50%)',
-      padding: '20px', // Adjust padding for spacing
+      padding: '1px', // Adjust padding for spacing
+      backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF', // bg-gray-800 or white
+      color: theme === 'dark' ? '#E5E7EB' : '#1F2937', // text-gray-100 or text-gray-900
     },
+    overlay: {
+      backgroundColor: 'rgba(31, 41, 55, 0.5)', // bg-gray-800 with opacity or white with opacity
+    }
   };
 
   return (
@@ -118,7 +125,7 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
       ariaHideApp={false}
       style={customStyles}
     >
-      <div className="bg-white p-6 rounded-lg">
+      <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
         <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
         <form className="space-y-4">
           <TextField
@@ -128,6 +135,12 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            InputProps={{
+              style: { color: theme === 'dark' ? '#E5E7EB' : '#1F2937' } // Text color
+            }}
+            InputLabelProps={{
+              style: { color: theme === 'dark' ? '#EBECEF' : '#4B5563' } // Label color
+            }}
           />
           <TextField
             label="University"
@@ -136,6 +149,12 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            InputProps={{
+              style: { color: theme === 'dark' ? '#E5E7EB' : '#1F2937' }
+            }}
+            InputLabelProps={{
+              style: { color: theme === 'dark' ? '#EBECEF' : '#4B5563' }
+            }}
           />
           <TextField
             label="Address"
@@ -144,6 +163,12 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            InputProps={{
+              style: { color: theme === 'dark' ? '#E5E7EB' : '#1F2937' }
+            }}
+            InputLabelProps={{
+              style: { color: theme === 'dark' ? '#EBECEF' : '#4B5563' }
+            }}
           />
           <TextField
             label="Email"
@@ -153,6 +178,12 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            InputProps={{
+              style: { color: theme === 'dark' ? '#E5E7EB' : '#1F2937' }
+            }}
+            InputLabelProps={{
+              style: { color: theme === 'dark' ? '#EBECEF' : '#4B5563' }
+            }}
           />
           <TextField
             label="Telephone"
@@ -161,14 +192,20 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            InputProps={{
+              style: { color: theme === 'dark' ? '#E5E7EB' : '#1F2937' }
+            }}
+            InputLabelProps={{
+              style: { color: theme === 'dark' ? '#EBECEF' : '#4B5563' }
+            }}
           />
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
+            <label className="block text-sm font-medium mb-1">Profile Picture</label>
             <input
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="border rounded-lg p-2 w-full"
+              className={`border rounded-lg p-2 w-full ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
             />
           </div>
           <div className="mt-4 flex justify-end space-x-4">
@@ -176,10 +213,10 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
               onClick={handleSubmit}
               variant="contained"
               sx={{
-                backgroundColor: '#16A34A', // Tailwind's bg-green-600
-                color: 'white', // Tailwind's text-white
-                padding: '8px 16px', // Tailwind's py-2 px-4
-                borderRadius: '0.5rem', // Tailwind's rounded-lg
+                backgroundColor: theme === 'dark' ? '#16A34A' : '#16A34A', // Tailwind's bg-green-600
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '0.5rem',
               }}
             >
               Save Changes
@@ -188,12 +225,12 @@ const EditProfileModal = ({ onClose, profileData, onSave }) => {
               onClick={onClose}
               variant="contained"
               sx={{
-                backgroundColor: '#EF4444', // Tailwind's bg-red-500
-                color: 'white', // Tailwind's text-white
-                padding: '8px 16px', // Tailwind's py-2 px-4
-                borderRadius: '0.5rem', // Tailwind's rounded-lg
+                backgroundColor: theme === 'dark' ? '#EF4444' : '#EF4444', // Tailwind's bg-red-500
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '0.5rem',
                 '&:hover': {
-                  backgroundColor: '#DC2626', // Slightly darker shade on hover
+                  backgroundColor: theme === 'dark' ? '#DC2626' : '#DC2626', // Slightly darker shade on hover
                 },
               }}
             >
