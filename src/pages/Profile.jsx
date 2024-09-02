@@ -24,6 +24,7 @@ const Profile = () => {
     team: [],
     ojtAdviser: '',
     subjectCode: '',
+    groupLeader: false, // Added field for group leader
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [editBadgesModalOpen, setEditBadgesModalOpen] = useState(false);
@@ -66,6 +67,7 @@ const Profile = () => {
         team: acfData.team || [],  // Fetch team data
         ojtAdviser: acfData.ojt_adviser || '',  // Fetch OJT adviser data
         subjectCode: acfData.subject_code || '',  // Fetch subject code data
+        groupLeader: acfData.group_leader === 'Group Leader',  // Fetch group leader status
       });
     } catch (error) {
       console.error('Error fetching profile data:', error);
@@ -158,6 +160,7 @@ const Profile = () => {
         team: updatedAbout.team,
         ojt_adviser: updatedAbout.ojtAdviser,
         subject_code: updatedAbout.subjectCode,
+        group_leader: updatedAbout.groupLeader ? 'Group Leader' : '', // Update group leader status
       }
     };
 
@@ -195,6 +198,7 @@ const Profile = () => {
             ojtAdviser={profileData.ojtAdviser}
             subjectCode={profileData.subjectCode}
             team={profileData.team}
+            groupLeader={profileData.groupLeader} // Pass groupLeader to ProfileAbout
             onEditClick={handleEditAboutClick}
           />
           <ProfileDirectory />
@@ -223,6 +227,7 @@ const Profile = () => {
               ojtAdviser: profileData.ojtAdviser || '',
               subjectCode: profileData.subjectCode || '',
               aboutText: profileData.about || '',
+              groupLeader: profileData.groupLeader, // Pass groupLeader to EditAboutModal
             }}
             onClose={handleCloseEditAboutModal}
             onSave={handleSaveAbout}
