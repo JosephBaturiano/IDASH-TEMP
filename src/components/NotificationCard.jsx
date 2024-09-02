@@ -20,15 +20,15 @@ const NotificationCard = ({ notifications }) => {
   return (
     <div className={`rounded-lg p-4 shadow-md ${cardBgColor} ${textColor}`}>
       <h3 className={`text-lg font-semibold mb-4 ${textColor}`}>Notifications</h3>
-      <ul className="space-y-2 text-[18px]">
+      <ul className="space-y-2 text-[18px] max-h-56 overflow-auto"> {/* Fixed height and overflow auto */}
         {notifications.map((notification, index) => (
-          <li key={index} className={`flex justify-between p-4 items-center rounded-lg ${itemBgColor}`}>
-            <div>
+          <li key={index} className={`flex flex-col justify-between p-4 items-start rounded-lg ${itemBgColor} relative`}>
+            <div className="flex-grow">
               <p className={`text-sm pb-2 ${textColor}`}>{notification.message}</p>
               <p className={`text-xs pb-1 ${textColor}`}>{notification.date}</p>
             </div>
             <button 
-              className={`px-4 py-1 rounded ${buttonTextColor} ${buttonBgColor}`}
+              className={`absolute bottom-2 right-2 px-2 py-1 text-xs rounded ${buttonTextColor} ${buttonBgColor}`}
               onClick={handleButtonClick}
             >
               {notification.action}
