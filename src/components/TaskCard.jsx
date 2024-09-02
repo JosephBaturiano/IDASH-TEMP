@@ -41,22 +41,31 @@ const TaskCard = () => {
             password: authPassword,
           },
         });
-        setTasks(response.data);
+  
+        // Sort the tasks by task number in ascending order, considering decimals
+        const sortedTasks = response.data.sort((a, b) => {
+          const taskNumberA = a.acf ? parseFloat(a.acf.task_number) : 0;
+          const taskNumberB = b.acf ? parseFloat(b.acf.task_number) : 0;
+          return taskNumberA - taskNumberB;
+        });
+  
+        setTasks(sortedTasks);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
+  
     const checkGroupLeaderStatus = async () => {
       const isLeader = await checkIfGroupLeader();
       setIsGroupLeader(isLeader);
     };
-
+  
     fetchTasks();
     checkGroupLeaderStatus();
   }, [apiBaseUrl, authUsername, authPassword]);
+  
 
   const handleStatusChange = async (e, taskId) => {
     if (!isGroupLeader) {

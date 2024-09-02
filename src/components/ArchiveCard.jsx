@@ -22,7 +22,15 @@ const ArchiveCard = () => {
           },
         });
         console.log('Fetched Archives:', response.data); // Log response data
-        setArchives(response.data);
+
+        // Sort archives by task number (considering decimal values)
+        const sortedArchives = response.data.sort((a, b) => {
+          const taskNumberA = a.acf ? parseFloat(a.acf.task_number) : 0;
+          const taskNumberB = b.acf ? parseFloat(b.acf.task_number) : 0;
+          return taskNumberA - taskNumberB;
+        });
+
+        setArchives(sortedArchives);
       } catch (err) {
         setError(`Failed to fetch archives: ${err.message}`);
       } finally {
@@ -33,9 +41,8 @@ const ArchiveCard = () => {
   }, [apiBaseUrl, authUsername, authPassword]);
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString(); // Adjust format as needed
+    if (dateString.length !== 8) return 'Invalid date';
+    return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
   };
 
   if (loading) {
