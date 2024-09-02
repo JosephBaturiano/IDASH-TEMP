@@ -11,20 +11,40 @@ const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
 const formatTime = (time) => {
   if (!time) return 'Invalid time';
 
-  const [hours, minutes] = time.split(':').map(Number);
-  
-  if (isNaN(hours) || isNaN(minutes)) {
+  // Match input time format (HH:MM AM/PM)
+  const regex = /^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i;
+  const match = time.match(regex);
+
+  if (!match) {
     console.error(`Invalid time format: ${time}`);
     return 'Invalid time';
   }
 
-  const date = new Date();
-  date.setHours(hours);
-  date.setMinutes(minutes);
+  let [_, hours, minutes, period] = match;
+  hours = parseInt(hours, 10);
+  minutes = parseInt(minutes, 10);
 
-  const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+  // Convert 12-hour time to 24-hour time if necessary
+  if (period) {
+    if (period.toUpperCase() === 'PM' && hours < 12) hours += 12;
+    if (period.toUpperCase() === 'AM' && hours === 12) hours = 0;
+  }
+
+  // Ensure hours and minutes are within valid ranges
+  if (isNaN(hours) || hours < 0 || hours >= 24 || isNaN(minutes) || minutes < 0 || minutes >= 60) {
+    console.error(`Invalid time values: ${hours}:${minutes}`);
+    return 'Invalid time';
+  }
+
+  // Format time as "HH:mm AM/PM"
+  const formattedTime = new Date();
+  formattedTime.setHours(hours);
+  formattedTime.setMinutes(minutes);
+  formattedTime.setSeconds(0);
+
+  const options = { hour: 'numeric', minute: '2-digit', hour12: true };
   const formatter = new Intl.DateTimeFormat('en-US', options);
-  return formatter.format(date).toLowerCase();
+  return formatter.format(formattedTime);
 };
 
 export function TimesheetProvider({ children }) {
