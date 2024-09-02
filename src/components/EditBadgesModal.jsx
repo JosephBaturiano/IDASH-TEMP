@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import axios from 'axios';
+import { useTheme } from '../context/ThemeContext'; // Import useTheme
 
 const EditBadgesModal = ({ badges, onClose, onSave }) => {
+  const { theme } = useTheme(); // Get the current theme
   const [files, setFiles] = useState({
     badgeOne: null,
     badgeTwo: null,
@@ -83,8 +85,8 @@ const EditBadgesModal = ({ badges, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg w-[400px]">
+    <div className={`fixed inset-0 flex items-center justify-center ${theme === 'dark' ? 'bg-gray-800 bg-opacity-50' : 'bg-gray-800 bg-opacity-50'}`}>
+      <div className={`p-6 rounded-lg w-[400px] border border-white ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
         <h2 className="text-xl font-medium mb-4">Edit Badges</h2>
         <div className="space-y-4">
           <input
@@ -92,21 +94,21 @@ const EditBadgesModal = ({ badges, onClose, onSave }) => {
             name="badgeOne"
             accept="image/*"
             onChange={handleFileChange}
-            className="w-full"
+            className={`w-full ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'} border rounded-lg p-2`}
           />
           <input
             type="file"
             name="badgeTwo"
             accept="image/*"
             onChange={handleFileChange}
-            className="w-full"
+            className={`w-full ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'} border rounded-lg p-2`}
           />
           <input
             type="file"
             name="badgeThree"
             accept="image/*"
             onChange={handleFileChange}
-            className="w-full"
+            className={`w-full ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'} border rounded-lg p-2`}
           />
         </div>
         <div className="flex justify-end mt-4 space-x-2">
@@ -114,7 +116,7 @@ const EditBadgesModal = ({ badges, onClose, onSave }) => {
             onClick={handleSubmit}
             variant="contained"
             sx={{
-              backgroundColor: '#16A34A',
+              backgroundColor: theme === 'dark' ? '#16A34A' : '#16A34A',
               color: 'white',
               padding: '8px 16px',
               borderRadius: '0.5rem',
@@ -126,12 +128,12 @@ const EditBadgesModal = ({ badges, onClose, onSave }) => {
             onClick={onClose}
             variant="contained"
             sx={{
-              backgroundColor: '#EF4444',
+              backgroundColor: theme === 'dark' ? '#EF4444' : '#EF4444',
               color: 'white',
               padding: '8px 16px',
               borderRadius: '0.5rem',
               '&:hover': {
-                backgroundColor: '#DC2626',
+                backgroundColor: theme === 'dark' ? '#DC2626' : '#DC2626',
               },
             }}
           >

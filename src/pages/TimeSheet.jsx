@@ -19,21 +19,21 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
   const { theme } = useTheme(); // Get the current theme
 
   return (
-    <thead className={theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}>
-      <tr className={`text-gray-700 font-semibold text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-        <th className="px-2 py-2">{`Task #`}</th>
-        <th className="px-2 py-2">{`Task Description`}</th>
-        <th className="px-2 py-2">{`Time Started`}</th>
-        <th className="px-2 py-2">{`Time Ended`}</th>
-        <th className="px-2 py-2">{`With Whom`}</th>
-        <th className="px-2 py-2">{`Deliverables`}</th>
-        <th className="px-2 py-2 flex items-center justify-center">
+    <thead className={`border-b ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+      <tr className={`text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+        <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Task #</th>
+        <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Task Description</th>
+        <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Time Started</th>
+        <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Time Ended</th>
+        <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>With Whom</th>
+        <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Deliverables</th>
+        <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'} flex items-center justify-center`}>
           Action
           <input
             type="checkbox"
             checked={isAllSelected}
             onChange={onSelectAll}
-            className="ml-2"
+            className={`ml-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-200 border-gray-300'}`}
           />
         </th>
       </tr>
