@@ -7,18 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 
 const ojtDocsData = {
     Unsigned: [
-        { name: 'AAA', url: 'https://drive.google.com/drive/folders/18IKR2Au8nCeGS2-0QaynjWP0Gj0mGzBm?usp=drive_link://drive.google.com/drive/folders/1x3103PSKrmAnAr98MOtf0nJNuyCEG6M4?usp=drive_link' },
-        { name: 'APS', url: 'https://drive.google.com/drive/folders/1C4F9hF9VKjhR6RlmMmCwu67R4MV6AXMo?usp=drive_link' },
-        { name: 'CDS', url: 'https://drive.google.com/drive/folders/1jh8HMpFg-F-hLi41MsnL-yFQiVutjnbF?usp=drive_link' },
-        { name: 'CJO', url: 'https://drive.google.com/drive/folders/1bp7IzCaEQb-ir0Cwi7qw8AUQDE_mm1BS?usp=drive_link' },
-        { name: 'EDL', url: 'https://drive.google.com/drive/folders/1oEaYbuPJB8cZplpNYfaqP5mwLjL8iX2Y?usp=drive_link' },
-        { name: 'JBM', url: 'https://drive.google.com/drive/folders/1m2mNmMwxuoMf4xAfIunO-zcC0EBqTVSc?usp=drive_link' },
-        { name: 'JZB', url: 'https://drive.google.com/drive/folders/1vg4krLl16NKU00G7FlatCOnhuyb5Jt9I?usp=drive_link' },
-        { name: 'KNM', url: 'https://drive.google.com/drive/folders/1gDJQxosEGDCzO6m4MOtBvcToOnDkGSHz?usp=drive_link' },
-        { name: 'LAA', url: 'https://drive.google.com/drive/folders/1-XuibKFYR63aggLHSMBvIGIhl9_I1YT6?usp=drive_link' },
-        { name: 'MRS', url: 'https://drive.google.com/drive/folders/16YgTFIeeM3uFYrJcY-vCgOZf0ssfGsBk?usp=drive_link' },
-        { name: 'RTL', url: 'https://drive.google.com/drive/folders/1tMlpwtMdgOTeUfWh_eH8YiJQitRHSnTI?usp=drive_link' },
-        { name: 'UJE', url: 'https://drive.google.com/drive/folders/1bMQXmCOIfSMTFrJsY8RvOlytQqBRNq0k?usp=drive_link' }
+        { name: 'UNSIGNED', url: 'https://drive.google.com/drive/folders/1WI0RDHo57WdYH9tKJuQ03BmFOk5V197Y?usp=drive_link' },
     ],
     Signed: [
         { name: 'AAA', url: 'https://drive.google.com/drive/folders/1x3103PSKrmAnAr98MOtf0nJNuyCEG6M4?usp=drive_link' },
@@ -80,50 +69,58 @@ const Files = () => {
             {['Signed', 'Unsigned', 'Templates'].map((tab) => (
               <div
                 key={tab}
-                className={`relative flex items-center cursor-pointer p-2 rounded-lg overflow-hidden transition-all duration-300 ${activeTab === tab ? tabActiveBgColor : tabHoverBgColor}`}
+                className={`relative flex items-center cursor-pointer p-2 rounded-lg overflow-hidden transition-all duration-300 ${
+                  activeTab === tab ? tabActiveBgColor : tabHoverBgColor
+                }`}
                 onClick={() => handleTabClick(tab)}
               >
-                <img src={folderImage} alt={tab} className="w-18 h-18 object-cover" />
+                <img
+                  src={folderImage}
+                  alt={tab}
+                  className="w-18 h-18 object-cover"
+                />
                 <span
-                  className={`absolute bottom-3 left-5 ${textColor} font-bold p-2 rounded w-full h-full flex items-end text-xl ${activeTab === tab ? 'text-blue-600' : ''}`}
+                  className={`absolute bottom-3 left-5 text-black font-bold p-2 rounded w-full h-full flex items-end text-xl`}
                   style={{ fontSize: '1rem', lineHeight: '1rem' }}
                 >
                   {tab}
                 </span>
                 <div
-                  className={`absolute bottom-0 left-0 w-full h-1 transition-transform duration-300 ${activeTab === tab ? 'bg-blue-600' : 'bg-transparent'} ${activeTab === tab ? 'transform scale-x-100' : 'transform scale-x-0'}`}
+                  className={`absolute bottom-0 left-0 w-full h-1 transition-transform duration-300 ${
+                    activeTab === tab ? 'bg-blue-600' : 'bg-transparent'
+                  } ${activeTab === tab ? 'transform scale-x-100' : 'transform scale-x-0'}`}
                 />
               </div>
             ))}
           </div>
         </div>
-
+  
         <hr className={`border-t ${borderColor} my-5`} />
         <h2 className={`text-2xl font-bold mb-4 ${textColor}`}>{activeTab}</h2>
         <div>
           {activeTab && (
             <div className="mx-auto mt-8 mb-8 max-w-4xl">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-4 justify-items-center">
                 {ojtDocsData[activeTab].map((item, index) => (
-                  <OJTDocsCard 
-                    key={index} 
-                    name={item.name} 
-                    url={item.url}
-                    className={`transition-transform duration-200 hover:scale-105 ${cardHoverBgColor}`} 
-                  />
+                  <div
+                    key={index}
+                    className={`w-72 transition-transform duration-200 hover:scale-105 ${cardHoverBgColor}`}
+                  >
+                    <OJTDocsCard name={item.name} url={item.url} />
+                  </div>
                 ))}
               </div>
             </div>
           )}
         </div>
-
+  
         <hr className={`border-t ${borderColor} my-5`} />
         <h2 className={`text-2xl font-bold mb-4 ${textColor}`}>Media</h2>
         <div className="mx-auto mt-8 mb-8 max-w-4xl">
           <div className="grid grid-cols-3 gap-4 justify-items-center">
             {mediaData.map((item, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`w-72 transition-transform duration-200 hover:scale-105 ${cardHoverBgColor}`}
               >
                 <MediaCard name={item.name} url={item.url} />
@@ -135,5 +132,5 @@ const Files = () => {
     </Home>
   );
 };
-
+  
 export default Files;
