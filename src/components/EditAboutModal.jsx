@@ -5,14 +5,16 @@ import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import FormLabel from '@mui/material/FormLabel';
-import FormHelperText from '@mui/material/FormHelperText';
+import { useTheme } from '../context/ThemeContext'; // Import useTheme
 
 const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
+  const { theme } = useTheme(); // Get the current theme
   const [formData, setFormData] = useState({
     team: aboutData.team || [],
     ojtAdviser: aboutData.ojtAdviser || '',
     subjectCode: aboutData.subjectCode || '',
     aboutText: aboutData.aboutText || '',
+    groupLeader: aboutData.groupLeader || false, // Added groupLeader field
   });
 
   const handleInputChange = (e) => {
@@ -31,23 +33,36 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
     }));
   };
 
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+    setFormData({ ...formData, [name]: checked });
+  };
+
   const handleSave = () => {
     onSave({
       team: formData.team,
       ojtAdviser: formData.ojtAdviser,
       subjectCode: formData.subjectCode,
       aboutText: formData.aboutText,
+      groupLeader: formData.groupLeader, // Include groupLeader in the save data
     });
-  };  
+  };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-[400px]">
+    <div className={`fixed inset-0 flex items-center justify-center z-50 ${theme === 'dark' ? 'bg-gray-800 bg-opacity-50' : 'bg-gray-800 bg-opacity-50'}`}>
+      <div className={`rounded-lg shadow-lg p-6 w-[448px] border ${theme === 'dark' ? 'border-gray-600 bg-gray-800 text-gray-100' : 'border-gray-300 bg-white text-gray-900'}`}>
         <h2 className="text-xl font-bold mb-4">Edit Profile Information</h2>
 
-        <div className="border p-3 rounded mb-4">
+        <div className={`border p-3 rounded mb-4 ${theme === 'dark' ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}`}>
           <FormControl component="fieldset">
-            <FormLabel component="legend" sx={{ fontSize: '0.9rem', marginBottom: '0.2rem' }}>
+            <FormLabel
+              component="legend"
+              sx={{
+                fontSize: '0.9rem',
+                marginBottom: '0.2rem',
+                color: theme === 'dark' ? '#E5E7EB' : '#1F2937', // Adjust color based on theme
+              }}
+            >
               Team
             </FormLabel>
             <FormGroup row>
@@ -91,39 +106,92 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
           </FormControl>
         </div>
 
-        <input
-          type="text"
-          name="ojtAdviser"
-          value={formData.ojtAdviser}
-          onChange={handleInputChange}
-          placeholder="OJT Adviser"
-          className="w-full mb-2 p-2 border border-gray-300 rounded"
-        />
+        <FormControl fullWidth margin="normal">
+          <FormLabel
+            htmlFor="ojtAdviser"
+            sx={{
+              fontSize: '0.9rem',
+              marginBottom: '0.2rem',
+              color: theme === 'dark' ? '#E5E7EB' : '#1F2937',
+            }}
+          >
+            OJT Adviser
+          </FormLabel>
+          <input
+            type="text"
+            id="ojtAdviser"
+            name="ojtAdviser"
+            value={formData.ojtAdviser}
+            onChange={handleInputChange}
+            placeholder="OJT Adviser"
+            className={`w-full p-2 border rounded ${theme === 'dark' ? 'border-gray-600 bg-gray-700 text-gray-100' : 'border-gray-300 bg-white text-gray-900'}`}
+          />
+        </FormControl>
 
-        <input
-          type="text"
-          name="subjectCode"
-          value={formData.subjectCode}
-          onChange={handleInputChange}
-          placeholder="Subject Code"
-          className="w-full mb-2 p-2 border border-gray-300 rounded"
-        />
+        <FormControl fullWidth margin="normal">
+          <FormLabel
+            htmlFor="subjectCode"
+            sx={{
+              fontSize: '0.9rem',
+              marginBottom: '0.2rem',
+              color: theme === 'dark' ? '#E5E7EB' : '#1F2937',
+            }}
+          >
+            Subject Code
+          </FormLabel>
+          <input
+            type="text"
+            id="subjectCode"
+            name="subjectCode"
+            value={formData.subjectCode}
+            onChange={handleInputChange}
+            placeholder="Subject Code"
+            className={`w-full p-2 border rounded ${theme === 'dark' ? 'border-gray-600 bg-gray-700 text-gray-100' : 'border-gray-300 bg-white text-gray-900'}`}
+          />
+        </FormControl>
 
-        <textarea
-          name="aboutText"
-          value={formData.aboutText}
-          onChange={handleInputChange}
-          placeholder="About Me"
-          className="w-full h-40 p-2 border border-gray-300 rounded"
-          maxLength="400"
-        />
+        <FormControl fullWidth margin="normal">
+          <FormLabel
+            htmlFor="aboutText"
+            sx={{
+              fontSize: '0.9rem',
+              marginBottom: '0.2rem',
+              color: theme === 'dark' ? '#E5E7EB' : '#1F2937',
+            }}
+          >
+            About Me
+          </FormLabel>
+          <textarea
+            id="aboutText"
+            name="aboutText"
+            value={formData.aboutText}
+            onChange={handleInputChange}
+            placeholder="About Me"
+            className={`w-full h-40 p-2 border rounded ${theme === 'dark' ? 'border-gray-600 bg-gray-700 text-gray-100' : 'border-gray-300 bg-white text-gray-900'}`}
+            maxLength="400"
+          />
+        </FormControl>
+
+        <div className="border p-3 rounded mb-4">
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formData.groupLeader}
+                onChange={handleCheckboxChange}
+                name="groupLeader"
+                size="small"
+              />
+            }
+            label={<span style={{ fontSize: '0.8rem' }}>Group Leader</span>}
+          />
+        </div>
 
         <div className="flex justify-end mt-4 space-x-2">
           <Button
             onClick={handleSave}
             variant="contained"
             sx={{
-              backgroundColor: '#16A34A',
+              backgroundColor: theme === 'dark' ? '#16A34A' : '#16A34A',
               color: 'white',
               padding: '8px 16px',
               borderRadius: '0.5rem',
@@ -135,12 +203,12 @@ const EditAboutModal = ({ aboutData = {}, onClose, onSave }) => {
             onClick={onClose}
             variant="contained"
             sx={{
-              backgroundColor: '#EF4444',
+              backgroundColor: theme === 'dark' ? '#EF4444' : '#EF4444',
               color: 'white',
               padding: '8px 16px',
               borderRadius: '0.5rem',
               '&:hover': {
-                backgroundColor: '#DC2626',
+                backgroundColor: theme === 'dark' ? '#DC2626' : '#DC2626',
               },
             }}
           >

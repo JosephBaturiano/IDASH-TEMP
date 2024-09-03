@@ -2,7 +2,7 @@ import React from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme
 
-const ProfileAbout = ({ about, ojtAdviser, subjectCode, team, onEditClick }) => {
+const ProfileAbout = ({ about, ojtAdviser, subjectCode, groupLeader, team, onEditClick }) => {
   const { theme } = useTheme(); // Get the current theme
   
   // Determine styles based on the theme
@@ -22,6 +22,8 @@ const ProfileAbout = ({ about, ojtAdviser, subjectCode, team, onEditClick }) => 
           <div><strong>Adviser: </strong>{ojtAdviser || 'N/A'}</div>
           <span>|</span>
           <div><strong>Code: </strong>{subjectCode || 'N/A'}</div>
+          <span>|</span>
+          <div><strong>Other: </strong>{groupLeader ? 'Group Leader' : 'N/A'}</div>
         </div>
         <div
           onClick={onEditClick}
