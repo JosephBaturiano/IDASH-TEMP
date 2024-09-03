@@ -15,7 +15,9 @@ const SideBar = () => {
     <div className={`flex flex-col h-full p-4`} style={{ backgroundColor: sidebarBgColor }}>
       {/* Logo */}
       <div className="flex justify-center mb-8">
-        <img src={iDashLogo} alt="Logo" className="w-40 h-50" />
+        <NavLink to="/">
+          <img src={iDashLogo} alt="Logo" className="w-40 h-50 cursor-pointer" />
+        </NavLink>
       </div>
 
       {/* Navigation Items */}
