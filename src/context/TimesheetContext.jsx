@@ -61,6 +61,7 @@ export function TimesheetProvider({ children }) {
         full_name: response.data.acf.full_name,
         OJTadviser: response.data.acf.ojt_adviser,
         subjectCode: response.data.acf.subject_code,
+        internSignature: response.data.acf.intern_signature
       };
       setUser(userInfo);
     })

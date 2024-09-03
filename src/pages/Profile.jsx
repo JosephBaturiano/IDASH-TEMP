@@ -6,7 +6,9 @@ import ProfileAbout from '../components/ProfileAbout';
 import ProfileDirectory from '../components/ProfileDirectory';
 import EditProfileModal from '../components/EditProfileModal';
 import EditBadgesModal from '../components/EditBadgesModal';
-import EditAboutModal from '../components/EditAboutModal'; // Import the EditAboutModal
+import EditAboutModal from '../components/EditAboutModal';
+import EditSignatureModal from '../components/EditSignatureModal'; // Import the EditSignatureModal
+import InternSignature from '../components/InternSignature'; // Import the InternSignature component
 import Home from './Home';
 
 const Profile = () => {
@@ -24,11 +26,13 @@ const Profile = () => {
     team: [],
     ojtAdviser: '',
     subjectCode: '',
-    groupLeader: false, // Added field for group leader
+    groupLeader: false,
+    internSignature: '',
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [editBadgesModalOpen, setEditBadgesModalOpen] = useState(false);
-  const [editAboutModalOpen, setEditAboutModalOpen] = useState(false); // State for the EditAboutModal
+  const [editAboutModalOpen, setEditAboutModalOpen] = useState(false);
+  const [editSignatureModalOpen, setEditSignatureModalOpen] = useState(false); // State for the EditSignatureModal
   const ojtTime = "00:00:00";
 
   useEffect(() => {
@@ -52,6 +56,7 @@ const Profile = () => {
       const badgeTwoUrl = acfData['badge-two'] ? await fetchImageUrl(acfData['badge-two']) : '';
       const badgeThreeUrl = acfData['badge-three'] ? await fetchImageUrl(acfData['badge-three']) : '';
       const userProfileUrl = acfData['user_profile'] ? await fetchImageUrl(acfData['user_profile']) : '';
+      const internSignatureUrl = acfData['intern_signature'] ? await fetchImageUrl(acfData['intern_signature']) : '';
 
       setProfileData({
         full_name: acfData.full_name,
@@ -63,11 +68,12 @@ const Profile = () => {
         badgeTwo: badgeTwoUrl,
         badgeThree: badgeThreeUrl,
         user_profile: userProfileUrl,
-        about: acfData.about,  // Fetch about data
-        team: acfData.team || [],  // Fetch team data
-        ojtAdviser: acfData.ojt_adviser || '',  // Fetch OJT adviser data
-        subjectCode: acfData.subject_code || '',  // Fetch subject code data
-        groupLeader: acfData.group_leader === 'Group Leader',  // Fetch group leader status
+        about: acfData.about,
+        team: acfData.team || [],
+        ojtAdviser: acfData.ojt_adviser || '',
+        subjectCode: acfData.subject_code || '',
+        groupLeader: acfData.group_leader === 'Group Leader',
+        internSignature: internSignatureUrl, // Set intern signature URL
       });
     } catch (error) {
       console.error('Error fetching profile data:', error);
@@ -146,7 +152,7 @@ const Profile = () => {
   };
 
   const handleEditAboutClick = () => {
-    setEditAboutModalOpen(true); // Open the "Edit About Me" modal
+    setEditAboutModalOpen(true);
   };
 
   const handleCloseEditAboutModal = () => {
@@ -180,6 +186,36 @@ const Profile = () => {
       });
   };
 
+  const handleEditSignatureClick = () => {
+    setEditSignatureModalOpen(true); // Open the "Edit Signature" modal
+  };
+
+  const handleCloseEditSignatureModal = () => {
+    setEditSignatureModalOpen(false);
+  };
+
+  const handleSaveSignature = async (updatedSignature) => {
+    const updatedProfileData = {
+      acf: {
+        intern_signature: updatedSignature, // Update intern signature
+      }
+    };
+
+    try {
+      await axios.post(import.meta.env.VITE_API_BASE_URL + 'users/me', updatedProfileData, {
+        headers: {
+          'Authorization': 'Basic ' + btoa(import.meta.env.VITE_AUTH_USERNAME + ':' + import.meta.env.VITE_AUTH_PASSWORD),
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Signature updated successfully');
+      fetchProfileData(); // Refetch profile data to get the updated signature
+      handleCloseEditSignatureModal();
+    } catch (error) {
+      console.error('Error updating signature:', error);
+    }
+  };
+
   return (
     <Home>
       <div className="flex justify-center items-start space-x-5">
@@ -198,10 +234,14 @@ const Profile = () => {
             ojtAdviser={profileData.ojtAdviser}
             subjectCode={profileData.subjectCode}
             team={profileData.team}
-            groupLeader={profileData.groupLeader} // Pass groupLeader to ProfileAbout
+            groupLeader={profileData.groupLeader}
             onEditClick={handleEditAboutClick}
           />
           <ProfileDirectory />
+          <InternSignature
+            signatureUrl={profileData.internSignature}
+            onEditClick={handleEditSignatureClick}
+          />
         </div>
 
         {modalOpen && (
@@ -227,10 +267,18 @@ const Profile = () => {
               ojtAdviser: profileData.ojtAdviser || '',
               subjectCode: profileData.subjectCode || '',
               aboutText: profileData.about || '',
-              groupLeader: profileData.groupLeader, // Pass groupLeader to EditAboutModal
+              groupLeader: profileData.groupLeader,
             }}
             onClose={handleCloseEditAboutModal}
             onSave={handleSaveAbout}
+          />
+        )}
+
+        {editSignatureModalOpen && (
+          <EditSignatureModal
+            signature={profileData.internSignature}
+            onClose={handleCloseEditSignatureModal}
+            onSave={handleSaveSignature}
           />
         )}
       </div>
