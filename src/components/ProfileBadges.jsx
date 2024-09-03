@@ -11,73 +11,29 @@ const ProfileBadges = ({ badgeOne, badgeTwo, badgeThree, onEditClick, onDeleteBa
   const textColorClass = `text-${theme === 'dark' ? 'white' : 'black'}`;
   const buttonClass = `absolute inset-0 m-auto h-[30px] w-[30px] bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity`;
 
+  const renderBadge = (badge, badgeName) => (
+    <div className="relative group">
+      {badge ? (
+        <>
+          <img src={badge} alt={badgeName} className="h-[90px] w-[90px]" />
+          <button
+            onClick={() => onDeleteBadge(badgeName)}
+            className={buttonClass}
+          >
+            x
+          </button>
+        </>
+      ) : null}
+    </div>
+  );
+
   return (
     <div className={containerClass}>
       <h2 className={`text-2xl font-medium mb-2 ${textColorClass}`}>Badges</h2>
       <div className="flex gap-4 px-1 pt-1">
-        {badgeOne ? (
-          <div className="relative group">
-            <img src={badgeOne} alt="Badge 1" className="h-[90px] w-[90px]" />
-            <button
-              onClick={() => onDeleteBadge('badgeOne')}
-              className={buttonClass}
-            >
-              x
-            </button>
-          </div>
-        ) : (
-          <div className="relative group">
-            <img src={placeholderBadge} alt="Placeholder Badge" className="h-[90px] w-[90px]" />
-            <button
-              onClick={() => onDeleteBadge('badgeOne')}
-              className={buttonClass}
-            >
-              x
-            </button>
-          </div>
-        )}
-        {badgeTwo ? (
-          <div className="relative group">
-            <img src={badgeTwo} alt="Badge 2" className="h-[90px] w-[90px]" />
-            <button
-              onClick={() => onDeleteBadge('badgeTwo')}
-              className={buttonClass}
-            >
-              x
-            </button>
-          </div>
-        ) : (
-          <div className="relative group">
-            <img src={placeholderBadge} alt="Placeholder Badge" className="h-[90px] w-[90px]" />
-            <button
-              onClick={() => onDeleteBadge('badgeTwo')}
-              className={buttonClass}
-            >
-              x
-            </button>
-          </div>
-        )}
-        {badgeThree ? (
-          <div className="relative group">
-            <img src={badgeThree} alt="Badge 3" className="h-[90px] w-[90px]" />
-            <button
-              onClick={() => onDeleteBadge('badgeThree')}
-              className={buttonClass}
-            >
-              x
-            </button>
-          </div>
-        ) : (
-          <div className="relative group">
-            <img src={placeholderBadge} alt="Placeholder Badge" className="h-[90px] w-[90px]" />
-            <button
-              onClick={() => onDeleteBadge('badgeThree')}
-              className={buttonClass}
-            >
-              x
-            </button>
-          </div>
-        )}
+        {renderBadge(badgeOne, 'badgeOne')}
+        {renderBadge(badgeTwo, 'badgeTwo')}
+        {renderBadge(badgeThree, 'badgeThree')}
       </div>
       <div
         onClick={onEditClick}
