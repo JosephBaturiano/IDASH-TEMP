@@ -17,6 +17,7 @@ export const useNotification = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [profileImageUrl, setProfileImageUrl] = useState('');
     const [announcements, setAnnouncements] = useState([]);
     const [rules, setRules] = useState([]);
     const [notifications, setNotifications] = useState([]);
@@ -38,8 +39,17 @@ export const NotificationProvider = ({ children }) => {
                     },
                 });
                 setUser(response.data);
-            } catch (error) {
-                console.error('Error fetching user data:', error);
+
+                if (response.data?.acf?.user_profile) {
+                    const mediaResponse = await axios.get(`${BASE_URL}media/${response.data.acf.user_profile}`, {
+                        headers: {
+                            'Authorization': AUTH_HEADER,
+                        },
+                    });
+                    setProfileImageUrl(mediaResponse.data.source_url);
+                }
+            } catch (err) {
+                setError(err.message || 'An error occurred');
             }
         };
 
@@ -115,7 +125,7 @@ export const NotificationProvider = ({ children }) => {
     };
 
     return (
-        <NotificationContext.Provider value={{ user, announcements, rules, notifications, unreadCount, markAllAsRead, loading, error, notificationsEnabled, toggleNotifications }}>
+        <NotificationContext.Provider value={{ user, profileImageUrl, announcements, rules, notifications, unreadCount, markAllAsRead, loading, error, notificationsEnabled, toggleNotifications }}>
             {children}
         </NotificationContext.Provider>
     );

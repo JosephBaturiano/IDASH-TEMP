@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { Menu, MenuItem, IconButton, ListItemIcon, Switch } from '@mui/material';
+import { Menu, MenuItem, IconButton, ListItemIcon } from '@mui/material';
 import { Logout, Person, Settings } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import FullName from '../components/FullName';
@@ -14,9 +14,10 @@ const TopBar = () => {
   const { timesheets } = useTimesheets();
   const {
     user = {},
+    profileImageUrl = '',
     notifications = [],
     unreadCount = 0,
-    markAllAsRead = () => {},
+    markAllAsRead = () => { },
     notificationsEnabled,
     toggleNotifications
   } = useNotification();
@@ -101,9 +102,9 @@ const TopBar = () => {
         {/* User Profile */}
         <div className="flex items-center space-x-4">
           <FullName name={user?.name} />
-          {user?.avatar_urls?.['96'] ? (
+          {profileImageUrl ? (
             <img
-              src={user.avatar_urls['96']}
+              src={profileImageUrl}
               alt="Profile"
               className="w-12 h-12 rounded-full object-cover cursor-pointer"
               onClick={handleProfileClick}
