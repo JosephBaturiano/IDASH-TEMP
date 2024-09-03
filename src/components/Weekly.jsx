@@ -249,13 +249,13 @@ function Weekly() {
                 <div className="flex justify-between mx-14 text-sm">
                   <div className="text-left">
                     <div className="h-9"></div>
-                    <p className="italic mb-2">Prepared By:</p>
+                    <p className="italic mb-10">Prepared By:</p>
                     <p className="font-bold">{user?.full_name}</p>
                     <p className="italic mb-7">Trainee/Student</p>
                   </div>
                   <div className="text-left">
                     <div className="h-9"></div>
-                    <p className="italic mb-2">Verified and Certified By:</p>
+                    <p className="italic mb-10">Verified and Certified By:</p>
                     <p className="font-bold">Mr. Rene S. Yap</p>
                     <p className="italic">Technical Director</p>
                     <p className="italic">VisibleTeam Solutions OPC</p>
