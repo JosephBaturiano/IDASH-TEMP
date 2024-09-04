@@ -176,34 +176,30 @@ const TaskCard = () => {
     }
   };
 
-  if (loading) {
-    return <p>Loading tasks...</p>;
-  }
-
   return (
     <div className={`p-6 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
       {error && <p className="text-red-500">Error: {error}</p>}
-      <table className={`table-auto w-full border-collapse border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+      <table className={`table-auto w-full border-collapse ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
         <thead className={theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}>
           <tr>
-            <th className="px-4 py-2 text-center">Task Number</th>
-            <th className="px-4 py-2 text-center">Description</th>
-            <th className="px-4 py-2 text-center">Date Created</th>
-            <th className="px-4 py-2 text-center">Allocated Time</th>
-            <th className="px-4 py-2 text-center">Assigned To</th>
-            <th className="px-4 py-2 text-center">Status</th>
-            <th className="px-4 py-2 text-center">Action</th>
+            <th className="px-6 py-3 text-center w-1/24">Task Number</th>
+            <th className="px-6 py-3 text-center w-1/4">Description</th>
+            <th className="px-6 py-3 text-center w-1/6">Date Created</th>
+            <th className="px-6 py-3 text-center w-1/6">Allocated Time</th>
+            <th className="px-6 py-3 text-center w-1/6">Assigned To</th>
+            <th className="px-6 py-3 text-center w-1/6">Status</th>
+            <th className="px-6 py-3 text-center w-1/12">Action</th>
           </tr>
         </thead>
         <tbody>
           {tasks.map((task) => (
             <tr key={task.id}>
-              <td className="border px-4 py-2 text-center">{task.acf ? task.acf.task_number : 'No number'}</td>
-              <td className="border px-4 py-2 text-center">{task.acf ? task.acf.task_description : 'No description'}</td>
-              <td className="border px-4 py-2 text-center">{task.acf ? formatDate(task.acf.date_created) : 'No date'}</td>
-              <td className="border px-4 py-2 text-center">{task.acf ? task.acf.allocated_time : 'No time'}</td>
-              <td className="border px-4 py-2 text-center">{task.acf ? task.acf.assigned_to : 'No assignee'}</td>
-              <td className="border px-4 py-2 text-center">
+              <td className="border px-6 py-4 text-center">{task.acf ? task.acf.task_number : 'No number'}</td>
+              <td className="border px-6 py-4 text-center">{task.acf ? task.acf.task_description : 'No description'}</td>
+              <td className="border px-6 py-4 text-center">{task.acf ? formatDate(task.acf.date_created) : 'No date'}</td>
+              <td className="border px-6 py-4 text-center">{task.acf ? task.acf.allocated_time : 'No time'}</td>
+              <td className="border px-6 py-4 text-center">{task.acf ? task.acf.assigned_to : 'No assignee'}</td>
+              <td className="border px-6 py-4 text-center">
                 <select
                   value={task.acf ? task.acf.status : 'Not Started'}
                   onChange={(e) => handleStatusChange(e, task.id)}
@@ -214,11 +210,11 @@ const TaskCard = () => {
                   <option value="Done">Done</option>
                 </select>
               </td>
-              <td className="border px-4 py-2 text-center">
+              <td className="border px-6 py-4 text-center">
                 <ArchiveIcon
                   onClick={() => {
                     if (!isGroupLeader) {
-                      alert('Only the Group Leader can archive a task.');
+                      alert('Only the Group Leader can archive tasks.');
                     } else {
                       handleArchive(task.id);
                     }
@@ -231,14 +227,12 @@ const TaskCard = () => {
         </tbody>
       </table>
       {currentPage < totalPages && (
-        <div className="text-center mt-4">
-          <button 
-            onClick={loadMoreTasks} 
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Load More Tasks
-          </button>
-        </div>
+        <button
+          onClick={loadMoreTasks}
+          className={`mt-4 px-4 py-2 rounded ${theme === 'dark' ? 'bg-gray-600 text-white' : 'bg-gray-300 text-gray-900'} hover:bg-gray-500`}
+        >
+          Load More
+        </button>
       )}
     </div>
   );
