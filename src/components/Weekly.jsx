@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
+import Draggable from 'react-draggable';
 import { useTimesheets } from '../context/TimesheetContext';
 import WeeklyHeader from '../components/WeeklyHeader';
 import WeeklyFooter from '../components/WeeklyFooter';
@@ -254,11 +255,17 @@ function Weekly() {
                   <div className="text-left">
                     <div className="h-9"></div>
                     <p className="italic mb-10">Prepared By:</p>
+                    <Draggable>
                     {user?.internSignature ? (
-                      <img src={user.internSignature} alt="Intern Signature" />
+                      <img
+                        src={user.internSignature}
+                        alt="Intern Signature"
+                        style={{ width: '300px', height: 'auto', position: 'absolute' }} // Adjust the size of the signature here
+                      />
                     ) : (
                       <p>No signature available</p>
                     )}
+                    </Draggable>
                     <p className="font-bold">{user?.full_name}</p>
                     <p className="italic mb-7">Trainee/Student</p>
 
