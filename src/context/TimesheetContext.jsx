@@ -73,43 +73,47 @@ export function TimesheetProvider({ children }) {
         let allTimesheets = [];
         let page = 1;
         let totalPages = 1; // Initialize to ensure loop runs at least once
-
+    
         while (page <= totalPages) {
-          try {
-            const response = await axios.get(`${API_BASE_URL}?author=${user.id}&per_page=100&page=${page}`, {
-              headers: { 'Authorization': AUTH_HEADER }
-            });
-
-            if (Array.isArray(response.data)) {
-              allTimesheets = [...allTimesheets, ...response.data];
-              totalPages = parseInt(response.headers['x-wp-totalpages'], 100) || 1; // Get total pages from header
-              page++;
-            } else {
-              console.error('API Response is not an array:', response.data);
-              break;
+            try {
+                const response = await axios.get(`${API_BASE_URL}?author=${user.id}&per_page=100&page=${page}`, {
+                    headers: { 'Authorization': AUTH_HEADER }
+                });
+    
+                if (Array.isArray(response.data)) {
+                    allTimesheets = [...allTimesheets, ...response.data];
+                    totalPages = parseInt(response.headers['x-wp-totalpages'], 10) || 1; // Get total pages from header
+                    page++;
+                } else {
+                    console.error('API Response is not an array:', response.data);
+                    break;
+                }
+            } catch (error) {
+                console.error('Error fetching timesheets:', error);
+                break;
             }
-          } catch (error) {
-            console.error('Error fetching timesheets:', error);
-            break;
-          }
         }
-
+    
         const formattedPosts = allTimesheets.map(post => ({
-          id: post.id,
-          taskNumber: post.acf.task_number,
-          description: post.acf.task_description,
-          timeStarted: formatTime(post.acf.time_started),
-          timeEnded: formatTime(post.acf.time_ended),
-          withWhom: post.acf.with_whom,
-          deliverables: post.acf.deliverables,
-          date: post.date,
+            id: post.id,
+            taskNumber: post.acf.task_number,
+            description: post.acf.task_description,
+            timeStarted: formatTime(post.acf.time_started),
+            timeEnded: formatTime(post.acf.time_ended),
+            withWhom: post.acf.with_whom,
+            deliverables: post.acf.deliverables,
+            date: post.date,
         }));
-
-        console.log('Formatted timesheets:', formattedPosts);
-        setTimesheets(formattedPosts);
-      };
-
-      fetchTimesheets();
+    
+        // Reverse the order of the formatted posts
+        const reversedPosts = formattedPosts.reverse();
+    
+        console.log('Formatted timesheets (reversed):', reversedPosts);
+        setTimesheets(reversedPosts);
+    };
+    
+    fetchTimesheets();
+    
     }
   }, [user]);
 
