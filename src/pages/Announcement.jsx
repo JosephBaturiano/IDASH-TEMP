@@ -51,7 +51,7 @@ const Announcement = ({ children }) => {
                         </div>
 
                         {/* Tab Content */}
-                        <div className={`p-6 h-[calc(100%-50px)] max-h-[500px] overflow-y-auto ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>
+                        <div className={`p-6 h-[calc(100%-100px)] max-h-auto overflow-y-auto ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>
                             {activeTab === 'announcements' && <AnnouncementCard />}
                             {activeTab === 'rules' && <RulesCard />}
                         </div>
