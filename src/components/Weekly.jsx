@@ -1,10 +1,12 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
+import Draggable from 'react-draggable';
 import { useTimesheets } from '../context/TimesheetContext';
 import WeeklyHeader from '../components/WeeklyHeader';
 import WeeklyFooter from '../components/WeeklyFooter';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import TimesheetItem from '../components/WeeklyContent';
+
 
 const SECTION_HEIGHT = 700; // Height of one section
 const FOOTER_HEIGHT = 50; // Height of the footer
@@ -44,11 +46,11 @@ function Weekly() {
   const calculateWeekNumber = (date) => {
     const startDate = new Date('2024-07-22');
     const currentDate = new Date(date);
-  
+
     const countWeekdays = (start, end) => {
       let count = 0;
       let day = new Date(start);
-      
+
       while (day <= end) {
         const dayOfWeek = day.getDay();
         if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Exclude weekends (0 = Sunday, 6 = Saturday)
@@ -56,15 +58,15 @@ function Weekly() {
         }
         day.setDate(day.getDate() + 1);
       }
-      
+
       return count;
     };
-  
+
     const totalWeekdays = countWeekdays(startDate, currentDate);
     return Math.floor(totalWeekdays / 5); // 5 weekdays in a week
   };
-  
-  
+
+
 
 
   const firstDate = sortedTimesheets.length > 0 ? formatDate(sortedTimesheets[0].date) : null;
@@ -108,6 +110,8 @@ function Weekly() {
         // Otherwise, add the row to the current section
         currentSection.push({ date, descriptions });
         currentHeight += rowHeight;
+        console.log('Intern Signature URL:', user?.internSignature);
+
       }
 
       container.removeChild(row);
@@ -158,6 +162,7 @@ function Weekly() {
   }
   return (
     <div>
+
       <button
         onClick={handleDownload}
         className="absolute top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 z-10"
@@ -250,8 +255,20 @@ function Weekly() {
                   <div className="text-left">
                     <div className="h-9"></div>
                     <p className="italic mb-10">Prepared By:</p>
+                    <Draggable>
+                    {user?.internSignature ? (
+                      <img
+                        src={user.internSignature}
+                        alt="Intern Signature"
+                        style={{ width: '300px', height: 'auto', position: 'absolute' }} // Adjust the size of the signature here
+                      />
+                    ) : (
+                      <p>No signature available</p>
+                    )}
+                    </Draggable>
                     <p className="font-bold">{user?.full_name}</p>
                     <p className="italic mb-7">Trainee/Student</p>
+
                   </div>
                   <div className="text-left">
                     <div className="h-9"></div>
