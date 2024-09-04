@@ -8,6 +8,7 @@ import TimeRendered from './TimeRendered';
 import { useTimesheets } from '../context/TimesheetContext';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme
 
+
 const ProfileCard = ({ profileData = {}, handleEditClick }) => {
   const {
     user_profile = '',
@@ -15,7 +16,7 @@ const ProfileCard = ({ profileData = {}, handleEditClick }) => {
     university = '',
     address = '',
     email = '',
-    telephone = ''
+    telephone = '',
   } = profileData;
 
   const { timesheets } = useTimesheets();
