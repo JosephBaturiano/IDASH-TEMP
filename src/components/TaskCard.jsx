@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext'; // Import useTheme to get th
 
 const TaskCard = () => {
   const [tasks, setTasks] = useState([]);
+  const [userNames, setUserNames] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isGroupLeader, setIsGroupLeader] = useState(false); // State to track if the user is a Group Leader
@@ -31,6 +32,25 @@ const TaskCard = () => {
     } catch (error) {
       console.error('Error fetching user data:', error);
       return false;
+    }
+  };
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axios.get(`${apiBaseUrl}users`, {
+        auth: {
+          username: authUsername,
+          password: authPassword,
+        },
+      });
+      const users = response.data;
+      const userIdToName = {};
+      users.forEach((user) => {
+        userIdToName[user.id] = user.name; // Map user IDs to names
+      });
+      setUserNames(userIdToName);
+    } catch (error) {
+      console.error('Error fetching user details:', error);
     }
   };
 
@@ -69,7 +89,7 @@ const TaskCard = () => {
       const isLeader = await checkIfGroupLeader();
       setIsGroupLeader(isLeader);
     };
-
+    fetchUserDetails();
     fetchTasks();
     checkGroupLeaderStatus();
   }, [apiBaseUrl, authUsername, authPassword]);
@@ -198,7 +218,16 @@ const TaskCard = () => {
               <td className="border px-6 py-4 text-center">{task.acf ? task.acf.task_description : 'No description'}</td>
               <td className="border px-6 py-4 text-center">{task.acf ? formatDate(task.acf.date_created) : 'No date'}</td>
               <td className="border px-6 py-4 text-center">{task.acf ? task.acf.allocated_time : 'No time'}</td>
-              <td className="border px-6 py-4 text-center">{task.acf ? task.acf.assigned_to : 'No assignee'}</td>
+              <td className="border px-6 py-4 text-center">
+                {task.acf && Array.isArray(task.acf.assigned_to) && task.acf.assigned_to.length > 0
+                  ? task.acf.assigned_to.map((userId, index) => (
+                      <span key={userId}>
+                        {userNames[userId] || 'Unknown User'}
+                        {index < task.acf.assigned_to.length - 1 && ', '}
+                      </span>
+                    ))
+                  : 'No assignee'}
+              </td>
               <td className="border px-6 py-4 text-center">
                 <select
                   value={task.acf ? task.acf.status : 'Not Started'}
