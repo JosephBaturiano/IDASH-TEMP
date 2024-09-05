@@ -46,7 +46,10 @@ const formatTime = (time) => {
 export function TimesheetProvider({ children }) {
   const [timesheets, setTimesheets] = useState([]);
   const [user, setUser] = useState(null);
+  const [interns, setInterns] = useState([]); // Store interns list
+  const [selectedIntern, setSelectedIntern] = useState(null); // Track selected intern
 
+  // Fetch current user
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -62,7 +65,6 @@ export function TimesheetProvider({ children }) {
           internSignature: response.data.acf.intern_signature,
         };
 
-        // Fetch the URL of the intern's signature
         if (userInfo.internSignature) {
           const signatureResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}media/${userInfo.internSignature}`, {
             headers: { 'Authorization': AUTH_HEADER }
@@ -79,58 +81,107 @@ export function TimesheetProvider({ children }) {
     fetchUser();
   }, []);
 
+  // Fetch interns
   useEffect(() => {
-    if (user && user.id) {
-      const fetchTimesheets = async () => {
-        let allTimesheets = [];
-        let page = 1;
-        let totalPages = 1; // Initialize to ensure loop runs at least once
-    
-        while (page <= totalPages) {
-            try {
-                const response = await axios.get(`${API_BASE_URL}?author=${user.id}&per_page=100&page=${page}`, {
-                    headers: { 'Authorization': AUTH_HEADER }
-                });
-    
-                if (Array.isArray(response.data)) {
-                    allTimesheets = [...allTimesheets, ...response.data];
-                    totalPages = parseInt(response.headers['x-wp-totalpages'], 10) || 1; // Get total pages from header
-                    page++;
-                } else {
-                    console.error('API Response is not an array:', response.data);
-                    break;
-                }
-            } catch (error) {
-                console.error('Error fetching timesheets:', error);
-                break;
-            }
+    const fetchInterns = async () => {
+      if (!user) return; // Ensure user is loaded before fetching interns
+
+      let allInterns = [];
+      let page = 1;
+      let totalPages = 1;
+
+      while (page <= totalPages) {
+        try {
+          const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}users?per_page=100&page=${page}`, {
+            headers: { 'Authorization': AUTH_HEADER }
+          });
+
+          if (Array.isArray(response.data)) {
+            allInterns = [...allInterns, ...response.data.map(intern => ({
+              id: intern.id,
+              name: intern.name
+            }))];
+
+            totalPages = parseInt(response.headers['x-wp-totalpages'], 10) || 1;
+            page++;
+          } else {
+            console.error('API Response is not an array:', response.data);
+            break;
+          }
+        } catch (error) {
+          console.error('Error fetching interns:', error);
+          break;
         }
-    
-        const formattedPosts = allTimesheets.map(post => ({
-            id: post.id,
-            taskNumber: post.acf.task_number,
-            description: post.acf.task_description,
-            timeStarted: formatTime(post.acf.time_started),
-            timeEnded: formatTime(post.acf.time_ended),
-            withWhom: post.acf.with_whom,
-            deliverables: post.acf.deliverables,
-            date: post.date,
-        }));
-    
-        // Reverse the order of the formatted posts
-        const reversedPosts = formattedPosts.reverse();
-    
-        console.log('Formatted timesheets (reversed):', reversedPosts);
-        setTimesheets(reversedPosts);
+      }
+
+      console.log('Fetched interns:', allInterns); // Log the fetched interns data
+
+      setInterns(allInterns);
+
+      // Set the selected intern to the current user if no other interns are available
+      const currentUserId = user.id;
+      if (allInterns.some(intern => intern.id === currentUserId)) {
+        setSelectedIntern(currentUserId); // User is an intern, set selectedIntern to user's ID
+      } else if (allInterns.length > 0) {
+        setSelectedIntern(allInterns[0].id); // Default to the first intern
+      } else {
+        setSelectedIntern(currentUserId); // Fallback to user ID if no interns are found
+      }
     };
-    
-    fetchTimesheets();
-    
+
+    fetchInterns();
+  }, [user]); // Fetch interns only after user is loaded
+
+  // Fetch timesheets for the selected intern or user
+  useEffect(() => {
+    const fetchTimesheets = async (authorId) => {
+      let allTimesheets = [];
+      let page = 1;
+      let totalPages = 1;
+
+      while (page <= totalPages) {
+        try {
+          const response = await axios.get(`${API_BASE_URL}?author=${authorId}&per_page=100&page=${page}`, {
+            headers: { 'Authorization': AUTH_HEADER }
+          });
+
+          if (Array.isArray(response.data)) {
+            allTimesheets = [...allTimesheets, ...response.data];
+            totalPages = parseInt(response.headers['x-wp-totalpages'], 10) || 1;
+            page++;
+          } else {
+            console.error('API Response is not an array:', response.data);
+            break;
+          }
+        } catch (error) {
+          console.error('Error fetching timesheets:', error);
+          break;
+        }
+      }
+
+      const formattedPosts = allTimesheets.map(post => ({
+        id: post.id,
+        taskNumber: post.acf.task_number,
+        description: post.acf.task_description,
+        timeStarted: formatTime(post.acf.time_started),
+        timeEnded: formatTime(post.acf.time_ended),
+        withWhom: post.acf.with_whom,
+        deliverables: post.acf.deliverables,
+        date: post.date,
+      }));
+
+      setTimesheets(formattedPosts.reverse());
+    };
+
+    if (selectedIntern) {
+      fetchTimesheets(selectedIntern);
+    } else if (user) {
+      fetchTimesheets(user.id);
     }
-  }, [user]);
+  }, [selectedIntern, user]);
 
   return (
-    <TimesheetContext.Provider value={{ timesheets, setTimesheets, user }}>
+    <TimesheetContext.Provider value={{ timesheets, setTimesheets, user, interns, selectedIntern, setSelectedIntern }}>
       {children}
     </TimesheetContext.Provider>
   );
