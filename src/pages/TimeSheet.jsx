@@ -19,7 +19,7 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
   const { theme } = useTheme(); // Get the current theme
 
   return (
-    <thead className={`border-b ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+    <thead className={`border-b ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
       <tr className={`text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Task #</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Task Description</th>
@@ -33,7 +33,7 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
             type="checkbox"
             checked={isAllSelected}
             onChange={onSelectAll}
-            className={`ml-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-200 border-gray-300'}`}
+            className={`ml-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}
           />
         </th>
       </tr>
@@ -41,11 +41,17 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
   );
 };
 
-
 const TimeSheet = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedWeek, setSelectedWeek] = useState(null);
-  const { timesheets, setTimesheets } = useTimesheets();
+  const {
+    timesheets,
+    setTimesheets,
+    user,
+    interns,
+    selectedIntern,
+    setSelectedIntern
+  } = useTimesheets();
   const [newTaskNumber, setNewTaskNumber] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [newTimeStarted, setNewTimeStarted] = useState('');
@@ -55,23 +61,9 @@ const TimeSheet = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentEditingItem, setCurrentEditingItem] = useState(null);
-  const [userId, setUserId] = useState(null);
   const [isAllSelected, setIsAllSelected] = useState(false);
+  const [isGroupLeader, setIsGroupLeader] = useState(false);
   const { theme } = useTheme();
-
-  useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
-      headers: {
-        'Authorization': AUTH_HEADER,
-      },
-    })
-      .then(response => {
-        setUserId(response.data.id);
-      })
-      .catch(error => {
-        console.error('Error fetching user info:', error);
-      });
-  }, []);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -84,7 +76,14 @@ const TimeSheet = () => {
     }
   }, [isModalOpen]);
 
+  useEffect(() => {
+    const fetchGroupLeaderStatus = async () => {
+      const status = await checkIfGroupLeader();
+      setIsGroupLeader(status);
+    };
 
+    fetchGroupLeaderStatus();
+  }, []);
 
   const normalizeDate = (dateString) => {
     // Normalize date to midnight in local time zone
@@ -275,6 +274,22 @@ const TimeSheet = () => {
     );
   };
 
+  const checkIfGroupLeader = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
+        headers: {
+          'Authorization': AUTH_HEADER,
+        },
+      });
+  
+      // Extract the group_leader field from ACF
+      return response.data.acf.group_leader || false;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      return false; // Default to false if there's an error
+    }
+  };
+
   return (
     <Home>
       <div className={`container mx-auto px-4 py-6 ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
@@ -311,9 +326,25 @@ const TimeSheet = () => {
                 </option>
               ))}
             </select>
-
-
           </div>
+
+          <div>
+            <select
+              value={selectedIntern || user?.id}
+              onChange={(e) => setSelectedIntern(e.target.value)}
+              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
+                }`}
+              disabled={!isGroupLeader} // Disable the dropdown if user?.groupLeader is false
+            >
+              <option value={user?.id}>Select Intern</option>
+              {interns.map((intern) => (
+                <option key={intern.id} value={intern.id}>
+                  {intern.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
 
           <div className="m-4">
             <Link
