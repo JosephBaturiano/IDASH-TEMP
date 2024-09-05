@@ -126,7 +126,7 @@ const TaskCard = () => {
       alert('Only the Group Leader can archive a task.');
       return; // Prevent archiving if the user is not a Group Leader
     }
-
+  
     const isConfirmed = window.confirm('Are you sure you want to archive this task?');
     
     if (isConfirmed) {
@@ -137,53 +137,55 @@ const TaskCard = () => {
             password: authPassword,
           },
         });
-
+  
         const taskToArchive = response.data;
-
+  
         if (!taskToArchive) {
           throw new Error('Task not found');
         }
-
+  
         const postData = {
           acf: {
             task_number: taskToArchive.acf.task_number,
             task_description: taskToArchive.acf.task_description,
             date_created: taskToArchive.acf.date_created,
             allocated_time: taskToArchive.acf.allocated_time,
-            assigned_to: taskToArchive.acf.assigned_to,
+            assigned_to: Array.isArray(taskToArchive.acf.assigned_to) ? taskToArchive.acf.assigned_to : [], // Ensure it's an array
             status: taskToArchive.acf.status,
           },
           status: 'publish',
         };
-
-        await axios.post(`${apiBaseUrl}archive/`,
-          postData,
-          {
-            auth: {
-              username: authUsername,
-              password: authPassword,
-            },
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
+  
+        // Log postData for debugging
+        console.log('Archive postData:', postData);
+  
+        await axios.post(`${apiBaseUrl}archive/`, postData, {
+          auth: {
+            username: authUsername,
+            password: authPassword,
+          },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+  
         await axios.delete(`${apiBaseUrl}task/${taskId}`, {
           auth: {
             username: authUsername,
             password: authPassword,
           },
         });
-
+  
         setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-
+  
       } catch (err) {
+        // Log detailed error message
         console.error('Error details:', err.response ? err.response.data : err.message);
         setError(`Failed to archive: ${err.message}`);
       }
     }
   };
+  
 
   const formatDate = (dateString) => {
     if (dateString.length !== 8) return 'Invalid date';
