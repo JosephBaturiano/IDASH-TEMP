@@ -40,9 +40,9 @@ const TaskDeliverables = () => {
       case 'Task':
         return <TaskCard assignedToMe={assignedToMe} currentUserId={currentUserId} />;
       case 'Issues':
-        return <IssuesCard assignedToMe={assignedToMe} currentUserId={currentUserId} />;
+        return <IssuesCard />;
       case 'Archive':
-        return <ArchiveCard assignedToMe={assignedToMe} currentUserId={currentUserId} />;
+        return <ArchiveCard />;
       default:
         return null;
     }
@@ -72,18 +72,26 @@ const TaskDeliverables = () => {
               </button>
             ))}
           </div>
-          <div className="flex items-center">
-            <label htmlFor="assignedToMe" className={`mr-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-              Assigned to me
-            </label>
-            <input
-              type="checkbox"
-              id="assignedToMe"
-              checked={assignedToMe}
-              onChange={(e) => setAssignedToMe(e.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-500 dark:ring-offset-gray-800"
-            />
-          </div>
+          {/* Render the "Assigned to me" checkbox only when the active tab is "Task" */}
+          {activeTab === 'Task' && (
+            <div className="flex items-center space-x-2">
+              <label
+                htmlFor="assignedToMe"
+                className={`cursor-pointer font-medium ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}
+              >
+                Assigned to me
+              </label>
+              <input
+                type="checkbox"
+                id="assignedToMe"
+                checked={assignedToMe}
+                onChange={(e) => setAssignedToMe(e.target.checked)}
+                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-500 dark:ring-offset-gray-800 dark:checked:bg-blue-500 dark:checked:border-transparent"
+              />
+            </div>
+          )}
         </div>
         <div role="tabpanel">
           {renderTabContent()}
