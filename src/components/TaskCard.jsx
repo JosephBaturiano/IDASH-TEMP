@@ -3,7 +3,7 @@ import axios from 'axios';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme to get the theme
 
-const TaskCard = () => {
+const TaskCard = ({assignedToMe, currentUserId} ) => {
   const [tasks, setTasks] = useState([]);
   const [userNames, setUserNames] = useState({});
   const [loading, setLoading] = useState(true);
@@ -66,7 +66,7 @@ const TaskCard = () => {
           per_page: 50, // Adjust based on API capabilities
         },
       });
-
+      
       // Sort tasks by task number in ascending order
       const sortedTasks = response.data.sort((a, b) => {
         const taskNumberA = a.acf ? parseFloat(a.acf.task_number) : 0;
@@ -74,7 +74,15 @@ const TaskCard = () => {
         return taskNumberA - taskNumberB;
       });
 
-      setTasks(prevTasks => page === 1 ? sortedTasks : [...prevTasks, ...sortedTasks]);
+      let filteredTasks = sortedTasks;
+      if (assignedToMe && currentUserId) {
+        // Filter tasks where currentUserId is in the assigned_to array
+        filteredTasks = sortedTasks.filter(
+          (task) => task.acf?.assigned_to?.includes(currentUserId)
+        );
+      }
+
+      setTasks(filteredTasks);
       setCurrentPage(page);
       setTotalPages(parseInt(response.headers['x-wp-totalpages'], 10)); // Update total pages from response headers
     } catch (err) {
@@ -92,7 +100,7 @@ const TaskCard = () => {
     fetchUserDetails();
     fetchTasks();
     checkGroupLeaderStatus();
-  }, [apiBaseUrl, authUsername, authPassword]);
+  }, [apiBaseUrl, authUsername, authPassword, assignedToMe, currentUserId ]);
 
   const handleStatusChange = async (e, taskId) => {
     if (!isGroupLeader) {
