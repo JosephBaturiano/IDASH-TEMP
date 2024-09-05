@@ -6,6 +6,7 @@ import WeeklyFooter from '../components/WeeklyFooter';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import TimesheetItem from '../components/WeeklyContent';
+import { useNotification } from '../context/NotificationContext'; // Import Notification Context
 
 
 const SECTION_HEIGHT = 700; // Height of one section
@@ -15,6 +16,7 @@ const CONTENT_HEIGHT = SECTION_HEIGHT - FOOTER_HEIGHT; // Available height for c
 function Weekly() {
   const { timesheets, user } = useTimesheets();
   const [sections, setSections] = useState([]);
+  const { user: notificationUser } = useNotification(); // Rename here
   const reportRefs = useRef([]);
 
   const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -153,9 +155,11 @@ function Weekly() {
       }
     }
 
-    // Define the name of the PDF file
-    const studentName = user?.full_name || 'Student';
-    const fileName = `${studentName} - Week ${weekNumber}.pdf`;
+    // Use the user's display name from the TopBar (which is already their initials)
+    const displayName = user?.name || 'Student'; // Default to 'Student' if name is unavailable
+
+    // Define the name of the PDF file using the display name (initials) from TopBar
+    const fileName = `${notificationUser?.name || 'Student'} - Week ${weekNumber}.pdf`;
 
     // Save the PDF with the custom name
     pdf.save(fileName);
@@ -256,15 +260,15 @@ function Weekly() {
                     <div className="h-9"></div>
                     <p className="italic mb-10">Prepared By:</p>
                     <Draggable>
-                    {user?.internSignature ? (
-                      <img
-                        src={user.internSignature}
-                        alt="Intern Signature"
-                        style={{ width: '300px', height: 'auto', position: 'absolute' }} // Adjust the size of the signature here
-                      />
-                    ) : (
-                      <p>No signature available</p>
-                    )}
+                      {user?.internSignature ? (
+                        <img
+                          src={user.internSignature}
+                          alt="Intern Signature"
+                          style={{ width: '300px', height: 'auto', position: 'absolute' }} // Adjust the size of the signature here
+                        />
+                      ) : (
+                        <p>No signature available</p>
+                      )}
                     </Draggable>
                     <p className="font-bold">{user?.full_name}</p>
                     <p className="italic mb-7">Trainee/Student</p>
