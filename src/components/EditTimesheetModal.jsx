@@ -17,7 +17,9 @@ const EditTimesheetModal = ({
     withWhom,
     setWithWhom,
     deliverables,
-    setDeliverables
+    setDeliverables,
+    selectedDate, // Prop for date
+    setSelectedDate // Setter for date
 }) => {
     const { theme } = useTheme(); // Get the current theme
 
@@ -38,6 +40,16 @@ const EditTimesheetModal = ({
             <div className={`p-6 rounded-lg shadow-lg w-full max-w-md ${modalBgColor}`}>
                 <h2 className={`text-xl font-semibold mb-4 ${textColor}`}>Edit Timesheet</h2>
                 <div className="space-y-4">
+                    <div>
+                        <label htmlFor="date" className={`block text-sm font-medium mb-1 ${textColor}`}>Date</label>
+                        <input
+                            id="date"
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
+                        />
+                    </div>
                     <div>
                         <label htmlFor="task-number" className={`block text-sm font-medium mb-1 ${textColor}`}>Task Number</label>
                         <input

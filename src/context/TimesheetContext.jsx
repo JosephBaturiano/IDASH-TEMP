@@ -48,6 +48,7 @@ export function TimesheetProvider({ children }) {
   const [user, setUser] = useState(null);
   const [interns, setInterns] = useState([]); // Store interns list
   const [selectedIntern, setSelectedIntern] = useState(null); // Track selected intern
+  const [selectedDate, setSelectedDate] = useState(null);
 
   // Fetch current user
   useEffect(() => {
@@ -165,7 +166,7 @@ export function TimesheetProvider({ children }) {
         timeEnded: formatTime(post.acf.time_ended),
         withWhom: post.acf.with_whom,
         deliverables: post.acf.deliverables,
-        date: post.date,
+        date: post.acf.date_created,
       }));
 
       setTimesheets(formattedPosts.reverse());
@@ -179,7 +180,7 @@ export function TimesheetProvider({ children }) {
   }, [selectedIntern, user]);
 
   return (
-    <TimesheetContext.Provider value={{ timesheets, setTimesheets, user, interns, selectedIntern, setSelectedIntern }}>
+    <TimesheetContext.Provider value={{ timesheets, setTimesheets, user, interns, selectedIntern, setSelectedIntern, selectedDate, setSelectedDate }}>
       {children}
     </TimesheetContext.Provider>
   );

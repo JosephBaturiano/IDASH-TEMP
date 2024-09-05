@@ -63,6 +63,7 @@ const TimeSheet = () => {
   const [currentEditingItem, setCurrentEditingItem] = useState(null);
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [isGroupLeader, setIsGroupLeader] = useState(false);
+  const [newSelectedDate, setNewSelectedDate] = useState('');
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -73,6 +74,8 @@ const TimeSheet = () => {
       setNewTimeEnded('');
       setNewWithWhom('');
       setNewDeliverables('');
+      setNewSelectedDate('');
+      
     }
   }, [isModalOpen]);
 
@@ -157,17 +160,18 @@ const TimeSheet = () => {
     setNewTimeEnded(item.timeEnded);
     setNewWithWhom(item.withWhom);
     setNewDeliverables(item.deliverables);
+    setNewSelectedDate(item.date)
     setIsEditModalOpen(true);
   };
 
   const handleSaveEdit = () => {
-    if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
+    if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables && newSelectedDate) {
       const updatedPostData = {
         title: newTaskNumber,
         content: newDescription,
         status: 'publish',
         acf: {
-          date_created: currentEditingItem.date,
+          date_created: newSelectedDate, // Ensure this is in the correct format
           task_number: newTaskNumber,
           task_description: newDescription,
           time_started: newTimeStarted,
@@ -176,7 +180,7 @@ const TimeSheet = () => {
           deliverables: newDeliverables,
         }
       };
-
+  
       axios.post(`${API_BASE_URL}/${currentEditingItem.id}`, updatedPostData, {
         headers: {
           'Authorization': AUTH_HEADER,
@@ -185,7 +189,7 @@ const TimeSheet = () => {
       })
         .then((response) => {
           console.log('Timesheet updated:', response.data);
-
+  
           const updatedTimesheets = timesheets.map((item) =>
             item.id === currentEditingItem.id
               ? {
@@ -196,6 +200,7 @@ const TimeSheet = () => {
                 timeEnded: formatTime(newTimeEnded),
                 withWhom: newWithWhom,
                 deliverables: newDeliverables,
+                date: newSelectedDate, // Ensure this is updated
               }
               : item
           );
@@ -210,6 +215,7 @@ const TimeSheet = () => {
       alert('Please fill all fields.');
     }
   };
+  
 
   const handleDeleteTimesheet = (itemId) => {
     axios.delete(`${API_BASE_URL}/${itemId}`, {
@@ -405,6 +411,8 @@ const TimeSheet = () => {
             setNewTimeEnded={setNewTimeEnded}
             newWithWhom={newWithWhom}
             setNewWithWhom={setNewWithWhom}
+            selectedDate={newSelectedDate}
+            setSelectedDate={setNewSelectedDate}
             newDeliverables={newDeliverables}
             setNewDeliverables={setNewDeliverables}
           />
@@ -426,6 +434,8 @@ const TimeSheet = () => {
             withWhom={newWithWhom}
             setWithWhom={setNewWithWhom}
             deliverables={newDeliverables}
+            selectedDate={newSelectedDate}
+            setSelectedDate={setNewSelectedDate}
             setDeliverables={setNewDeliverables}
             onDelete={() => handleDeleteTimesheet(currentEditingItem.id)}
           />
