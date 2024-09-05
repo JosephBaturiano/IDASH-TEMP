@@ -100,23 +100,24 @@ const TimeSheet = () => {
     })
     : timesheets;
 
-  const handleAddTimesheet = () => {
-    if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
+    const handleAddTimesheet = () => {
+      // Creating the postData without checking if all fields are filled
       const postData = {
-        title: newDescription,
-        content: `Task Number: ${newTaskNumber}`,
+        title: newDescription || 'No Description', // Provide a default value if empty
+        content: `Task Number: ${newTaskNumber || 'No Task Number'}`, // Default if empty
         status: 'publish',
         acf: {
           date_created: new Date().toISOString().split('T')[0],
-          task_number: newTaskNumber,
-          task_description: newDescription,
-          time_started: newTimeStarted,
-          time_ended: newTimeEnded,
-          with_whom: newWithWhom,
-          deliverables: newDeliverables,
+          task_number: newTaskNumber || 'N/A', // Default value if empty
+          task_description: newDescription || 'N/A', // Default value if empty
+          time_started: newTimeStarted || 'N/A', // Default value if empty
+          time_ended: newTimeEnded || 'N/A', // Default value if empty
+          with_whom: newWithWhom || 'N/A', // Default value if empty
+          deliverables: newDeliverables || 'N/A', // Default value if empty
         }
       };
-
+    
+      // Send the POST request to the API
       axios.post(API_BASE_URL, postData, {
         headers: {
           'Authorization': AUTH_HEADER,
@@ -125,29 +126,30 @@ const TimeSheet = () => {
       })
         .then((response) => {
           console.log('Timesheet added:', response.data);
-
+    
+          // Create the new timesheet object
           const newTimesheet = {
             id: response.data.id,
-            taskNumber: newTaskNumber,
-            description: newDescription,
-            timeStarted: formatTime(newTimeStarted),
-            timeEnded: formatTime(newTimeEnded),
-            withWhom: newWithWhom,
-            deliverables: newDeliverables,
-            date: selectedDate || new Date().toISOString().split('T')[0],
+            taskNumber: newTaskNumber || 'N/A', // Default value if empty
+            description: newDescription || 'N/A', // Default value if empty
+            timeStarted: newTimeStarted ? formatTime(newTimeStarted) : 'N/A', // Format or default value
+            timeEnded: newTimeEnded ? formatTime(newTimeEnded) : 'N/A', // Format or default value
+            withWhom: newWithWhom || 'N/A', // Default value if empty
+            deliverables: newDeliverables || 'N/A', // Default value if empty
+            date: selectedDate || new Date().toISOString().split('T')[0], // Default to today’s date
           };
-
+    
+          // Update the timesheets list in the state
           setTimesheets([...timesheets, newTimesheet]);
+    
+          // Close the modal after submission
           setIsModalOpen(false);
         })
         .catch((error) => {
           console.error('Error adding timesheet:', error);
           alert('There was an error adding the timesheet.');
         });
-    } else {
-      alert('Please fill all fields.');
-    }
-  };
+    };    
 
   const handleEditTimesheet = (item) => {
     setCurrentEditingItem(item);
