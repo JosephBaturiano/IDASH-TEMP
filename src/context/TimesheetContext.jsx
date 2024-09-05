@@ -114,8 +114,6 @@ export function TimesheetProvider({ children }) {
         }
       }
 
-      console.log('Fetched interns:', allInterns); // Log the fetched interns data
-
       setInterns(allInterns);
 
       // Set the selected intern to the current user if no other interns are available
