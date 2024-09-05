@@ -37,7 +37,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
 
   const fetchUserDetails = async () => {
     try {
-      const response = await axios.get(`${apiBaseUrl}users`, {
+      const response = await axios.get(`${apiBaseUrl}users?per_page=100&page=1`, {
         auth: {
           username: authUsername,
           password: authPassword,
