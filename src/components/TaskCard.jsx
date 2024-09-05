@@ -66,22 +66,38 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
           per_page: 50, // Adjust based on API capabilities
         },
       });
-      
+  
       // Sort tasks by task number in ascending order
       const sortedTasks = response.data.sort((a, b) => {
         const taskNumberA = a.acf ? parseFloat(a.acf.task_number) : 0;
         const taskNumberB = b.acf ? parseFloat(b.acf.task_number) : 0;
         return taskNumberA - taskNumberB;
       });
-
+  
+      // Define the custom user ID arrays for special filtering
+      const rj_id = [8, 15, 3, 14]; // Users who can see tasks with assigned_to id=19
+      const tf_id = [10, 13, 12];   // Users who can see tasks with assigned_to id=20
+      const rn_id = [9, 17, 18, 11, 16]; // Users who can see tasks with assigned_to id=21
+  
       let filteredTasks = sortedTasks;
       if (assignedToMe && currentUserId) {
-        // Filter tasks where currentUserId is in the assigned_to array
-        filteredTasks = sortedTasks.filter(
-          (task) => task.acf?.assigned_to?.includes(currentUserId)
-        );
+        filteredTasks = sortedTasks.filter((task) => {
+          const assignedTo = task.acf?.assigned_to || [];
+          // Filter tasks where currentUserId is in the assigned_to array
+          // OR task is assigned to id=19 and currentUserId is in rj_id
+          // OR task is assigned to id=20 and currentUserId is in tf_id
+          // OR task is assigned to id=21 and currentUserId is in rn_id
+          // OR task is assigned to id=22 (visible to all users)
+          return (
+            assignedTo.includes(currentUserId) ||
+            (assignedTo.includes(19) && rj_id.includes(currentUserId)) ||
+            (assignedTo.includes(20) && tf_id.includes(currentUserId)) ||
+            (assignedTo.includes(21) && rn_id.includes(currentUserId)) ||
+            assignedTo.includes(22) // Visible to all users
+          );
+        });
       }
-
+  
       setTasks(filteredTasks);
       setCurrentPage(page);
       setTotalPages(parseInt(response.headers['x-wp-totalpages'], 10)); // Update total pages from response headers
@@ -91,6 +107,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     const checkGroupLeaderStatus = async () => {
