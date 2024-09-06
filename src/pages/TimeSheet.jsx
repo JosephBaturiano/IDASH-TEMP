@@ -89,11 +89,16 @@ const TimeSheet = () => {
   }, []);
 
   const normalizeDate = (dateString) => {
-    // Normalize date to midnight in local time zone
-    const date = new Date(dateString);
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate()).toISOString().split('T')[0];
+    // Check if the date is in the format 'dd/mm/yyyy'
+    if (dateString.includes('/')) {
+      const [day, month, year] = dateString.split('/');
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`; // Convert to 'yyyy-mm-dd'
+    }
+  
+    // If already in 'yyyy-mm-dd' format, return as is
+    return dateString;
   };
-
+  
   const filteredTimesheets = selectedDate
     ? timesheets.filter((item) => {
       // Normalize both selectedDate and item.date to YYYY-MM-DD format
