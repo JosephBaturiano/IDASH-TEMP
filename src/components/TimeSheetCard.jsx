@@ -33,7 +33,7 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
 
         {/* Display the comment if it's visible */}
         {isCommentVisible && item.comment && item.comment !== 'No Comment' && (
-          <div className="absolute top-full mt-1 left-0 bg-blue-500 text-white text-sm rounded py-1 px-2 z-50 whitespace-nowrap">
+          <div className="absolute text-left top-full mt-1 left-0 w-64 bg-blue-500 text-white text-sm rounded py-2 px-3 z-50 overflow-auto whitespace-normal break-words">
             {item.comment}
           </div>
         )}
