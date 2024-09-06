@@ -174,7 +174,7 @@ const TimeSheet = () => {
         content: newDescription,
         status: 'publish',
         acf: {
-          date_created: newSelectedDate, // Ensure this is in the correct format
+          date_created: newSelectedDate,
           task_number: newTaskNumber,
           task_description: newDescription,
           time_started: newTimeStarted,
@@ -194,6 +194,7 @@ const TimeSheet = () => {
         .then((response) => {
           console.log('Timesheet updated:', response.data);
   
+          // Update the timesheets state with the edited item
           const updatedTimesheets = timesheets.map((item) =>
             item.id === currentEditingItem.id
               ? {
@@ -204,7 +205,8 @@ const TimeSheet = () => {
                 timeEnded: formatTime(newTimeEnded),
                 withWhom: newWithWhom,
                 deliverables: newDeliverables,
-                date: newSelectedDate, // Ensure this is updated
+                date: newSelectedDate,
+                comment: newComment, // Update the comment in the timesheet
               }
               : item
           );
@@ -218,8 +220,7 @@ const TimeSheet = () => {
     } else {
       alert('Please fill all fields.');
     }
-  };
-  
+  };  
 
   const handleDeleteTimesheet = (itemId) => {
     axios.delete(`${API_BASE_URL}/${itemId}`, {
