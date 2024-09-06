@@ -64,6 +64,7 @@ const TimeSheet = () => {
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [isGroupLeader, setIsGroupLeader] = useState(false);
   const [newSelectedDate, setNewSelectedDate] = useState('');
+  const [newComment, setNewComment] = useState(''); // Added this state for comment
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -75,7 +76,7 @@ const TimeSheet = () => {
       setNewWithWhom('');
       setNewDeliverables('');
       setNewSelectedDate('');
-      
+      setNewComment(''); // Reset comment  
     }
   }, [isModalOpen]);
 
@@ -109,23 +110,22 @@ const TimeSheet = () => {
     : timesheets;
 
     const handleAddTimesheet = () => {
-      // Creating the postData without checking if all fields are filled
       const postData = {
-        title: newDescription || 'No Description', // Provide a default value if empty
-        content: `Task Number: ${newTaskNumber || 'No Task Number'}`, // Default if empty
+        title: newDescription || 'No Description',
+        content: `Task Number: ${newTaskNumber || 'No Task Number'}`,
         status: 'publish',
         acf: {
           date_created: new Date().toISOString().split('T')[0],
-          task_number: newTaskNumber || 'N/A', // Default value if empty
-          task_description: newDescription || 'N/A', // Default value if empty
-          time_started: newTimeStarted || 'N/A', // Default value if empty
-          time_ended: newTimeEnded || 'N/A', // Default value if empty
-          with_whom: newWithWhom || 'N/A', // Default value if empty
-          deliverables: newDeliverables || 'N/A', // Default value if empty
+          task_number: newTaskNumber || 'N/A',
+          task_description: newDescription || 'N/A',
+          time_started: newTimeStarted || 'N/A',
+          time_ended: newTimeEnded || 'N/A',
+          with_whom: newWithWhom || 'N/A',
+          deliverables: newDeliverables || 'N/A',
+          comment: newComment || 'No Comment',  // Include the comment field here
         }
       };
     
-      // Send the POST request to the API
       axios.post(API_BASE_URL, postData, {
         headers: {
           'Authorization': AUTH_HEADER,
@@ -133,31 +133,26 @@ const TimeSheet = () => {
         },
       })
         .then((response) => {
-          console.log('Timesheet added:', response.data);
-    
-          // Create the new timesheet object
           const newTimesheet = {
             id: response.data.id,
-            taskNumber: newTaskNumber || 'N/A', // Default value if empty
-            description: newDescription || 'N/A', // Default value if empty
-            timeStarted: newTimeStarted ? formatTime(newTimeStarted) : 'N/A', // Format or default value
-            timeEnded: newTimeEnded ? formatTime(newTimeEnded) : 'N/A', // Format or default value
-            withWhom: newWithWhom || 'N/A', // Default value if empty
-            deliverables: newDeliverables || 'N/A', // Default value if empty
-            date: selectedDate || new Date().toISOString().split('T')[0], // Default to today’s date
+            taskNumber: newTaskNumber || 'N/A',
+            description: newDescription || 'N/A',
+            timeStarted: newTimeStarted ? formatTime(newTimeStarted) : 'N/A',
+            timeEnded: newTimeEnded ? formatTime(newTimeEnded) : 'N/A',
+            withWhom: newWithWhom || 'N/A',
+            deliverables: newDeliverables || 'N/A',
+            date: selectedDate || new Date().toISOString().split('T')[0],
+            comment: newComment || 'No Comment',  // Store the comment
           };
     
-          // Update the timesheets list in the state
           setTimesheets([...timesheets, newTimesheet]);
-    
-          // Close the modal after submission
           setIsModalOpen(false);
         })
         .catch((error) => {
           console.error('Error adding timesheet:', error);
           alert('There was an error adding the timesheet.');
         });
-    };    
+    };     
 
   const handleEditTimesheet = (item) => {
     setCurrentEditingItem(item);
@@ -168,6 +163,7 @@ const TimeSheet = () => {
     setNewWithWhom(item.withWhom);
     setNewDeliverables(item.deliverables);
     setNewSelectedDate(item.date)
+    setNewComment(item.comment);
     setIsEditModalOpen(true);
   };
 
@@ -422,6 +418,8 @@ const TimeSheet = () => {
             setSelectedDate={setNewSelectedDate}
             newDeliverables={newDeliverables}
             setNewDeliverables={setNewDeliverables}
+            newComment={newComment} // Passed newComment
+            setNewComment={setNewComment} // Passed setNewComment
           />
         )}
 
