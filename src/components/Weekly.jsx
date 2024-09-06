@@ -211,7 +211,7 @@ function Weekly() {
                       </tr>
                       <tr>
                         <td className="border-collapse border-black">Company Name:</td>
-                        <td className="border-b border-black">VisibleTeam LLC</td>
+                        <td className="border-b border-black">VisibleTeam OPC</td>
                       </tr>
                       <tr>
                         <td className="border-collapse border-black">Company Address:</td>
