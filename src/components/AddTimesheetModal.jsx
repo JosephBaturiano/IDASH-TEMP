@@ -17,8 +17,8 @@ const AddTimesheetModal = ({
   setNewWithWhom,
   newDeliverables,
   setNewDeliverables,
-  newSelectedDate, // Use newSelectedDate for the date
-  setNewSelectedDate, // Use setNewSelectedDate for the date setter
+  selectedDate, // Use newSelectedDate for the date
+  setSelectedDate, // Use setNewSelectedDate for the date setter
   newComment, // Add newComment prop
   setNewComment // Add setNewComment prop
 }) => {
@@ -116,8 +116,8 @@ const AddTimesheetModal = ({
             <input
               id="date-created"
               type="date"
-              value={newSelectedDate} // Use newSelectedDate
-              onChange={(e) => setNewSelectedDate(e.target.value)} // Use setNewSelectedDate
+              value={selectedDate} // Use newSelectedDate
+              onChange={(e) => setSelectedDate(e.target.value)} // Use setNewSelectedDate
               className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
             />
           </div>

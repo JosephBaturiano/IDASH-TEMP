@@ -115,7 +115,7 @@ const TimeSheet = () => {
         content: `Task Number: ${newTaskNumber || 'No Task Number'}`,
         status: 'publish',
         acf: {
-          date_created: new Date().toISOString().split('T')[0],
+          date_created: newSelectedDate,
           task_number: newTaskNumber || 'N/A',
           task_description: newDescription || 'N/A',
           time_started: newTimeStarted || 'N/A',
@@ -141,7 +141,7 @@ const TimeSheet = () => {
             timeEnded: newTimeEnded ? formatTime(newTimeEnded) : 'N/A',
             withWhom: newWithWhom || 'N/A',
             deliverables: newDeliverables || 'N/A',
-            date: selectedDate || new Date().toISOString().split('T')[0],
+            date: newSelectedDate || new Date().toISOString().split('T')[0],
             comment: newComment || 'No Comment',  // Store the comment
           };
     
