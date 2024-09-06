@@ -181,6 +181,7 @@ const TimeSheet = () => {
           time_ended: newTimeEnded,
           with_whom: newWithWhom,
           deliverables: newDeliverables,
+          comment: newComment, // Include comment in the update data
         }
       };
   
@@ -442,6 +443,8 @@ const TimeSheet = () => {
             selectedDate={newSelectedDate}
             setSelectedDate={setNewSelectedDate}
             setDeliverables={setNewDeliverables}
+            comments={newComment} // Pass the comment state
+            setComments={setNewComment} // Pass the comment setter
             onDelete={() => handleDeleteTimesheet(currentEditingItem.id)}
           />
         )}

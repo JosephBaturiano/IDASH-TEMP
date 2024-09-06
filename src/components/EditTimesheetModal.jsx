@@ -18,8 +18,10 @@ const EditTimesheetModal = ({
     setWithWhom,
     deliverables,
     setDeliverables,
-    selectedDate, // Prop for date
-    setSelectedDate // Setter for date
+    selectedDate,
+    setSelectedDate,
+    comments, // Add comments prop
+    setComments // Add setComments prop
 }) => {
     const { theme } = useTheme(); // Get the current theme
 
@@ -29,8 +31,8 @@ const EditTimesheetModal = ({
     const modalBgColor = theme === 'dark' ? 'bg-gray-900' : 'bg-white';
     const textColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-900';
     const borderColor = theme === 'dark' ? 'border-gray-700' : 'border-gray-200';
-    const inputBgColor = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'; // Different background for inputs
-    const inputTextColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-900'; // Text color for inputs
+    const inputBgColor = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100';
+    const inputTextColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-900';
     const buttonBgSave = theme === 'dark' ? 'bg-green-500' : 'bg-green-600';
     const buttonBgCancel = theme === 'dark' ? 'bg-red-600' : 'bg-red-500';
     const buttonBgDelete = theme === 'dark' ? 'bg-red-800' : 'bg-red-700';
@@ -116,6 +118,18 @@ const EditTimesheetModal = ({
                             placeholder="Deliverables"
                             value={deliverables}
                             onChange={(e) => setDeliverables(e.target.value)}
+                            className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
+                        />
+                    </div>
+
+                    {/* Comments Input Field */}
+                    <div>
+                        <label htmlFor="comments" className={`block text-sm font-medium mb-1 ${textColor}`}>Comments</label>
+                        <textarea
+                            id="comments"
+                            placeholder="Add your comments here"
+                            value={comments}
+                            onChange={(e) => setComments(e.target.value)}
                             className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
                         />
                     </div>
