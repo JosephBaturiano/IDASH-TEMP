@@ -11,7 +11,6 @@ const AUTH_HEADER = 'Basic ' + btoa(`${AUTH_USERNAME}:${AUTH_PASSWORD}`);
 const formatTime = (time) => {
   if (!time) return 'Invalid time';
 
-  // Match input time format (HH:MM AM/PM)
   const regex = /^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i;
   const match = time.match(regex);
 
@@ -24,19 +23,16 @@ const formatTime = (time) => {
   hours = parseInt(hours, 10);
   minutes = parseInt(minutes, 10);
 
-  // Convert 12-hour time to 24-hour time if necessary
   if (period) {
     if (period.toUpperCase() === 'PM' && hours < 12) hours += 12;
     if (period.toUpperCase() === 'AM' && hours === 12) hours = 0;
   }
 
-  // Ensure hours and minutes are within valid ranges
   if (isNaN(hours) || hours < 0 || hours >= 24 || isNaN(minutes) || minutes < 0 || minutes >= 60) {
     console.error(`Invalid time values: ${hours}:${minutes}`);
     return 'Invalid time';
   }
 
-  // Format time as "HH:mm AM/PM"
   const formattedTime = new Date();
   formattedTime.setHours(hours);
   formattedTime.setMinutes(minutes);
@@ -50,71 +46,145 @@ const formatTime = (time) => {
 export function TimesheetProvider({ children }) {
   const [timesheets, setTimesheets] = useState([]);
   const [user, setUser] = useState(null);
+  const [interns, setInterns] = useState([]);
+  const [selectedIntern, setSelectedIntern] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
+  // Fetch current user
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
-      headers: { 'Authorization': AUTH_HEADER }
-    })
-    .then(response => {
-      const userInfo = {
-        id: response.data.id,
-        full_name: response.data.acf.full_name,
-        OJTadviser: response.data.acf.ojt_adviser,
-        subjectCode: response.data.acf.subject_code,
-      };
-      setUser(userInfo);
-    })
-    .catch(error => console.error('Error fetching user info:', error));
-  }, []);
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
+          headers: { 'Authorization': AUTH_HEADER }
+        });
 
-  useEffect(() => {
-    if (user && user.id) {
-      const fetchTimesheets = async () => {
-        let allTimesheets = [];
-        let page = 1;
-        let totalPages = 1; // Initialize to ensure loop runs at least once
+        const userInfo = {
+          id: response.data.id,
+          full_name: response.data.acf.full_name,
+          OJTadviser: response.data.acf.ojt_adviser,
+          subjectCode: response.data.acf.subject_code,
+          internSignature: response.data.acf.intern_signature,
+        };
 
-        while (page <= totalPages) {
-          try {
-            const response = await axios.get(`${API_BASE_URL}?author=${user.id}&per_page=100&page=${page}`, {
-              headers: { 'Authorization': AUTH_HEADER }
-            });
-
-            if (Array.isArray(response.data)) {
-              allTimesheets = [...allTimesheets, ...response.data];
-              totalPages = parseInt(response.headers['x-wp-totalpages'], 100) || 1; // Get total pages from header
-              page++;
-            } else {
-              console.error('API Response is not an array:', response.data);
-              break;
-            }
-          } catch (error) {
-            console.error('Error fetching timesheets:', error);
-            break;
-          }
+        if (userInfo.internSignature) {
+          const signatureResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}media/${userInfo.internSignature}`, {
+            headers: { 'Authorization': AUTH_HEADER }
+          });
+          userInfo.internSignature = signatureResponse.data.source_url;
         }
 
-        const formattedPosts = allTimesheets.map(post => ({
-          id: post.id,
-          taskNumber: post.acf.task_number,
-          description: post.acf.task_description,
-          timeStarted: formatTime(post.acf.time_started),
-          timeEnded: formatTime(post.acf.time_ended),
-          withWhom: post.acf.with_whom,
-          deliverables: post.acf.deliverables,
-          date: post.date,
-        }));
+        setUser(userInfo);
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    };
 
-        console.log('Formatted timesheets:', formattedPosts);
-        setTimesheets(formattedPosts);
-      };
+    fetchUser();
+  }, []);
 
-      fetchTimesheets();
-    }
+  // Fetch interns
+  useEffect(() => {
+    const fetchInterns = async () => {
+      if (!user) return;
+
+      let allInterns = [];
+      let page = 1;
+      let totalPages = 1;
+
+      while (page <= totalPages) {
+        try {
+          const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}users?per_page=100&page=${page}`, {
+            headers: { 'Authorization': AUTH_HEADER }
+          });
+
+          if (Array.isArray(response.data)) {
+            allInterns = [
+              ...allInterns,
+              ...response.data.map(intern => ({
+                id: intern.id,
+                name: intern.name,
+              })),
+            ];
+
+            totalPages = parseInt(response.headers['x-wp-totalpages'], 10) || 1;
+            page++;
+          } else {
+            console.error('API Response is not an array:', response.data);
+            break;
+          }
+        } catch (error) {
+          console.error('Error fetching interns:', error);
+          break;
+        }
+      }
+
+      setInterns(allInterns);
+
+      const currentUserId = user.id;
+      if (allInterns.some(intern => intern.id === currentUserId)) {
+        setSelectedIntern(currentUserId);
+      } else if (allInterns.length > 0) {
+        setSelectedIntern(allInterns[0].id);
+      } else {
+        setSelectedIntern(currentUserId);
+      }
+    };
+
+    fetchInterns();
   }, [user]);
 
+  // Fetch timesheets for the selected intern or user
+  useEffect(() => {
+    const fetchTimesheets = async (authorId) => {
+      let allTimesheets = [];
+      let page = 1;
+      let totalPages = 1;
+
+      while (page <= totalPages) {
+        try {
+          const response = await axios.get(`${API_BASE_URL}?author=${authorId}&per_page=100&page=${page}`, {
+            headers: { 'Authorization': AUTH_HEADER }
+          });
+
+          if (Array.isArray(response.data)) {
+            allTimesheets = [...allTimesheets, ...response.data];
+            totalPages = parseInt(response.headers['x-wp-totalpages'], 10) || 1;
+            page++;
+          } else {
+            console.error('API Response is not an array:', response.data);
+            break;
+          }
+        } catch (error) {
+          console.error('Error fetching timesheets:', error);
+          break;
+        }
+      }
+
+      // Include the comment in the formatted posts
+      const formattedPosts = allTimesheets.map(post => ({
+        id: post.id,
+        taskNumber: post.acf.task_number,
+        description: post.acf.task_description,
+        timeStarted: formatTime(post.acf.time_started),
+        timeEnded: formatTime(post.acf.time_ended),
+        withWhom: post.acf.with_whom,
+        deliverables: post.acf.deliverables,
+        date: post.acf.date_created,
+        comment: post.acf.comment || 'No Comment', // Include comment field
+      }));
+
+      setTimesheets(formattedPosts.reverse());
+    };
+
+    if (selectedIntern) {
+      fetchTimesheets(selectedIntern);
+    } else if (user) {
+      fetchTimesheets(user.id);
+    }
+  }, [selectedIntern, user]);
+
   return (
-    <TimesheetContext.Provider value={{ timesheets, setTimesheets, user }}>
+    <TimesheetContext.Provider value={{ timesheets, setTimesheets, user, interns, selectedIntern, setSelectedIntern, selectedDate, setSelectedDate }}>
       {children}
     </TimesheetContext.Provider>
   );
@@ -128,4 +198,4 @@ const useTimesheets = () => {
   return context;
 }
 
-export {useTimesheets, formatTime};
+export { useTimesheets, formatTime };

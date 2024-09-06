@@ -7,10 +7,30 @@ const ArchiveCard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { theme } = useTheme(); // Get the current theme
+  const [userNames, setUserNames] = useState({});
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const authUsername = import.meta.env.VITE_AUTH_USERNAME;
   const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axios.get(`${apiBaseUrl}users`, {
+        auth: {
+          username: authUsername,
+          password: authPassword,
+        },
+      });
+      const users = response.data;
+      const userIdToName = {};
+      users.forEach((user) => {
+        userIdToName[user.id] = user.name; // Map user IDs to names
+      });
+      setUserNames(userIdToName);
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchArchives = async () => {
@@ -37,7 +57,9 @@ const ArchiveCard = () => {
         setLoading(false);
       }
     };
+
     fetchArchives();
+    fetchUserDetails(); // Fetch user details when the component mounts
   }, [apiBaseUrl, authUsername, authPassword]);
 
   const formatDate = (dateString) => {
@@ -70,7 +92,16 @@ const ArchiveCard = () => {
               <td className="border px-4 py-2 text-center">{archive.acf.task_description || 'N/A'}</td>
               <td className="border px-4 py-2 text-center">{formatDate(archive.acf.date_created)}</td>
               <td className="border px-4 py-2 text-center">{archive.acf.allocated_time || 'N/A'}</td>
-              <td className="border px-4 py-2 text-center">{archive.acf.assigned_to || 'N/A'}</td>
+              <td className="border px-4 py-2 text-center">
+                {Array.isArray(archive.acf.assigned_to) && archive.acf.assigned_to.length > 0
+                  ? archive.acf.assigned_to.map((userId, index) => (
+                      <span key={userId}>
+                        {userNames[userId] || 'Unknown User'}
+                        {index < archive.acf.assigned_to.length - 1 && ', '}
+                      </span>
+                    ))
+                  : 'N/A'}
+              </td>
               <td className="border px-4 py-2 text-center">{archive.acf.status || 'N/A'}</td>
             </tr>
           ))}

@@ -19,7 +19,7 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
   const { theme } = useTheme(); // Get the current theme
 
   return (
-    <thead className={`border-b ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`}>
+    <thead className={`border-b ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
       <tr className={`text-center ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Task #</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Task Description</th>
@@ -33,7 +33,7 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
             type="checkbox"
             checked={isAllSelected}
             onChange={onSelectAll}
-            className={`ml-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-200 border-gray-300'}`}
+            className={`ml-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}
           />
         </th>
       </tr>
@@ -41,11 +41,17 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
   );
 };
 
-
 const TimeSheet = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedWeek, setSelectedWeek] = useState(null);
-  const { timesheets, setTimesheets } = useTimesheets();
+  const {
+    timesheets,
+    setTimesheets,
+    user,
+    interns,
+    selectedIntern,
+    setSelectedIntern
+  } = useTimesheets();
   const [newTaskNumber, setNewTaskNumber] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [newTimeStarted, setNewTimeStarted] = useState('');
@@ -55,23 +61,11 @@ const TimeSheet = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentEditingItem, setCurrentEditingItem] = useState(null);
-  const [userId, setUserId] = useState(null);
   const [isAllSelected, setIsAllSelected] = useState(false);
+  const [isGroupLeader, setIsGroupLeader] = useState(false);
+  const [newSelectedDate, setNewSelectedDate] = useState('');
+  const [newComment, setNewComment] = useState(''); // Added this state for comment
   const { theme } = useTheme();
-
-  useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
-      headers: {
-        'Authorization': AUTH_HEADER,
-      },
-    })
-      .then(response => {
-        setUserId(response.data.id);
-      })
-      .catch(error => {
-        console.error('Error fetching user info:', error);
-      });
-  }, []);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -81,17 +75,31 @@ const TimeSheet = () => {
       setNewTimeEnded('');
       setNewWithWhom('');
       setNewDeliverables('');
+      setNewSelectedDate('');
+      setNewComment(''); // Reset comment  
     }
   }, [isModalOpen]);
 
+  useEffect(() => {
+    const fetchGroupLeaderStatus = async () => {
+      const status = await checkIfGroupLeader();
+      setIsGroupLeader(status);
+    };
 
+    fetchGroupLeaderStatus();
+  }, []);
 
   const normalizeDate = (dateString) => {
-    // Normalize date to midnight in local time zone
-    const date = new Date(dateString);
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate()).toISOString().split('T')[0];
+    // Check if the date is in the format 'dd/mm/yyyy'
+    if (dateString.includes('/')) {
+      const [day, month, year] = dateString.split('/');
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`; // Convert to 'yyyy-mm-dd'
+    }
+  
+    // If already in 'yyyy-mm-dd' format, return as is
+    return dateString;
   };
-
+  
   const filteredTimesheets = selectedDate
     ? timesheets.filter((item) => {
       // Normalize both selectedDate and item.date to YYYY-MM-DD format
@@ -101,23 +109,23 @@ const TimeSheet = () => {
     })
     : timesheets;
 
-  const handleAddTimesheet = () => {
-    if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
+    const handleAddTimesheet = () => {
       const postData = {
-        title: newDescription,
-        content: `Task Number: ${newTaskNumber}`,
+        title: newDescription || 'No Description',
+        content: `Task Number: ${newTaskNumber || 'No Task Number'}`,
         status: 'publish',
         acf: {
           date_created: new Date().toISOString().split('T')[0],
-          task_number: newTaskNumber,
-          task_description: newDescription,
-          time_started: newTimeStarted,
-          time_ended: newTimeEnded,
-          with_whom: newWithWhom,
-          deliverables: newDeliverables,
+          task_number: newTaskNumber || 'N/A',
+          task_description: newDescription || 'N/A',
+          time_started: newTimeStarted || 'N/A',
+          time_ended: newTimeEnded || 'N/A',
+          with_whom: newWithWhom || 'N/A',
+          deliverables: newDeliverables || 'N/A',
+          comment: newComment || 'No Comment',  // Include the comment field here
         }
       };
-
+    
       axios.post(API_BASE_URL, postData, {
         headers: {
           'Authorization': AUTH_HEADER,
@@ -125,19 +133,18 @@ const TimeSheet = () => {
         },
       })
         .then((response) => {
-          console.log('Timesheet added:', response.data);
-
           const newTimesheet = {
             id: response.data.id,
-            taskNumber: newTaskNumber,
-            description: newDescription,
-            timeStarted: formatTime(newTimeStarted),
-            timeEnded: formatTime(newTimeEnded),
-            withWhom: newWithWhom,
-            deliverables: newDeliverables,
+            taskNumber: newTaskNumber || 'N/A',
+            description: newDescription || 'N/A',
+            timeStarted: newTimeStarted ? formatTime(newTimeStarted) : 'N/A',
+            timeEnded: newTimeEnded ? formatTime(newTimeEnded) : 'N/A',
+            withWhom: newWithWhom || 'N/A',
+            deliverables: newDeliverables || 'N/A',
             date: selectedDate || new Date().toISOString().split('T')[0],
+            comment: newComment || 'No Comment',  // Store the comment
           };
-
+    
           setTimesheets([...timesheets, newTimesheet]);
           setIsModalOpen(false);
         })
@@ -145,10 +152,7 @@ const TimeSheet = () => {
           console.error('Error adding timesheet:', error);
           alert('There was an error adding the timesheet.');
         });
-    } else {
-      alert('Please fill all fields.');
-    }
-  };
+    };     
 
   const handleEditTimesheet = (item) => {
     setCurrentEditingItem(item);
@@ -158,26 +162,29 @@ const TimeSheet = () => {
     setNewTimeEnded(item.timeEnded);
     setNewWithWhom(item.withWhom);
     setNewDeliverables(item.deliverables);
+    setNewSelectedDate(item.date)
+    setNewComment(item.comment);
     setIsEditModalOpen(true);
   };
 
   const handleSaveEdit = () => {
-    if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables) {
+    if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables && newSelectedDate) {
       const updatedPostData = {
         title: newTaskNumber,
         content: newDescription,
         status: 'publish',
         acf: {
-          date_created: currentEditingItem.date,
+          date_created: newSelectedDate,
           task_number: newTaskNumber,
           task_description: newDescription,
           time_started: newTimeStarted,
           time_ended: newTimeEnded,
           with_whom: newWithWhom,
           deliverables: newDeliverables,
+          comment: newComment, // Include comment in the update data
         }
       };
-
+  
       axios.post(`${API_BASE_URL}/${currentEditingItem.id}`, updatedPostData, {
         headers: {
           'Authorization': AUTH_HEADER,
@@ -186,7 +193,8 @@ const TimeSheet = () => {
       })
         .then((response) => {
           console.log('Timesheet updated:', response.data);
-
+  
+          // Update the timesheets state with the edited item
           const updatedTimesheets = timesheets.map((item) =>
             item.id === currentEditingItem.id
               ? {
@@ -197,6 +205,8 @@ const TimeSheet = () => {
                 timeEnded: formatTime(newTimeEnded),
                 withWhom: newWithWhom,
                 deliverables: newDeliverables,
+                date: newSelectedDate,
+                comment: newComment, // Update the comment in the timesheet
               }
               : item
           );
@@ -210,7 +220,7 @@ const TimeSheet = () => {
     } else {
       alert('Please fill all fields.');
     }
-  };
+  };  
 
   const handleDeleteTimesheet = (itemId) => {
     axios.delete(`${API_BASE_URL}/${itemId}`, {
@@ -275,6 +285,22 @@ const TimeSheet = () => {
     );
   };
 
+  const checkIfGroupLeader = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}users/me`, {
+        headers: {
+          'Authorization': AUTH_HEADER,
+        },
+      });
+  
+      // Extract the group_leader field from ACF
+      return response.data.acf.group_leader || false;
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      return false; // Default to false if there's an error
+    }
+  };
+
   return (
     <Home>
       <div className={`container mx-auto px-4 py-6 ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
@@ -311,9 +337,25 @@ const TimeSheet = () => {
                 </option>
               ))}
             </select>
-
-
           </div>
+
+          <div>
+            <select
+              value={selectedIntern || user?.id}
+              onChange={(e) => setSelectedIntern(e.target.value)}
+              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
+                }`}
+              disabled={!isGroupLeader} // Disable the dropdown if user?.groupLeader is false
+            >
+              <option value={user?.id}>Select Intern</option>
+              {interns.map((intern) => (
+                <option key={intern.id} value={intern.id}>
+                  {intern.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
 
           <div className="m-4">
             <Link
@@ -374,8 +416,12 @@ const TimeSheet = () => {
             setNewTimeEnded={setNewTimeEnded}
             newWithWhom={newWithWhom}
             setNewWithWhom={setNewWithWhom}
+            selectedDate={newSelectedDate}
+            setSelectedDate={setNewSelectedDate}
             newDeliverables={newDeliverables}
             setNewDeliverables={setNewDeliverables}
+            newComment={newComment} // Passed newComment
+            setNewComment={setNewComment} // Passed setNewComment
           />
         )}
 
@@ -395,7 +441,11 @@ const TimeSheet = () => {
             withWhom={newWithWhom}
             setWithWhom={setNewWithWhom}
             deliverables={newDeliverables}
+            selectedDate={newSelectedDate}
+            setSelectedDate={setNewSelectedDate}
             setDeliverables={setNewDeliverables}
+            comments={newComment} // Pass the comment state
+            setComments={setNewComment} // Pass the comment setter
             onDelete={() => handleDeleteTimesheet(currentEditingItem.id)}
           />
         )}

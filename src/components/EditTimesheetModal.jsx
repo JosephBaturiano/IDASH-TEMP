@@ -17,7 +17,11 @@ const EditTimesheetModal = ({
     withWhom,
     setWithWhom,
     deliverables,
-    setDeliverables
+    setDeliverables,
+    selectedDate,
+    setSelectedDate,
+    comments, // Add comments prop
+    setComments // Add setComments prop
 }) => {
     const { theme } = useTheme(); // Get the current theme
 
@@ -27,8 +31,8 @@ const EditTimesheetModal = ({
     const modalBgColor = theme === 'dark' ? 'bg-gray-900' : 'bg-white';
     const textColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-900';
     const borderColor = theme === 'dark' ? 'border-gray-700' : 'border-gray-200';
-    const inputBgColor = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'; // Different background for inputs
-    const inputTextColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-900'; // Text color for inputs
+    const inputBgColor = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100';
+    const inputTextColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-900';
     const buttonBgSave = theme === 'dark' ? 'bg-green-500' : 'bg-green-600';
     const buttonBgCancel = theme === 'dark' ? 'bg-red-600' : 'bg-red-500';
     const buttonBgDelete = theme === 'dark' ? 'bg-red-800' : 'bg-red-700';
@@ -38,6 +42,16 @@ const EditTimesheetModal = ({
             <div className={`p-6 rounded-lg shadow-lg w-full max-w-md ${modalBgColor}`}>
                 <h2 className={`text-xl font-semibold mb-4 ${textColor}`}>Edit Timesheet</h2>
                 <div className="space-y-4">
+                    <div>
+                        <label htmlFor="date" className={`block text-sm font-medium mb-1 ${textColor}`}>Date</label>
+                        <input
+                            id="date"
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
+                        />
+                    </div>
                     <div>
                         <label htmlFor="task-number" className={`block text-sm font-medium mb-1 ${textColor}`}>Task Number</label>
                         <input
@@ -104,6 +118,18 @@ const EditTimesheetModal = ({
                             placeholder="Deliverables"
                             value={deliverables}
                             onChange={(e) => setDeliverables(e.target.value)}
+                            className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
+                        />
+                    </div>
+
+                    {/* Comments Input Field */}
+                    <div>
+                        <label htmlFor="comments" className={`block text-sm font-medium mb-1 ${textColor}`}>Comments</label>
+                        <textarea
+                            id="comments"
+                            placeholder="Add your comments here"
+                            value={comments}
+                            onChange={(e) => setComments(e.target.value)}
                             className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
                         />
                     </div>
