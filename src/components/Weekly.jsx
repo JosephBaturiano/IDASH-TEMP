@@ -9,8 +9,8 @@ import TimesheetItem from '../components/WeeklyContent';
 import { useNotification } from '../context/NotificationContext'; // Import Notification Context
 
 
-const SECTION_HEIGHT = 700; // Height of one section
-const FOOTER_HEIGHT = 50; // Height of the footer
+const SECTION_HEIGHT = 900; // Height of one section
+const FOOTER_HEIGHT = 0; // Height of the footer
 const CONTENT_HEIGHT = SECTION_HEIGHT - FOOTER_HEIGHT; // Available height for content
 
 function Weekly() {
@@ -232,13 +232,14 @@ function Weekly() {
               )}
               <div className="px-8 ">
                 <table className="w-full text-left border-collapse border border-black">
-
+                {index === 0 && (
                   <thead>
                     <tr className="border border-black text-center">
                       <th className="border border-black px-4 w-40 text-md">DAY</th>
                       <th className="border border-black px-4 text-md">ACTIVITIES</th>
                     </tr>
                   </thead>
+                  )}
                   <tbody>
                     {section.map((item, itemIndex) => (
                       <TimesheetItem
