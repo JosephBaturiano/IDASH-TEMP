@@ -3,3 +3,13 @@
 @tailwind utilities;
 
 @layer base {img{display: initial;}}
+
+/* Import Tailwind base styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for the paper fold indicator */
+.comment-indicator {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
