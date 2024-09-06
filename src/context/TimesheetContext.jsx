@@ -46,8 +46,8 @@ const formatTime = (time) => {
 export function TimesheetProvider({ children }) {
   const [timesheets, setTimesheets] = useState([]);
   const [user, setUser] = useState(null);
-  const [interns, setInterns] = useState([]); // Store interns list
-  const [selectedIntern, setSelectedIntern] = useState(null); // Track selected intern
+  const [interns, setInterns] = useState([]);
+  const [selectedIntern, setSelectedIntern] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
 
   // Fetch current user
@@ -85,7 +85,7 @@ export function TimesheetProvider({ children }) {
   // Fetch interns
   useEffect(() => {
     const fetchInterns = async () => {
-      if (!user) return; // Ensure user is loaded before fetching interns
+      if (!user) return;
 
       let allInterns = [];
       let page = 1;
@@ -98,10 +98,13 @@ export function TimesheetProvider({ children }) {
           });
 
           if (Array.isArray(response.data)) {
-            allInterns = [...allInterns, ...response.data.map(intern => ({
-              id: intern.id,
-              name: intern.name
-            }))];
+            allInterns = [
+              ...allInterns,
+              ...response.data.map(intern => ({
+                id: intern.id,
+                name: intern.name,
+              })),
+            ];
 
             totalPages = parseInt(response.headers['x-wp-totalpages'], 10) || 1;
             page++;
@@ -117,19 +120,18 @@ export function TimesheetProvider({ children }) {
 
       setInterns(allInterns);
 
-      // Set the selected intern to the current user if no other interns are available
       const currentUserId = user.id;
       if (allInterns.some(intern => intern.id === currentUserId)) {
-        setSelectedIntern(currentUserId); // User is an intern, set selectedIntern to user's ID
+        setSelectedIntern(currentUserId);
       } else if (allInterns.length > 0) {
-        setSelectedIntern(allInterns[0].id); // Default to the first intern
+        setSelectedIntern(allInterns[0].id);
       } else {
-        setSelectedIntern(currentUserId); // Fallback to user ID if no interns are found
+        setSelectedIntern(currentUserId);
       }
     };
 
     fetchInterns();
-  }, [user]); // Fetch interns only after user is loaded
+  }, [user]);
 
   // Fetch timesheets for the selected intern or user
   useEffect(() => {
@@ -158,6 +160,7 @@ export function TimesheetProvider({ children }) {
         }
       }
 
+      // Include the comment in the formatted posts
       const formattedPosts = allTimesheets.map(post => ({
         id: post.id,
         taskNumber: post.acf.task_number,
@@ -167,6 +170,7 @@ export function TimesheetProvider({ children }) {
         withWhom: post.acf.with_whom,
         deliverables: post.acf.deliverables,
         date: post.acf.date_created,
+        comment: post.acf.comment || 'No Comment', // Include comment field
       }));
 
       setTimesheets(formattedPosts.reverse());

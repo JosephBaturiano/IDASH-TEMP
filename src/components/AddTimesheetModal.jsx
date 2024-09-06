@@ -18,7 +18,9 @@ const AddTimesheetModal = ({
   newDeliverables,
   setNewDeliverables,
   newSelectedDate, // Use newSelectedDate for the date
-  setNewSelectedDate // Use setNewSelectedDate for the date setter
+  setNewSelectedDate, // Use setNewSelectedDate for the date setter
+  newComment, // Add newComment prop
+  setNewComment // Add setNewComment prop
 }) => {
   const { theme } = useTheme(); // Get the current theme
 
@@ -117,6 +119,19 @@ const AddTimesheetModal = ({
               value={newSelectedDate} // Use newSelectedDate
               onChange={(e) => setNewSelectedDate(e.target.value)} // Use setNewSelectedDate
               className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
+            />
+          </div>
+
+          {/* Comment Input */}
+          <div>
+            <label htmlFor="comment" className={`block text-sm font-medium mb-1 ${textColor}`}>Comment</label>
+            <textarea
+              id="comment"
+              placeholder="Add a comment"
+              value={newComment} // Bind the newComment value
+              onChange={(e) => setNewComment(e.target.value)} // Handle changes
+              className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`} 
+              rows="3"
             />
           </div>
         </div>
