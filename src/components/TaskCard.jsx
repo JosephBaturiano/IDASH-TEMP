@@ -172,7 +172,8 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       task_number: task.acf.task_number || '',
       task_description: task.acf.task_description || '',
       date_created: task.acf.date_created || '',
-      assignedTo: task.acf.assignedTo || '',
+      assigned_to: task.acf.assigned_to || '',
+      allocated_time: task.acf.alocated_time || '',
       status: task.acf.status || '',
     });
   };
@@ -197,10 +198,22 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!editingTask) return;
+  
+    // Check if the user is a group leader before editing
+    if (!isGroupLeader) {
+      alert('Only the Group Leader can edit a task.');
+      return; // Prevent editing if the user is not a Group Leader
+    }
+    
     try {
       await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}task/${editingTask.id}`,
-        { acf: updatedTask },
+        {
+          acf: {
+            ...updatedTask,
+            assigned_to: Array.isArray(updatedTask.assigned_to) ? updatedTask.assigned_to : [parseInt(updatedTask.assigned_to, 10)],
+          },
+        },
         {
           auth: {
             username: import.meta.env.VITE_AUTH_USERNAME,
@@ -221,6 +234,12 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
+  
+    // Check if the user is a group leader before adding
+    if (!isGroupLeader) {
+      alert('Only the Group Leader can add a new task.');
+      return; // Prevent adding if the user is not a Group Leader
+    }
 
     // Structure of newTask should be verified
     const postData = {
@@ -433,6 +452,13 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
               </button>
               <button
                 type="button"
+                onClick={() => handleDelete(editingTask.id)}
+                className="ml-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Delete
+              </button>
+              <button
+                type="button"
                 onClick={() => setEditingTask(null)}
                 className="ml-2 bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
               >
@@ -535,11 +561,21 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
         </div>
       )}
       <button
-        onClick={() => setShowAddModal(true)}
-        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4"
+        onClick={() => {
+          if (!isGroupLeader) {
+            alert('Only the Group Leader can add tasks.');
+          } else {
+            setShowAddModal(true);
+          }
+        }}
+        className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4 ${
+          !isGroupLeader ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
+        disabled={!isGroupLeader} // Disables the button for non-group leaders
       >
         <AddIcon className="mr-2" /> Add Task
       </button>
+
       <table className={`w-full border-collapse border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
         <thead className={theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}>
           <tr>
@@ -579,12 +615,14 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
                   className={`cursor-pointer text-blue-500 hover:text-blue-600 ${!isGroupLeader ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
                 <EditIcon
-                  onClick={() => handleEditClick(task)}
-                  className="cursor-pointer text-blue-500 hover:text-blue-600"
-                />
-                <DeleteIcon
-                  onClick={() => handleDelete(task.id)}
-                  className="ml-2 cursor-pointer text-red-500 hover:text-red-600"
+                  onClick={() => {
+                    if (!isGroupLeader) {
+                      alert('Only the Group Leader can archive tasks.');
+                    } else {
+                    handleEditClick(task);
+                  }
+                 }}
+                  className={`cursor-pointer text-blue-500 hover:text-blue-600 ${!isGroupLeader ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
               </td>
             </tr>
