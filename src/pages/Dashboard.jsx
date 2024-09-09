@@ -32,16 +32,11 @@ const Dashboard = () => {
     };
     fetchTasks();
   }, []);
-
-  const formatDate = (dateString) => {
-    if (dateString.length !== 8) return 'Invalid date';
-    return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
-  };
   
   // Generate notifications from tasks
   const notifications = tasks.map(task => ({
     message: `NEW POST: ${task.acf.task_description}`,
-    date: formatDate(task.acf.date_created),
+    date: task.acf.date_created,
     action: 'Check'
   }));
 
