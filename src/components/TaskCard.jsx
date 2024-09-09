@@ -6,7 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme to get the theme
 
-const TaskCard = ({assignedToMe, currentUserId} ) => {
+const TaskCard = ({ assignedToMe, currentUserId }) => {
   const [tasks, setTasks] = useState([]);
   const [userNames, setUserNames] = useState({});
   const [userOptions, setUserOptions] = useState([]); // State to store user options
@@ -24,6 +24,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const authUsername = import.meta.env.VITE_AUTH_USERNAME;
   const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
+  const authHeader = 'Basic ' + btoa(`${authUsername}:${authPassword}`);
 
   // Function to check if the user is a Group Leader
   const checkIfGroupLeader = async () => {
@@ -60,7 +61,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
     } catch (error) {
       console.error('Error fetching user details:', error);
     }
-  };
+  };  
 
   const fetchTasks = async (page = 1) => {
     try {
@@ -74,19 +75,19 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
           per_page: 50, // Adjust based on API capabilities
         },
       });
-  
+
       // Sort tasks by task number in ascending order
       const sortedTasks = response.data.sort((a, b) => {
         const taskNumberA = a.acf ? parseFloat(a.acf.task_number) : 0;
         const taskNumberB = b.acf ? parseFloat(b.acf.task_number) : 0;
         return taskNumberA - taskNumberB;
       });
-  
+
       // Define the custom user ID arrays for special filtering
       const rj_id = [8, 15, 3, 14]; // Users who can see tasks with assigned_to id=19
       const tf_id = [10, 13, 12];   // Users who can see tasks with assigned_to id=20
       const rn_id = [9, 17, 18, 11, 16]; // Users who can see tasks with assigned_to id=21
-  
+
       let filteredTasks = sortedTasks;
       if (assignedToMe && currentUserId) {
         filteredTasks = sortedTasks.filter((task) => {
@@ -105,7 +106,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
           );
         });
       }
-  
+
       setTasks(filteredTasks);
       setCurrentPage(page);
       setTotalPages(parseInt(response.headers['x-wp-totalpages'], 10)); // Update total pages from response headers
@@ -115,7 +116,45 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       setLoading(false);
     }
   };
-  
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      let allUsers = [];
+      let page = 1;
+      let totalPages = 1;
+
+      while (page <= totalPages) {
+        try {
+          const response = await axios.get(`${apiBaseUrl}users?per_page=100&page=${page}`, {
+            headers: { 'Authorization': authHeader }
+          });
+
+          if (Array.isArray(response.data)) {
+            allUsers = [
+              ...allUsers,
+              ...response.data.map(user => ({
+                id: user.id,
+                name: user.name, // Use `name` for display in the dropdown
+              })),
+            ];
+
+            totalPages = parseInt(response.headers['x-wp-totalpages'], 10) || 1;
+            page++;
+          } else {
+            console.error('API Response is not an array:', response.data);
+            break;
+          }
+        } catch (error) {
+          console.error('Error fetching users:', error);
+          break;
+        }
+      }
+
+      setUserOptions(allUsers); // Store users in state
+    };
+
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
     const checkGroupLeaderStatus = async () => {
@@ -125,7 +164,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
     fetchUserDetails();
     fetchTasks();
     checkGroupLeaderStatus();
-  }, [apiBaseUrl, authUsername, authPassword, assignedToMe, currentUserId ]);
+  }, [apiBaseUrl, authUsername, authPassword, assignedToMe, currentUserId]);
 
   const handleEditClick = (task) => {
     setEditingTask(task);
@@ -139,22 +178,21 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
   };
 
 
-  const handleChange = (e) => {
-    setUpdatedTask(prevState => ({
+  const handleAddChange = (e) => {
+    const { name, value } = e.target;
+    setNewTask(prevState => ({
       ...prevState,
-      [e.target.name]: e.target.value
+      [name]: value,
     }));
   };
   
-
-  
-
-  const handleAddChange = (e) => {
-    setNewTask({
-      ...newTask,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedTask(prevState => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };  
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
@@ -173,7 +211,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       const updatedTasks = tasks.map((task) =>
         task.id === editingTask.id ? { ...task, acf: updatedTask } : task
       );
-      
+
       setTasks(updatedTasks);
       setEditingTask(null);
     } catch (err) {
@@ -187,7 +225,10 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
     // Structure of newTask should be verified
     const postData = {
       status: 'publish',
-      acf: newTask,
+      acf: {
+        ...newTask,
+        assigned_to: Array.isArray(newTask.assigned_to) ? newTask.assigned_to : [parseInt(newTask.assigned_to, 10)]
+      }
     };
 
     try {
@@ -216,7 +257,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       setError(`Failed to add task: ${err.message}`);
     }
   };
-  
+
   const handleDelete = async (id) => {
     try {
       await axios.delete(
@@ -240,9 +281,9 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       alert('Only the Group Leader can archive a task.');
       return; // Prevent archiving if the user is not a Group Leader
     }
-  
+
     const isConfirmed = window.confirm('Are you sure you want to archive this task?');
-    
+
     if (isConfirmed) {
       try {
         const response = await axios.get(`${apiBaseUrl}task/${taskId}`, {
@@ -251,13 +292,13 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
             password: authPassword,
           },
         });
-  
+
         const taskToArchive = response.data;
-  
+
         if (!taskToArchive) {
           throw new Error('Task not found');
         }
-  
+
         const postData = {
           acf: {
             task_number: taskToArchive.acf.task_number,
@@ -269,10 +310,10 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
           },
           status: 'publish',
         };
-  
+
         // Log postData for debugging
         console.log('Archive postData:', postData);
-  
+
         await axios.post(`${apiBaseUrl}archive/`, postData, {
           auth: {
             username: authUsername,
@@ -282,16 +323,16 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
             'Content-Type': 'application/json',
           },
         });
-  
+
         await axios.delete(`${apiBaseUrl}task/${taskId}`, {
           auth: {
             username: authUsername,
             password: authPassword,
           },
         });
-  
+
         setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-  
+
       } catch (err) {
         // Log detailed error message
         console.error('Error details:', err.response ? err.response.data : err.message);
@@ -299,7 +340,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       }
     }
   };
-  
+
 
   const loadMoreTasks = () => {
     if (currentPage < totalPages) {
@@ -428,7 +469,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
               </div>
               <div className="mb-2">
                 <label className="block">Date</label>
-                  <input
+                <input
                   type="date"
                   name="date_created"
                   value={newTask.date_created || ''}
@@ -455,9 +496,10 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
                   onChange={handleAddChange}
                   className="w-full border border-gray-300 rounded p-2"
                 >
+                  <option value="">Select User</option> {/* Default option */}
                   {userOptions.map((user) => (
                     <option key={user.id} value={user.id}>
-                      {user.name}
+                      {user.name} {/* Show user name */}
                     </option>
                   ))}
                 </select>
@@ -520,8 +562,8 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
               <td className="border px-4 py-2 text-center">
                 {task.acf && Array.isArray(task.acf.assigned_to) && task.acf.assigned_to.length > 0
                   ? task.acf.assigned_to.map((userId, index) => (
-                      <span key={index}>{userNames[userId]}</span>
-                    ))
+                    <span key={index}>{userNames[userId]}</span>
+                  ))
                   : 'No assignee'}
               </td>
               <td className="border px-4 py-2 text-center">{task.acf?.status || 'No status'}</td>
@@ -562,4 +604,3 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
   );
 }
 export default TaskCard;
-  
