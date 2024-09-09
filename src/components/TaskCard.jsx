@@ -183,7 +183,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Structure of newTask should be verified
     const postData = {
       status: 'publish',
@@ -208,7 +208,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
 
       // Ensure response.data matches the format expected in setTasks
       const addedTask = response.data;
-      setTasks(prevTasks => [...prevTask, addedTask]); // Use functional update to avoid stale state
+      setTasks(prevTask => [...prevTask, addedTask]); // Use functional update to avoid stale state
       setShowAddModal(false);
 
     } catch (err) {
@@ -301,15 +301,6 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
   };
   
 
-  const formatDate = (dateString) => {
-    if (dateString.length !== 8) return 'Invalid date';
-    const year = dateString.slice(0, 4);
-    const month = dateString.slice(4, 6);
-    const day = dateString.slice(6, 8);
-    return `${year}-${month}-${day}`;
-  };
-  
-
   const loadMoreTasks = () => {
     if (currentPage < totalPages) {
       fetchTasks(currentPage + 1);
@@ -349,7 +340,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
                 <input
                   type="date"
                   name="date_created"
-                  value={updatedTask.date_created}
+                  value={updatedTask.date_created || ''}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded p-2"
                 />
@@ -440,7 +431,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
                   <input
                   type="date"
                   name="date_created"
-                  value={formatDate(newTask.date_created || '')}
+                  value={newTask.date_created || ''}
                   onChange={handleAddChange}
                   className="w-full border border-gray-300 rounded p-2"
                 />
@@ -524,7 +515,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
             <tr key={task.id}>
               <td className="border px-4 py-2 text-center">{task.acf?.task_number || 'No number'}</td>
               <td className="border px-4 py-2 text-center">{task.acf?.task_description || 'No description'}</td>
-              <td className="border px-4 py-2 text-center">{task.acf ? formatDate(task.acf.date_created) : 'No date'}</td>
+              <td className="border px-4 py-2 text-center">{task.acf ? task.acf.date_created : 'No date'}</td>
               <td className="border px-4 py-2 text-center">{task.acf?.allocated_time || 'No time'}</td>
               <td className="border px-4 py-2 text-center">
                 {task.acf && Array.isArray(task.acf.assigned_to) && task.acf.assigned_to.length > 0
