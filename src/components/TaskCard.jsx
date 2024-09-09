@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ArchiveIcon from '@mui/icons-material/Archive';
-import { useTheme } from '../context/ThemeContext'; // Import useTheme to get the theme
 import AddIcon from '@mui/icons-material/Add';
-import { useTimesheets } from '../context/TimesheetContext';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useTheme } from '../context/ThemeContext'; // Import useTheme to get the theme
 
 const TaskCard = ({assignedToMe, currentUserId} ) => {
   const [tasks, setTasks] = useState([]);
   const [userNames, setUserNames] = useState({});
+  const [userOptions, setUserOptions] = useState([]); // State to store user options
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isGroupLeader, setIsGroupLeader] = useState(false); // State to track if the user is a Group Leader
   const [currentPage, setCurrentPage] = useState(1); // Add state for pagination
   const [totalPages, setTotalPages] = useState(1); // Add state for total pages
-  const { theme } = useTheme(); // Get the current theme
+  const [editingTask, setEditingTask] = useState(null);
   const [newTask, setNewTask] = useState({}); // State for new task
+  const [updatedTask, setUpdatedTask] = useState({});
   const [showAddModal, setShowAddModal] = useState(false); // State to control add modal visibility
-  const {
-    timesheets,
-    setTimesheets,
-    user,
-    interns,
-    selectedIntern,
-    setSelectedIntern
-  } = useTimesheets();
+  const { theme } = useTheme(); // Get the current theme
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const authUsername = import.meta.env.VITE_AUTH_USERNAME;
@@ -131,25 +127,63 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
     checkGroupLeaderStatus();
   }, [apiBaseUrl, authUsername, authPassword, assignedToMe, currentUserId ]);
 
-  const handleChange = (e) => {
+  const handleEditClick = (task) => {
+    setEditingTask(task);
     setUpdatedTask({
-      ...updatedTask,
-      [e.target.name]: e.target.value,
+      task_number: task.acf.task_number || '',
+      task_description: task.acf.task_description || '',
+      date_created: task.acf.date_created || '',
+      assignedTo: task.acf.assignedTo || '',
+      status: task.acf.status || '',
     });
   };
 
-  const handleAddChange = (event) => {
-    const { name, value } = event.target;
-    setNewTask((prevTask) => ({
-      ...prevTask,
-      [name]: value, // Set a single value instead of an array
+
+  const handleChange = (e) => {
+    setUpdatedTask(prevState => ({
+      ...prevState,
+      [e.target.name]: e.target.value
     }));
   };
   
 
+  
+
+  const handleAddChange = (e) => {
+    setNewTask({
+      ...newTask,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingTask) return;
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}task/${editingTask.id}`,
+        { acf: updatedTask },
+        {
+          auth: {
+            username: import.meta.env.VITE_AUTH_USERNAME,
+            password: import.meta.env.VITE_AUTH_PASSWORD,
+          },
+        }
+      );
+      const updatedTasks = tasks.map((task) =>
+        task.id === editingTask.id ? { ...task, acf: updatedTask } : task
+      );
+      
+      setTasks(updatedTasks);
+      setEditingTask(null);
+    } catch (err) {
+      setError(`Failed to update task: ${err.message}`);
+    }
+  };
+
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-
+    
     // Structure of newTask should be verified
     const postData = {
       status: 'publish',
@@ -174,7 +208,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
 
       // Ensure response.data matches the format expected in setTasks
       const addedTask = response.data;
-      setTasks(prevTask => [...prevTask, addedTask]); // Use functional update to avoid stale state
+      setTasks(prevTasks => [...prevTask, addedTask]); // Use functional update to avoid stale state
       setShowAddModal(false);
 
     } catch (err) {
@@ -182,7 +216,7 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       setError(`Failed to add task: ${err.message}`);
     }
   };
-
+  
   const handleDelete = async (id) => {
     try {
       await axios.delete(
@@ -194,8 +228,8 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
           },
         }
       );
-      const updatedTask = task.filter((task) => task.id !== id);
-      setTasks(updatedTask);
+      const updatedTasks = tasks.filter((task) => task.id !== id);
+      setTasks(updatedTasks);
     } catch (err) {
       setError(`Failed to delete task: ${err.message}`);
     }
@@ -265,12 +299,16 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       }
     }
   };
+  
 
   const formatDate = (dateString) => {
     if (dateString.length !== 8) return 'Invalid date';
-    return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
+    const year = dateString.slice(0, 4);
+    const month = dateString.slice(4, 6);
+    const day = dateString.slice(6, 8);
+    return `${year}-${month}-${day}`;
   };
-
+  
 
   const loadMoreTasks = () => {
     if (currentPage < totalPages) {
@@ -281,28 +319,27 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
   return (
     <div className={`p-6 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
       {error && <p className="text-red-500">Error: {error}</p>}
-
-{showAddModal && (
+      {editingTask && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
           <div className={`p-4 rounded shadow-lg w-1/3 ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
-            <h2 className="text-xl mb-2">Add Task</h2>
-            <form onSubmit={handleAddSubmit}>
-            <div className="mb-2">
+            <h2 className="text-xl mb-2">Edit Task</h2>
+            <form onSubmit={handleEditSubmit}>
+              <div className="mb-2">
                 <label className="block">Task Number</label>
                 <input
                   type="text"
                   name="task_number"
-                  value={newTask.task_number}
-                  onChange={handleAddChange}
+                  value={updatedTask.task_number}
+                  onChange={handleChange}
                   className="w-full border border-gray-300 rounded p-2"
                 />
               </div>
               <div className="mb-2">
-                <label className="block">Description</label>
+                <label className="block">Task Description</label>
                 <textarea
                   name="task_description"
-                  value={newTask.task_description}
-                  onChange={handleAddChange}
+                  value={updatedTask.task_description}
+                  onChange={handleChange}
                   className="w-full border border-gray-300 rounded p-2"
                   rows="4"
                 />
@@ -312,9 +349,110 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
                 <input
                   type="date"
                   name="date_created"
-                  value={newTask.date_created}
+                  value={updatedTask.date_created}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                />
+              </div>
+
+              <div className="mb-2">
+                <label className="block">Allocated Time</label>
+                <textarea
+                  name="allocated_time"
+                  value={updatedTask.allocated_time || ''}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                  rows="1"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block">Assigned To</label>
+                <select
+                  name="assigned_to"
+                  value={updatedTask.assigned_to}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                >
+                  {userOptions.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-2">
+                <label className="block">Status</label>
+                <select
+                  name="status"
+                  value={updatedTask.status}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                >
+                  <option value="Not Started">Not Started</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Done">Done</option>
+                </select>
+              </div>
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingTask(null)}
+                className="ml-2 bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+          <div className={`p-4 rounded shadow-lg w-1/3 ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+            <h2 className="text-xl mb-2">Add Task</h2>
+            <form onSubmit={handleAddSubmit}>
+              <div className="mb-2">
+                <label className="block">Task Number</label>
+                <input
+                  type="text"
+                  name="task_number"
+                  value={newTask.task_number || ''}
                   onChange={handleAddChange}
                   className="w-full border border-gray-300 rounded p-2"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block">Description</label>
+                <textarea
+                  name="task_description"
+                  value={newTask.task_description || ''}
+                  onChange={handleAddChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                  rows="4"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block">Date</label>
+                  <input
+                  type="date"
+                  name="date_created"
+                  value={formatDate(newTask.date_created || '')}
+                  onChange={handleAddChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block">Allocated Time</label>
+                <textarea
+                  name="allocated_time"
+                  value={newTask.allocated_time || ''}
+                  onChange={handleAddChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                  rows="1"
                 />
               </div>
 
@@ -322,48 +460,30 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
                 <label className="block">Assigned To</label>
                 <select
                   name="assigned_to"
-                  value={newTask.assigned_to || ""} // Ensure a default value is present
+                  value={newTask.assigned_to || ''}
                   onChange={handleAddChange}
-                  className={`w-full border rounded p-2 ${
-                    theme === 'dark'
-                      ? 'bg-gray-800 text-white border-gray-700'
-                      : 'bg-white text-gray-900 border-gray-300'
-                  }`}
+                  className="w-full border border-gray-300 rounded p-2"
                 >
-                  <option value="">Select Intern</option> {/* Default placeholder option */}
-                  {interns.map((intern) => (
-                    <option key={intern.id} value={intern.id}>
-                      {intern.name}
+                  {userOptions.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
                     </option>
                   ))}
                 </select>
-              </div>
-
-
-              <div className="mb-2">
-                <label className="block">Allocated Time</label>
-                <input
-                  type="text"
-                  name="allocated_time"
-                  value={newTask.allocated_time}
-                  onChange={handleAddChange}
-                  className="w-full border border-gray-300 rounded p-2"
-                />
               </div>
               <div className="mb-2">
                 <label className="block">Status</label>
                 <select
                   name="status"
-                  value={newTask.status}
+                  value={newTask.status || ''}
                   onChange={handleAddChange}
                   className="w-full border border-gray-300 rounded p-2"
                 >
-                  <option value="Open">Open</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Closed">Closed</option>
+                  <option value="Not Started">Not Started</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Done">Done</option>
                 </select>
               </div>
-
               <button
                 type="submit"
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -387,47 +507,34 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       >
         <AddIcon className="mr-2" /> Add Task
       </button>
-      <table className={`table-auto w-full border-collapse ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+      <table className={`w-full border-collapse border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
         <thead className={theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}>
           <tr>
-            <th className="px-6 py-3 text-center w-1/24">Task Number</th>
-            <th className="px-6 py-3 text-center w-1/4">Description</th>
-            <th className="px-6 py-3 text-center w-1/6">Date Created</th>
-            <th className="px-6 py-3 text-center w-1/6">Allocated Time</th>
-            <th className="px-6 py-3 text-center w-1/6">Assigned To</th>
-            <th className="px-6 py-3 text-center w-1/6">Status</th>
-            <th className="px-6 py-3 text-center w-1/12">Action</th>
+            <th className="border px-4 py-2 text-center">Task Number</th>
+            <th className="border px-4 py-2 text-center">Description</th>
+            <th className="border px-4 py-2 text-center">Date Created</th>
+            <th className="border px-4 py-2 text-center">Allocated Time</th>
+            <th className="border px-4 py-2 text-center">Assigned To</th>
+            <th className="border px-4 py-2 text-center">Status</th>
+            <th className="border px-4 py-2 text-center">Action</th>
           </tr>
         </thead>
         <tbody>
           {tasks.map((task) => (
             <tr key={task.id}>
-              <td className="border px-6 py-4 text-center">{task.acf ? task.acf.task_number : 'No number'}</td>
-              <td className="border px-6 py-4 text-center">{task.acf ? task.acf.task_description : 'No description'}</td>
-              <td className="border px-6 py-4 text-center">{task.acf ? formatDate(task.acf.date_created) : 'No date'}</td>
-              <td className="border px-6 py-4 text-center">{task.acf ? task.acf.allocated_time : 'No time'}</td>
-              <td className="border px-6 py-4 text-center">
+              <td className="border px-4 py-2 text-center">{task.acf?.task_number || 'No number'}</td>
+              <td className="border px-4 py-2 text-center">{task.acf?.task_description || 'No description'}</td>
+              <td className="border px-4 py-2 text-center">{task.acf ? formatDate(task.acf.date_created) : 'No date'}</td>
+              <td className="border px-4 py-2 text-center">{task.acf?.allocated_time || 'No time'}</td>
+              <td className="border px-4 py-2 text-center">
                 {task.acf && Array.isArray(task.acf.assigned_to) && task.acf.assigned_to.length > 0
                   ? task.acf.assigned_to.map((userId, index) => (
-                      <span key={userId}>
-                        {userNames[userId] || 'Unknown User'}
-                        {index < task.acf.assigned_to.length - 1 && ', '}
-                      </span>
+                      <span key={index}>{userNames[userId]}</span>
                     ))
                   : 'No assignee'}
               </td>
-              <td className="border px-6 py-4 text-center">
-                <select
-                  value={task.acf ? task.acf.status : 'Not Started'}
-                  onChange={(e) => handleStatusChange(e, task.id)}
-                  className={`w-full border rounded p-2 ${theme === 'dark' ? 'bg-gray-800 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-300'}`}
-                >
-                  <option value="Not Started">Not Started</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Done">Done</option>
-                </select>
-              </td>
-              <td className="border px-6 py-4 text-center">
+              <td className="border px-4 py-2 text-center">{task.acf?.status || 'No status'}</td>
+              <td className="border px-4 py-2 text-center">
                 <ArchiveIcon
                   onClick={() => {
                     if (!isGroupLeader) {
@@ -436,13 +543,22 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
                       handleArchive(task.id);
                     }
                   }}
-                  className={`cursor-pointer text-blue-500 hover:text-blue-600 ${!isGroupLeader && 'opacity-50 cursor-not-allowed'}`}
+                  className={`cursor-pointer text-blue-500 hover:text-blue-600 ${!isGroupLeader ? 'opacity-50 cursor-not-allowed' : ''}`}
+                />
+                <EditIcon
+                  onClick={() => handleEditClick(task)}
+                  className="cursor-pointer text-blue-500 hover:text-blue-600"
+                />
+                <DeleteIcon
+                  onClick={() => handleDelete(task.id)}
+                  className="ml-2 cursor-pointer text-red-500 hover:text-red-600"
                 />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
       {currentPage < totalPages && (
         <button
           onClick={loadMoreTasks}
@@ -453,6 +569,6 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       )}
     </div>
   );
-};
-
+}
 export default TaskCard;
+  
