@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme to get the theme
+import AddIcon from '@mui/icons-material/Add';
+import { useTimesheets } from '../context/TimesheetContext';
 
 const TaskCard = ({assignedToMe, currentUserId} ) => {
   const [tasks, setTasks] = useState([]);
@@ -12,6 +14,16 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
   const [currentPage, setCurrentPage] = useState(1); // Add state for pagination
   const [totalPages, setTotalPages] = useState(1); // Add state for total pages
   const { theme } = useTheme(); // Get the current theme
+  const [newTask, setNewTask] = useState({}); // State for new task
+  const [showAddModal, setShowAddModal] = useState(false); // State to control add modal visibility
+  const {
+    timesheets,
+    setTimesheets,
+    user,
+    interns,
+    selectedIntern,
+    setSelectedIntern
+  } = useTimesheets();
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const authUsername = import.meta.env.VITE_AUTH_USERNAME;
@@ -119,30 +131,73 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
     checkGroupLeaderStatus();
   }, [apiBaseUrl, authUsername, authPassword, assignedToMe, currentUserId ]);
 
-  const handleStatusChange = async (e, taskId) => {
-    if (!isGroupLeader) {
-      alert('Only the Group Leader can change the status.');
-      return; // Prevent status change if the user is not a Group Leader
-    }
+  const handleChange = (e) => {
+    setUpdatedTask({
+      ...updatedTask,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-    const newStatus = e.target.value;
-    const updatedTasks = tasks.map(task =>
-      task.id === taskId
-        ? { ...task, acf: { ...task.acf, status: newStatus } }
-        : task
-    );
-    setTasks(updatedTasks);
+  const handleAddChange = (event) => {
+    const { name, value } = event.target;
+    setNewTask((prevTask) => ({
+      ...prevTask,
+      [name]: value, // Set a single value instead of an array
+    }));
+  };
+  
+
+  const handleAddSubmit = async (e) => {
+    e.preventDefault();
+
+    // Structure of newTask should be verified
+    const postData = {
+      status: 'publish',
+      acf: newTask,
+    };
+
     try {
-      await axios.post(`${apiBaseUrl}task/${taskId}`, {
-        acf: { status: newStatus },
-      }, {
-        auth: {
-          username: authUsername,
-          password: authPassword,
-        },
-      });
+      console.log('Submitting new task:', newTask); // Debugging
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}task`,
+        postData,
+        {
+          auth: {
+            username: import.meta.env.VITE_AUTH_USERNAME,
+            password: import.meta.env.VITE_AUTH_PASSWORD,
+          },
+        }
+      );
+
+      console.log('Add task response:', response.data); // Debugging
+
+      // Ensure response.data matches the format expected in setTasks
+      const addedTask = response.data;
+      setTasks(prevTask => [...prevTask, addedTask]); // Use functional update to avoid stale state
+      setShowAddModal(false);
+
     } catch (err) {
-      setError(`Failed to update status: ${err.message}`);
+      console.error('Failed to add task:', err);
+      setError(`Failed to add task: ${err.message}`);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}task/${id}`,
+        {
+          auth: {
+            username: import.meta.env.VITE_AUTH_USERNAME,
+            password: import.meta.env.VITE_AUTH_PASSWORD,
+          },
+        }
+      );
+      const updatedTask = task.filter((task) => task.id !== id);
+      setTasks(updatedTask);
+    } catch (err) {
+      setError(`Failed to delete task: ${err.message}`);
     }
   };
 
@@ -210,12 +265,12 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
       }
     }
   };
-  
 
   const formatDate = (dateString) => {
     if (dateString.length !== 8) return 'Invalid date';
     return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
   };
+
 
   const loadMoreTasks = () => {
     if (currentPage < totalPages) {
@@ -226,6 +281,112 @@ const TaskCard = ({assignedToMe, currentUserId} ) => {
   return (
     <div className={`p-6 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
       {error && <p className="text-red-500">Error: {error}</p>}
+
+{showAddModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+          <div className={`p-4 rounded shadow-lg w-1/3 ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+            <h2 className="text-xl mb-2">Add Task</h2>
+            <form onSubmit={handleAddSubmit}>
+            <div className="mb-2">
+                <label className="block">Task Number</label>
+                <input
+                  type="text"
+                  name="task_number"
+                  value={newTask.task_number}
+                  onChange={handleAddChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block">Description</label>
+                <textarea
+                  name="task_description"
+                  value={newTask.task_description}
+                  onChange={handleAddChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                  rows="4"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block">Date Created</label>
+                <input
+                  type="date"
+                  name="date_created"
+                  value={newTask.date_created}
+                  onChange={handleAddChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                />
+              </div>
+
+              <div className="mb-2">
+                <label className="block">Assigned To</label>
+                <select
+                  name="assigned_to"
+                  value={newTask.assigned_to || ""} // Ensure a default value is present
+                  onChange={handleAddChange}
+                  className={`w-full border rounded p-2 ${
+                    theme === 'dark'
+                      ? 'bg-gray-800 text-white border-gray-700'
+                      : 'bg-white text-gray-900 border-gray-300'
+                  }`}
+                >
+                  <option value="">Select Intern</option> {/* Default placeholder option */}
+                  {interns.map((intern) => (
+                    <option key={intern.id} value={intern.id}>
+                      {intern.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+
+              <div className="mb-2">
+                <label className="block">Allocated Time</label>
+                <input
+                  type="text"
+                  name="allocated_time"
+                  value={newTask.allocated_time}
+                  onChange={handleAddChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block">Status</label>
+                <select
+                  name="status"
+                  value={newTask.status}
+                  onChange={handleAddChange}
+                  className="w-full border border-gray-300 rounded p-2"
+                >
+                  <option value="Open">Open</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Closed">Closed</option>
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                className="ml-2 bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+      <button
+        onClick={() => setShowAddModal(true)}
+        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4"
+      >
+        <AddIcon className="mr-2" /> Add Task
+      </button>
       <table className={`table-auto w-full border-collapse ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
         <thead className={theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}>
           <tr>
