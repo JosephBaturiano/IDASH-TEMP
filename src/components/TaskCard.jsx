@@ -61,7 +61,7 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
     } catch (error) {
       console.error('Error fetching user details:', error);
     }
-  };  
+  };
 
   const fetchTasks = async (page = 1) => {
     try {
@@ -186,25 +186,25 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       [name]: value,
     }));
   };
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUpdatedTask(prevState => ({
       ...prevState,
       [name]: value,
     }));
-  };  
+  };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!editingTask) return;
-  
+
     // Check if the user is a group leader before editing
     if (!isGroupLeader) {
       alert('Only the Group Leader can edit a task.');
       return; // Prevent editing if the user is not a Group Leader
     }
-  
+
     const updatedPayload = {
       acf: {
         ...updatedTask,
@@ -219,7 +219,7 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
         status: updatedTask.status || 'Not Started', // Set default if empty
       },
     };
-  
+
     try {
       // Send PUT request to update the task on the server
       const response = await axios.put(
@@ -232,7 +232,7 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           },
         }
       );
-  
+
       // Update the local state with the new task data from the response
       const updatedTaskFromResponse = response.data;
       setTasks((prevTasks) =>
@@ -240,18 +240,18 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           task.id === editingTask.id ? updatedTaskFromResponse : task
         )
       );
-  
+
       setEditingTask(null); // Close the modal
     } catch (err) {
       console.error('Error updating task:', err.response ? err.response.data : err.message);
       setError(`Failed to update task: ${err.message}`);
     }
   };
-  
+
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Check if the user is a group leader before adding
     if (!isGroupLeader) {
       alert('Only the Group Leader can add a new task.');
@@ -276,10 +276,10 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
         status: newTask.status || 'Not Started',  // Ensure 'Not Started' if status is empty
       },
     };
-  
+
     try {
       console.log('Submitting new task:', newTask); // Debugging
-  
+
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}task`,
         postData,
@@ -290,29 +290,29 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           },
         }
       );
-  
+
       console.log('Add task response:', response.data); // Debugging
-  
+
       // Ensure response.data matches the format expected in setTasks
       const addedTask = response.data;
       setTasks(prevTasks => [...prevTasks, addedTask]); // Use functional update to avoid stale state
       setShowAddModal(false);
-  
+
     } catch (err) {
       console.error('Failed to add task:', err);
       setError(`Failed to add task: ${err.message}`);
     }
   };
-  
+
 
   const handleDelete = async (id) => {
     // Show a confirmation prompt to the user
     const isConfirmed = window.confirm('Are you sure you want to delete this task? This action cannot be undone.');
-  
+
     if (!isConfirmed) {
       return; // If the user clicks "Cancel", stop the delete action
     }
-  
+
     try {
       await axios.delete(
         `${import.meta.env.VITE_API_BASE_URL}task/${id}`,
@@ -323,18 +323,18 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           },
         }
       );
-  
+
       // Update the tasks state to remove the deleted task
       const updatedTasks = tasks.filter((task) => task.id !== id);
       setTasks(updatedTasks);
-  
+
       // Close the modal after successful deletion
       setEditingTask(null);
     } catch (err) {
       setError(`Failed to delete task: ${err.message}`);
     }
   };
-  
+
   const handleArchive = async (taskId) => {
     if (!isGroupLeader) {
       alert('Only the Group Leader can archive a task.');
@@ -608,9 +608,8 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
             setShowAddModal(true);
           }
         }}
-        className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4 ${
-          !isGroupLeader ? 'opacity-50 cursor-not-allowed' : ''
-        }`}
+        className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4 ${!isGroupLeader ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         disabled={!isGroupLeader} // Disables the button for non-group leaders
       >
         <AddIcon className="mr-2" /> Add Task
@@ -619,13 +618,13 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       <table className={`w-full border-collapse border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
         <thead className={theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}>
           <tr>
-            <th className="border px-4 py-2 text-center">Task Number</th>
-            <th className="border px-4 py-2 text-center">Description</th>
-            <th className="border px-4 py-2 text-center">Date Created</th>
-            <th className="border px-4 py-2 text-center">Allocated Time</th>
-            <th className="border px-4 py-2 text-center">Assigned To</th>
-            <th className="border px-4 py-2 text-center">Status</th>
-            <th className="border px-4 py-2 text-center">Action</th>
+            <th className="border px-4 py-2 text-center w-24">Task Number</th>
+            <th className="border px-4 py-2 text-center w-64">Description</th>
+            <th className="border px-4 py-2 text-center w-32">Date Created</th>
+            <th className="border px-4 py-2 text-center w-32">Allocated Time</th>
+            <th className="border px-4 py-2 text-center w-32">Assigned To</th>
+            <th className="border px-4 py-2 text-center w-24">Status</th>
+            <th className="border px-4 py-2 text-center w-24">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -659,9 +658,9 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
                     if (!isGroupLeader) {
                       alert('Only the Group Leader can archive tasks.');
                     } else {
-                    handleEditClick(task);
-                  }
-                 }}
+                      handleEditClick(task);
+                    }
+                  }}
                   className={`cursor-pointer text-blue-500 hover:text-blue-600 ${!isGroupLeader ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
               </td>
