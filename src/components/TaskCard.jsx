@@ -173,7 +173,7 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       task_description: task.acf.task_description || '',
       date_created: task.acf.date_created || '',
       assigned_to: task.acf.assigned_to || '',
-      allocated_time: task.acf.alocated_time || '',
+      allocated_time: task.acf.allocated_time || '',
       status: task.acf.status || '',
     });
   };
@@ -212,11 +212,11 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
         assigned_to: Array.isArray(updatedTask.assigned_to)
           ? updatedTask.assigned_to
           : [parseInt(updatedTask.assigned_to, 10)],
-        task_number: updatedTask.task_number || 'DefaultTaskNumber',
+        task_number: updatedTask.task_number || 'No task number',
         task_description: updatedTask.task_description || 'No description provided',
         date_created: updatedTask.date_created || new Date().toISOString().split('T')[0],
-        allocated_time: updatedTask.allocated_time || 'Not time',
-        status: updatedTask.status || 'Pending', // Set default if empty
+        allocated_time: updatedTask.allocated_time || 'No time',
+        status: updatedTask.status || 'Not Started', // Set default if empty
       },
     };
   
@@ -257,13 +257,22 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       alert('Only the Group Leader can add a new task.');
       return; // Prevent adding if the user is not a Group Leader
     }
-  
+
+    if (!newTask.assigned_to) {
+      alert('Please select a User to assign the task.');
+      return; // Prevent adding if 'assigned_to' is not filled
+    }
+
     // Ensure the status field is set properly; fallback to 'Not Started' if it's not provided
     const postData = {
       status: 'publish',
       acf: {
         ...newTask,
         assigned_to: Array.isArray(newTask.assigned_to) ? newTask.assigned_to : [parseInt(newTask.assigned_to, 10)],
+        task_number: newTask.task_number || 'No task number',
+        task_description: newTask.task_description || 'No description provided',
+        date_created: newTask.date_created || new Date().toISOString().split('T')[0],
+        allocated_time: newTask.allocated_time || 'No time',
         status: newTask.status || 'Not Started',  // Ensure 'Not Started' if status is empty
       },
     };
@@ -326,7 +335,6 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
     }
   };
   
-
   const handleArchive = async (taskId) => {
     if (!isGroupLeader) {
       alert('Only the Group Leader can archive a task.');
