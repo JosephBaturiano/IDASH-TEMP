@@ -297,6 +297,13 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
   
 
   const handleDelete = async (id) => {
+    // Show a confirmation prompt to the user
+    const isConfirmed = window.confirm('Are you sure you want to delete this task? This action cannot be undone.');
+  
+    if (!isConfirmed) {
+      return; // If the user clicks "Cancel", stop the delete action
+    }
+  
     try {
       await axios.delete(
         `${import.meta.env.VITE_API_BASE_URL}task/${id}`,
@@ -307,12 +314,18 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           },
         }
       );
+  
+      // Update the tasks state to remove the deleted task
       const updatedTasks = tasks.filter((task) => task.id !== id);
       setTasks(updatedTasks);
+  
+      // Close the modal after successful deletion
+      setEditingTask(null);
     } catch (err) {
       setError(`Failed to delete task: ${err.message}`);
     }
   };
+  
 
   const handleArchive = async (taskId) => {
     if (!isGroupLeader) {
