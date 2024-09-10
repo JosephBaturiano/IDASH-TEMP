@@ -204,16 +204,27 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       alert('Only the Group Leader can edit a task.');
       return; // Prevent editing if the user is not a Group Leader
     }
-    
+  
+    const updatedPayload = {
+      acf: {
+        ...updatedTask,
+        // Ensure assigned_to is always an array
+        assigned_to: Array.isArray(updatedTask.assigned_to)
+          ? updatedTask.assigned_to
+          : [parseInt(updatedTask.assigned_to, 10)],
+        task_number: updatedTask.task_number || 'DefaultTaskNumber',
+        task_description: updatedTask.task_description || 'No description provided',
+        date_created: updatedTask.date_created || new Date().toISOString().split('T')[0],
+        allocated_time: updatedTask.allocated_time || 'Not time',
+        status: updatedTask.status || 'Pending', // Set default if empty
+      },
+    };
+  
     try {
-      await axios.put(
+      // Send PUT request to update the task on the server
+      const response = await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}task/${editingTask.id}`,
-        {
-          acf: {
-            ...updatedTask,
-            assigned_to: Array.isArray(updatedTask.assigned_to) ? updatedTask.assigned_to : [parseInt(updatedTask.assigned_to, 10)],
-          },
-        },
+        updatedPayload,
         {
           auth: {
             username: import.meta.env.VITE_AUTH_USERNAME,
@@ -221,16 +232,22 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           },
         }
       );
-      const updatedTasks = tasks.map((task) =>
-        task.id === editingTask.id ? { ...task, acf: updatedTask } : task
+  
+      // Update the local state with the new task data from the response
+      const updatedTaskFromResponse = response.data;
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === editingTask.id ? updatedTaskFromResponse : task
+        )
       );
-
-      setTasks(updatedTasks);
-      setEditingTask(null);
+  
+      setEditingTask(null); // Close the modal
     } catch (err) {
+      console.error('Error updating task:', err.response ? err.response.data : err.message);
       setError(`Failed to update task: ${err.message}`);
     }
   };
+  
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
@@ -240,19 +257,20 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       alert('Only the Group Leader can add a new task.');
       return; // Prevent adding if the user is not a Group Leader
     }
-
-    // Structure of newTask should be verified
+  
+    // Ensure the status field is set properly; fallback to 'Not Started' if it's not provided
     const postData = {
       status: 'publish',
       acf: {
         ...newTask,
-        assigned_to: Array.isArray(newTask.assigned_to) ? newTask.assigned_to : [parseInt(newTask.assigned_to, 10)]
-      }
+        assigned_to: Array.isArray(newTask.assigned_to) ? newTask.assigned_to : [parseInt(newTask.assigned_to, 10)],
+        status: newTask.status || 'Not Started',  // Ensure 'Not Started' if status is empty
+      },
     };
-
+  
     try {
       console.log('Submitting new task:', newTask); // Debugging
-
+  
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}task`,
         postData,
@@ -263,19 +281,20 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           },
         }
       );
-
+  
       console.log('Add task response:', response.data); // Debugging
-
+  
       // Ensure response.data matches the format expected in setTasks
       const addedTask = response.data;
-      setTasks(prevTask => [...prevTask, addedTask]); // Use functional update to avoid stale state
+      setTasks(prevTasks => [...prevTasks, addedTask]); // Use functional update to avoid stale state
       setShowAddModal(false);
-
+  
     } catch (err) {
       console.error('Failed to add task:', err);
       setError(`Failed to add task: ${err.message}`);
     }
   };
+  
 
   const handleDelete = async (id) => {
     try {
