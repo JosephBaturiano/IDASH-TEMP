@@ -101,13 +101,19 @@ const TimeSheet = () => {
   };
   
   const filteredTimesheets = selectedDate
-    ? timesheets.filter((item) => {
+  ? timesheets.filter((item) => {
+      // Ensure item.date and selectedDate are valid before normalizing
+      if (!item.date || !selectedDate) {
+        return false; // Skip if either date is invalid
+      }
+
       // Normalize both selectedDate and item.date to YYYY-MM-DD format
       const itemDate = normalizeDate(item.date);
       const formattedSelectedDate = normalizeDate(selectedDate);
+
       return itemDate === formattedSelectedDate;
     })
-    : timesheets;
+  : timesheets; 
 
     const handleAddTimesheet = () => {
       const postData = {
