@@ -10,7 +10,7 @@ import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import WeekSelectionModal from '../components/WeekSelectionModal';
-
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
@@ -102,6 +102,7 @@ const TimeSheet = () => {
     // If already in 'yyyy-mm-dd' format, return as is
     return dateString;
   };
+
 
   const filteredTimesheets = selectedDate
     ? timesheets.filter((item) => {
@@ -260,18 +261,24 @@ const TimeSheet = () => {
     return { start, end };
   };
 
+  const navigate = useNavigate();
+
   const handleWeekSelect = (weekNumber) => {
     setSelectedWeek(weekNumber);
+    // Perform week selection logic
     const { start, end } = getWeekRange(weekNumber);
-  
+
     setTimesheets(prevTimesheets =>
       prevTimesheets.map(item => ({
         ...item,
         includeInReport: item.date >= start && item.date <= end,
       }))
     );
+
+    // Redirect to the weekly report page
+    navigate('/weekly');
   };
-  
+
 
 
   const handleSelectAll = () => {
@@ -316,8 +323,7 @@ const TimeSheet = () => {
         <div className="flex justify-between items-center mb-4">
           <label
             htmlFor="date"
-            className={`block font-medium mr-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}
+            className={`block font-medium mr-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
           >
             Filter by Date:
           </label>
@@ -327,33 +333,15 @@ const TimeSheet = () => {
               id="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className={`border rounded-lg px-3 py-2 ${theme === 'dark' ? 'bg-gray-800 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
-                }`}
+              className={`border rounded-lg px-3 py-2 ${theme === 'dark' ? 'bg-gray-800 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
             />
           </div>
-
-
-          <div>
-            <select
-              value={selectedWeek}
-              onChange={(e) => handleWeekSelect(Number(e.target.value))}
-              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
-                }`}
-            >
-              {[...Array(10).keys()].map(week => (
-                <option key={week} value={week} className={`${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
-                  Week {week}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
+  
+          <div className="flex items-center gap-4">
             <select
               value={selectedIntern || user?.id}
               onChange={(e) => setSelectedIntern(e.target.value)}
-              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
-                }`}
+              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
               disabled={!isGroupLeader} // Disable the dropdown if user?.groupLeader is false
             >
               <option value={user?.id}>Select Intern</option>
@@ -363,26 +351,25 @@ const TimeSheet = () => {
                 </option>
               ))}
             </select>
+  
+            <button
+              onClick={() => setIsWeekSelectionModalOpen(true)}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors duration-300"
+            >
+              <PictureAsPdf />
+              Generate PDF
+            </button>
+  
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300"
+            >
+              <AddIcon />
+              Add Timesheet
+            </button>
           </div>
-
-
-          <button
-            onClick={() => setIsWeekSelectionModalOpen(true)}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors duration-300"
-          >
-            <PictureAsPdf />
-            Generate PDF
-          </button>
-
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300"
-          >
-            <AddIcon />
-            Add Timesheet
-          </button>
         </div>
-
+  
         <div className="overflow-x-auto mb-4">
           <table className="min-w-full bg-gray-50 border border-gray-200">
             <TimesheetHeader
@@ -406,7 +393,7 @@ const TimeSheet = () => {
             </tbody>
           </table>
         </div>
-
+  
         {isWeekSelectionModalOpen && (
           <WeekSelectionModal
             isOpen={isWeekSelectionModalOpen}
@@ -414,7 +401,7 @@ const TimeSheet = () => {
             onSelect={handleWeekSelect}
           />
         )}
-
+  
         {isModalOpen && (
           <AddTimesheetModal
             isOpen={isModalOpen}
@@ -438,7 +425,7 @@ const TimeSheet = () => {
             setNewComment={setNewComment} // Passed setNewComment
           />
         )}
-
+  
         {isEditModalOpen && (
           <EditTimesheetModal
             isOpen={isEditModalOpen}
@@ -465,7 +452,7 @@ const TimeSheet = () => {
         )}
       </div>
     </Home>
-  );
+  );  
 };
 
 export default TimeSheet;

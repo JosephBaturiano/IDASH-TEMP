@@ -8,8 +8,9 @@ const WeekSelectionModal = ({ isOpen, onClose, onSelect }) => {
   const handleSelect = () => {
     if (week) {
       onSelect(week);
+      onClose(); // Close the modal after selection
     }
-  };
+  };  
 
   if (!isOpen) return null;
 
