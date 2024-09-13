@@ -4,7 +4,6 @@ import { useTheme } from '../context/ThemeContext'; // Import useTheme to get th
 
 const ArchiveCard = () => {
   const [archives, setArchives] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { theme } = useTheme(); // Get the current theme
   const [userNames, setUserNames] = useState({});
@@ -62,15 +61,6 @@ const ArchiveCard = () => {
     fetchUserDetails(); // Fetch user details when the component mounts
   }, [apiBaseUrl, authUsername, authPassword]);
 
-  const formatDate = (dateString) => {
-    if (dateString.length !== 8) return 'Invalid date';
-    return `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`;
-  };
-
-  if (loading) {
-    return <p className={`p-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Loading archives...</p>;
-  }
-
   return (
     <div className={`p-6 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
       {error && <p className="text-red-500">{error}</p>}
@@ -90,7 +80,7 @@ const ArchiveCard = () => {
             <tr key={archive.acf.task_number} className={theme === 'dark' ? 'bg-gray-900' : 'bg-white'}>
               <td className="border px-4 py-2 text-center">{archive.acf.task_number || 'N/A'}</td>
               <td className="border px-4 py-2 text-center">{archive.acf.task_description || 'N/A'}</td>
-              <td className="border px-4 py-2 text-center">{formatDate(archive.acf.date_created)}</td>
+              <td className="border px-4 py-2 text-center">{archive.acf.date_created}</td>
               <td className="border px-4 py-2 text-center">{archive.acf.allocated_time || 'N/A'}</td>
               <td className="border px-4 py-2 text-center">
                 {Array.isArray(archive.acf.assigned_to) && archive.acf.assigned_to.length > 0

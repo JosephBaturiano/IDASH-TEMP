@@ -3,7 +3,7 @@ import axios from 'axios';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import Select from 'react-select';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme to get the theme
 
 const TaskCard = ({ assignedToMe, currentUserId }) => {
@@ -178,33 +178,66 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
     });
   };
 
-
   const handleAddChange = (e) => {
-    const { name, value } = e.target;
-    setNewTask(prevState => ({
-      ...prevState,
-      [name]: value,
-    }));
+    const { name, type, value, options } = e.target;
+  
+    if (type === 'select-multiple') {
+      // Handle multi-select fields
+      const selectedValues = Array.from(options)
+        .filter(option => option.selected)
+        .map(option => option.value);
+  
+      setNewTask(prevState => ({
+        ...prevState,
+        [name]: selectedValues,
+      }));
+    } else {
+      // Handle other input types (text, single select, etc.)
+      setNewTask(prevState => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUpdatedTask(prevState => ({
-      ...prevState,
-      [name]: value,
-    }));
+    const { name, type, value, options } = e.target;
+  
+    
+    if (e.target.multiple) {
+      const selectedValues = Array.from(options)
+        .filter(option => option.selected)
+        .map(option => option.value);
+  
+      setUpdatedTask(prevState => ({
+        ...prevState,
+        [name]: selectedValues,
+      }));
+    } else {
+      // Handle regular input fields (text, single select, etc.)
+      setUpdatedTask(prevState => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
-
+  
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!editingTask) return;
-
+  
     // Check if the user is a group leader before editing
     if (!isGroupLeader) {
       alert('Only the Group Leader can edit a task.');
       return; // Prevent editing if the user is not a Group Leader
     }
-
+  
+    // Ensure that 'assigned_to' is not empty
+    if (!updatedTask.assigned_to || (Array.isArray(updatedTask.assigned_to) && updatedTask.assigned_to.length === 0)) {
+      alert('Please select at least one user to assign the task.');
+      return; // Prevent saving edit if 'assigned_to' is empty
+    }
+  
     const updatedPayload = {
       acf: {
         ...updatedTask,
@@ -219,7 +252,7 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
         status: updatedTask.status || 'Not Started', // Set default if empty
       },
     };
-
+  
     try {
       // Send PUT request to update the task on the server
       const response = await axios.put(
@@ -232,7 +265,7 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           },
         }
       );
-
+  
       // Update the local state with the new task data from the response
       const updatedTaskFromResponse = response.data;
       setTasks((prevTasks) =>
@@ -240,15 +273,14 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           task.id === editingTask.id ? updatedTaskFromResponse : task
         )
       );
-
+  
       setEditingTask(null); // Close the modal
     } catch (err) {
       console.error('Error updating task:', err.response ? err.response.data : err.message);
       setError(`Failed to update task: ${err.message}`);
     }
   };
-
-
+  
   const handleAddSubmit = async (e) => {
     e.preventDefault();
 
@@ -258,11 +290,10 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       return; // Prevent adding if the user is not a Group Leader
     }
 
-    if (!newTask.assigned_to) {
-      alert('Please select a User to assign the task.');
-      return; // Prevent adding if 'assigned_to' is not filled
+    if (!newTask.assigned_to || (Array.isArray(newTask.assigned_to) && newTask.assigned_to.length === 0)) {
+      alert('Please select at least one user to assign the task.');
+      return; // Prevent saving edit if 'assigned_to' is empty
     }
-
     // Ensure the status field is set properly; fallback to 'Not Started' if it's not provided
     const postData = {
       status: 'publish',
@@ -303,7 +334,6 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       setError(`Failed to add task: ${err.message}`);
     }
   };
-
 
   const handleDelete = async (id) => {
     // Show a confirmation prompt to the user
@@ -362,7 +392,7 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           acf: {
             task_number: taskToArchive.acf.task_number,
             task_description: taskToArchive.acf.task_description,
-            date_created: taskToArchive.acf.date_created,
+            date_created: taskToArchive.date_created || new Date().toISOString().split('T')[0],
             allocated_time: taskToArchive.acf.allocated_time,
             assigned_to: Array.isArray(taskToArchive.acf.assigned_to) ? taskToArchive.acf.assigned_to : [], // Ensure it's an array
             status: taskToArchive.acf.status,
@@ -400,12 +430,16 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
     }
   };
 
-
   const loadMoreTasks = () => {
     if (currentPage < totalPages) {
       fetchTasks(currentPage + 1);
     }
   };
+
+  const userOptionsFormatted = userOptions.map(user => ({
+    value: user.id,
+    label: user.name,
+  }));
 
   return (
     <div className={`p-6 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
@@ -456,21 +490,24 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
                   rows="1"
                 />
               </div>
+
               <div className="mb-2">
                 <label className="block">Assigned To</label>
-                <select
+                <Select
+                  isMulti
                   name="assigned_to"
-                  value={updatedTask.assigned_to}
-                  onChange={handleChange}
+                  value={userOptionsFormatted.filter(option => updatedTask.assigned_to.includes(option.value))}
+                  onChange={selectedOptions => {
+                    setUpdatedTask(prevState => ({
+                      ...prevState,
+                      assigned_to: selectedOptions.map(option => option.value),
+                    }));
+                  }}
+                  options={userOptionsFormatted}
                   className="w-full border border-gray-300 rounded p-2"
-                >
-                  {userOptions.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
+
               <div className="mb-2">
                 <label className="block">Status</label>
                 <select
@@ -556,20 +593,26 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
 
               <div className="mb-2">
                 <label className="block">Assigned To</label>
-                <select
+                <Select
+                  isMulti
                   name="assigned_to"
-                  value={newTask.assigned_to || ''}
-                  onChange={handleAddChange}
+                  value={
+                    Array.isArray(newTask.assigned_to) 
+                      ? userOptionsFormatted.filter(option => newTask.assigned_to.includes(option.value)) 
+                      : []  // If newTask.assigned_to is undefined or not an array, return an empty array
+                  }
+                  onChange={selectedOptions => {
+                    setNewTask(prevState => ({
+                      ...prevState,
+                      assigned_to: selectedOptions ? selectedOptions.map(option => option.value) : [],
+                    }));
+                  }}
+                  options={userOptionsFormatted}
                   className="w-full border border-gray-300 rounded p-2"
-                >
-                  <option value="">Select User</option> {/* Default option */}
-                  {userOptions.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name} {/* Show user name */}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
+
+
               <div className="mb-2">
                 <label className="block">Status</label>
                 <select
@@ -635,12 +678,16 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
               <td className="border px-4 py-2 text-center">{task.acf ? task.acf.date_created : 'No date'}</td>
               <td className="border px-4 py-2 text-center">{task.acf?.allocated_time || 'No time'}</td>
               <td className="border px-4 py-2 text-center">
-                {task.acf && Array.isArray(task.acf.assigned_to) && task.acf.assigned_to.length > 0
-                  ? task.acf.assigned_to.map((userId, index) => (
-                    <span key={index}>{userNames[userId]}</span>
+              {task.acf && Array.isArray(task.acf.assigned_to) && task.acf.assigned_to.length > 0
+                ? task.acf.assigned_to.map((userId, index) => (
+                    <span key={index}>
+                      {userNames[userId]}
+                      {index < task.acf.assigned_to.length - 1 && ', '}
+                    </span>
                   ))
-                  : 'No assignee'}
-              </td>
+                : 'No assignee'}
+            </td>
+
               <td className="border px-4 py-2 text-center">{task.acf?.status || 'No status'}</td>
               <td className="border px-4 py-2 text-center">
                 <ArchiveIcon
