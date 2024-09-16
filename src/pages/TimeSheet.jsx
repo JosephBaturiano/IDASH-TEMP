@@ -340,17 +340,12 @@ const TimeSheet = () => {
               className={`border rounded-lg px-3 py-2 ${theme === 'dark' ? 'bg-gray-800 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
             />
           </div>
-
+  
           <div className="flex items-center gap-4">
             <select
-              value={selectedIntern || user?.id}
-              onChange={(e) => setSelectedIntern(e.target.value)}
-              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
-              id="team"
               value={selectedTeam}
               onChange={(e) => setSelectedTeam(e.target.value)}
-              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
-              }`}              
+              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
               disabled={!isGroupLeader} // Disable the dropdown if user?.groupLeader is false
             >
               <option value="">All</option>
@@ -364,30 +359,27 @@ const TimeSheet = () => {
                 </option>
               ))}
             </select>
-
-          </div>
-
-          <div>
-            <select
-              value={selectedIntern || user?.id}
-              onChange={(e) => setSelectedIntern(e.target.value)}
-              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
-            >
-              <option value={user?.id}>Select Intern</option>
-
-              {interns
-                .filter((intern) => {
-                  if (!selectedTeam) return true; // Show all if no team is selected
-                  return intern.internTeam.includes(selectedTeam); // Check if selectedTeam exists in internTeam array
-                })
-                .map((intern) => (
-                  <option key={intern.id} value={intern.id}>
-                    {intern.name}
-                  </option>
-                ))}
-            </select>
-          </div>
-
+  
+            <div>
+              <select
+                value={selectedIntern || user?.id}
+                onChange={(e) => setSelectedIntern(e.target.value)}
+                className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
+              >
+                <option value={user?.id}>Select Intern</option>
+                {interns
+                  .filter((intern) => {
+                    if (!selectedTeam) return true; // Show all if no team is selected
+                    return intern.internTeam.includes(selectedTeam); // Check if selectedTeam exists in internTeam array
+                  })
+                  .map((intern) => (
+                    <option key={intern.id} value={intern.id}>
+                      {intern.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+  
             <button
               onClick={() => {
                 if (isProceedToPDF) {
@@ -396,12 +388,11 @@ const TimeSheet = () => {
                   setIsWeekSelectionModalOpen(true);
                 }
               }}
-              className={`${isProceedToPDF ? 'bg-green-500' : 'bg-red-500'
-                } text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 transition-colors duration-300`}
+              className={`${isProceedToPDF ? 'bg-green-500' : 'bg-red-500'} text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 transition-colors duration-300`}
             >
               {isProceedToPDF ? 'Proceed to PDF' : 'Generate PDF'}
             </button>
-
+  
             <button
               onClick={() => setIsModalOpen(true)}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300"
@@ -411,7 +402,7 @@ const TimeSheet = () => {
             </button>
           </div>
         </div>
-
+  
         <div className="overflow-x-auto mb-4">
           <table className="min-w-full bg-gray-50 border border-gray-200">
             <TimesheetHeader
@@ -435,7 +426,7 @@ const TimeSheet = () => {
             </tbody>
           </table>
         </div>
-
+  
         {isWeekSelectionModalOpen && (
           <WeekSelectionModal
             isOpen={isWeekSelectionModalOpen}
@@ -443,7 +434,7 @@ const TimeSheet = () => {
             onSelect={handleWeekSelect}
           />
         )}
-
+  
         {isModalOpen && (
           <AddTimesheetModal
             isOpen={isModalOpen}
@@ -467,7 +458,7 @@ const TimeSheet = () => {
             setNewComment={setNewComment} // Passed setNewComment
           />
         )}
-
+  
         {isEditModalOpen && (
           <EditTimesheetModal
             isOpen={isEditModalOpen}
@@ -495,6 +486,7 @@ const TimeSheet = () => {
       </div>
     </Home>
   );
+  
 };
 
 export default TimeSheet;
