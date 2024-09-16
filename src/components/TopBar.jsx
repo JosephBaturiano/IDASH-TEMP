@@ -10,7 +10,7 @@ import { useNotification } from '../context/NotificationContext';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme
 import { format } from 'date-fns';
 
-const TopBar = () => {
+const TopBar = ({currentUserId} ) => {
   const { timesheets } = useTimesheets();
   const {
     user = {},
@@ -45,7 +45,7 @@ const TopBar = () => {
         <div className="flex items-center space-x-4 bg-gray-200 p-2 rounded-lg shadow-md">
           <div className="flex flex-col font-bold text-center">
             <span className="text-xs font-bold text-gray-600 pb-1">Time Rendered</span>
-            <TimeRendered timesheets={timesheets} />
+            <TimeRendered timesheets={timesheets} currentUserId={currentUserId} />
           </div>
         </div>
 

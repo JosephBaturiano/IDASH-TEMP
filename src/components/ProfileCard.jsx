@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import SchoolIcon from '@mui/icons-material/School';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import TimeRendered from './TimeRendered';
 import { useTimesheets } from '../context/TimesheetContext';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme
+import { UserContext } from '../context/UserContext'; // Import UserContext
 
 
 const ProfileCard = ({ profileData = {}, handleEditClick }) => {
@@ -21,6 +22,7 @@ const ProfileCard = ({ profileData = {}, handleEditClick }) => {
 
   const { timesheets } = useTimesheets();
   const { theme } = useTheme(); // Get the current theme
+  const { currentUserId } = useContext(UserContext); // Access currentUserId from UserContext
 
   // Determine the styles based on the theme
   const containerClass = `bg-${theme === 'dark' ? 'gray-800' : 'white'} rounded-lg shadow-md w-[400px] p-6 mb-10 h-full relative`;
@@ -54,7 +56,7 @@ const ProfileCard = ({ profileData = {}, handleEditClick }) => {
         <h2 className={`text-center text-2xl font-medium mb-5 ${textColorClass}`}>{full_name}</h2>
         <div className={`flex flex-col items-center ${bgColorClass} font-bold rounded-3xl shadow-md p-2 mb-6 w-[200px] mx-auto`}>
           <span className={`text-xs font-semibold ${timeColorClass} mb-1`}>Time Rendered</span>
-          <TimeRendered timesheets={timesheets} />
+          <TimeRendered timesheets={timesheets} currentUserId={currentUserId} />
         </div>
         <div className="space-y-3 px-6">
           <div className="flex items-center space-x-4">

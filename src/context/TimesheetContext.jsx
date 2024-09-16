@@ -103,6 +103,7 @@ export function TimesheetProvider({ children }) {
               ...response.data.map(intern => ({
                 id: intern.id,
                 name: intern.name,
+                internTeam: intern.acf.team || [], // Ensure it's an array even if empty
               })),
             ];
 

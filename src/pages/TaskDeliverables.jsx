@@ -49,7 +49,7 @@ const TaskDeliverables = () => {
   };
 
   return (
-    <Home>
+    <Home currentUserId={currentUserId}>
       <div className="p-6">
         <h1 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
           Task Deliverables
