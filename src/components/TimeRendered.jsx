@@ -1,14 +1,13 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme from your context
 
-// Function to convert 12-hour time format to 24-hour format
 const convertTo24HourFormat = (time) => {
   const [timePart, modifier] = time.split(' ');
   const [hours, minutes] = timePart.split(':').map(Number);
   
   if (isNaN(hours) || isNaN(minutes)) {
     console.error(`Invalid time format: ${time}`);
-    return null; // Return null if invalid time
+    return null;
   }
 
   let newHours = hours;
@@ -22,54 +21,71 @@ const convertTo24HourFormat = (time) => {
   return { hours: newHours, minutes };
 };
 
-// Function to calculate total time from timesheets
-const calculateTotalTime = (timesheets) => {
-  return timesheets.reduce((total, item) => {
+const calculateTotalTime = (timesheets, currentUserId) => {
+  console.log(`Current User ID: ${currentUserId}`); // Log the currentUserId to check if it's correct
+  
+  let totalMinutes = timesheets.reduce((total, item) => {
     if (item.timeStarted && item.timeEnded) {
-      // Convert times to 24-hour format
       const startTime24 = convertTo24HourFormat(item.timeStarted);
       const endTime24 = convertTo24HourFormat(item.timeEnded);
 
       if (!startTime24 || !endTime24) {
         console.error(`Invalid time conversion: ${item.timeStarted} - ${item.timeEnded}`);
-        return total; // Skip invalid time entries
+        return total; 
       }
 
-      // Create Date objects for start and end times
       const startTime = new Date();
       startTime.setHours(startTime24.hours, startTime24.minutes, 0, 0);
 
       const endTime = new Date();
       endTime.setHours(endTime24.hours, endTime24.minutes, 0, 0);
 
-      // Handle case where end time is before start time
       if (endTime < startTime) {
-        endTime.setDate(endTime.getDate() + 1); // Add one day to end time
+        endTime.setDate(endTime.getDate() + 1); 
       }
 
-      // Calculate the difference in milliseconds
       const diff = endTime - startTime;
-
-      if (diff < 0) {
-        console.error(`End time is before start time: ${item.timeStarted} - ${item.timeEnded}`);
-        return total; // Skip negative time differences
-      }
-
-      // Convert milliseconds to minutes and add to total
       const minutes = diff / (1000 * 60);
       return total + minutes;
     }
     return total;
   }, 0);
+
+  console.log(`Base total time (in minutes): ${totalMinutes}`);
+
+  // Define additional time for specific user IDs
+  const additionalTimeByUserId = {
+    // TF TEAM
+    10: 0,  // AAA: Additional minutes
+    13: 0,  // APS: Additional minutes
+    12: 0,  // KNM: Additional minutes
+
+    // RJ TEAM
+    8: 0,   // CJO: Additional minutes
+    15: 0,  // EDL: Additional minutes
+    3: 60,   // JBM: Additional minutes
+    14: 0,  // MRS: Additional minutes
+
+    //RN TEAM
+    9: 0,   // CDS: Additional minutes
+    18: 0,  // LAA: Additional minutes
+    11: 0,  // RTL: Additional minutes
+    16: 0,  // UJE: Additional minutes
+    17: 0   // JZB: Additional minutes
+  };
+
+  const additionalTime = additionalTimeByUserId[currentUserId] || 0;
+  totalMinutes += additionalTime;
+
+  console.log(`Total time after adding additional minutes: ${totalMinutes}`);
+  return totalMinutes;
 };
 
-// TimeRendered component
-const TimeRendered = ({ timesheets }) => {
+const TimeRendered = ({ timesheets, currentUserId }) => {
   const { theme } = useTheme(); // Get the current theme from the context
 
-  const totalMinutes = calculateTotalTime(timesheets);
+  const totalMinutes = calculateTotalTime(timesheets, currentUserId);
 
-  // Check if totalMinutes is a valid number
   if (isNaN(totalMinutes)) {
     console.error('Invalid total minutes calculation');
     return <div>Error calculating total time.</div>;
@@ -78,7 +94,6 @@ const TimeRendered = ({ timesheets }) => {
   const totalHours = Math.floor(totalMinutes / 60);
   const remainingMinutes = Math.round(totalMinutes % 60);
 
-  // Define text and background color based on the current theme
   const textColor = theme === 'light' ? 'text-gray-700' : 'text-white';
   const backgroundColor = theme === 'light' ? 'bg-gray-100' : 'bg-gray-800';
 
