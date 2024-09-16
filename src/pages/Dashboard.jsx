@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import Home from './Home'; 
 import ZoomCard from '../components/ZoomCard';
@@ -6,8 +6,10 @@ import ProjectCard from '../components/ProjectCard';
 import Calendar from '../components/Calendar';
 import NotificationCard from '../components/NotificationCard'; 
 import { useTheme } from '../context/ThemeContext'; // Import useTheme
+import { UserContext } from '../context/UserContext'; // Import UserContext
 
 const Dashboard = () => {
+  const { currentUserId } = useContext(UserContext); // Access currentUserId from UserContext
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,7 +48,7 @@ const Dashboard = () => {
   const textColor = theme === 'dark' ? 'text-gray-200' : 'text-gray-800'; // Light text color for dark mode, dark text color for light mode
 
   return (
-    <Home>
+    <Home currentUserId={currentUserId}>
       <div className="flex flex-grow mt-4 gap-10">
         {/* Left Column (Zoom and Project Cards) */}
         <div className="w-2/3 space-y-4">

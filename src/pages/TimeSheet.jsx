@@ -9,6 +9,8 @@ import { useTimesheets, formatTime } from '../context/TimesheetContext'; // Adju
 import { PictureAsPdf } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import WeekSelectionModal from '../components/WeekSelectionModal';
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + 'timesheet';
 const AUTH_USERNAME = import.meta.env.VITE_AUTH_USERNAME;
@@ -25,6 +27,7 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Task Description</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Time Started</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Time Ended</th>
+        <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Duration</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>With Whom</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Deliverables</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'} flex items-center justify-center`}>
@@ -42,6 +45,8 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
 };
 
 const TimeSheet = () => {
+  const [isWeekSelected, setIsWeekSelected] = useState(false);  // To toggle between buttons
+  const [isProceedToPDF, setIsProceedToPDF] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedWeek, setSelectedWeek] = useState(null);
   const {
@@ -65,6 +70,8 @@ const TimeSheet = () => {
   const [isGroupLeader, setIsGroupLeader] = useState(false);
   const [newSelectedDate, setNewSelectedDate] = useState('');
   const [newComment, setNewComment] = useState(''); // Added this state for comment
+  const [isWeekSelectionModalOpen, setIsWeekSelectionModalOpen] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState(''); // State for selected team
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -95,64 +102,71 @@ const TimeSheet = () => {
       const [day, month, year] = dateString.split('/');
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`; // Convert to 'yyyy-mm-dd'
     }
-  
+
     // If already in 'yyyy-mm-dd' format, return as is
     return dateString;
   };
-  
+
+
   const filteredTimesheets = selectedDate
     ? timesheets.filter((item) => {
+      // Ensure item.date and selectedDate are valid before normalizing
+      if (!item.date || !selectedDate) {
+        return false; // Skip if either date is invalid
+      }
+
       // Normalize both selectedDate and item.date to YYYY-MM-DD format
       const itemDate = normalizeDate(item.date);
       const formattedSelectedDate = normalizeDate(selectedDate);
+
       return itemDate === formattedSelectedDate;
     })
     : timesheets;
 
-    const handleAddTimesheet = () => {
-      const postData = {
-        title: newDescription || 'No Description',
-        content: `Task Number: ${newTaskNumber || 'No Task Number'}`,
-        status: 'publish',
-        acf: {
-          date_created: newSelectedDate,
-          task_number: newTaskNumber || 'N/A',
-          task_description: newDescription || 'N/A',
-          time_started: newTimeStarted || 'N/A',
-          time_ended: newTimeEnded || 'N/A',
-          with_whom: newWithWhom || 'N/A',
+  const handleAddTimesheet = () => {
+    const postData = {
+      title: newDescription || 'No Description',
+      content: `Task Number: ${newTaskNumber || 'No Task Number'}`,
+      status: 'publish',
+      acf: {
+        date_created: newSelectedDate,
+        task_number: newTaskNumber || 'N/A',
+        task_description: newDescription || 'N/A',
+        time_started: newTimeStarted || 'N/A',
+        time_ended: newTimeEnded || 'N/A',
+        with_whom: newWithWhom || 'N/A',
+        deliverables: newDeliverables || 'N/A',
+        comment: newComment || 'No Comment',  // Include the comment field here
+      }
+    };
+
+    axios.post(API_BASE_URL, postData, {
+      headers: {
+        'Authorization': AUTH_HEADER,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        const newTimesheet = {
+          id: response.data.id,
+          taskNumber: newTaskNumber || 'N/A',
+          description: newDescription || 'N/A',
+          timeStarted: newTimeStarted ? formatTime(newTimeStarted) : 'N/A',
+          timeEnded: newTimeEnded ? formatTime(newTimeEnded) : 'N/A',
+          withWhom: newWithWhom || 'N/A',
           deliverables: newDeliverables || 'N/A',
-          comment: newComment || 'No Comment',  // Include the comment field here
-        }
-      };
-    
-      axios.post(API_BASE_URL, postData, {
-        headers: {
-          'Authorization': AUTH_HEADER,
-          'Content-Type': 'application/json',
-        },
+          date: newSelectedDate || new Date().toISOString().split('T')[0],
+          comment: newComment || 'No Comment',  // Store the comment
+        };
+
+        setTimesheets([...timesheets, newTimesheet]);
+        setIsModalOpen(false);
       })
-        .then((response) => {
-          const newTimesheet = {
-            id: response.data.id,
-            taskNumber: newTaskNumber || 'N/A',
-            description: newDescription || 'N/A',
-            timeStarted: newTimeStarted ? formatTime(newTimeStarted) : 'N/A',
-            timeEnded: newTimeEnded ? formatTime(newTimeEnded) : 'N/A',
-            withWhom: newWithWhom || 'N/A',
-            deliverables: newDeliverables || 'N/A',
-            date: newSelectedDate || new Date().toISOString().split('T')[0],
-            comment: newComment || 'No Comment',  // Store the comment
-          };
-    
-          setTimesheets([...timesheets, newTimesheet]);
-          setIsModalOpen(false);
-        })
-        .catch((error) => {
-          console.error('Error adding timesheet:', error);
-          alert('There was an error adding the timesheet.');
-        });
-    };     
+      .catch((error) => {
+        console.error('Error adding timesheet:', error);
+        alert('There was an error adding the timesheet.');
+      });
+  };
 
   const handleEditTimesheet = (item) => {
     setCurrentEditingItem(item);
@@ -184,7 +198,7 @@ const TimeSheet = () => {
           comment: newComment, // Include comment in the update data
         }
       };
-  
+
       axios.post(`${API_BASE_URL}/${currentEditingItem.id}`, updatedPostData, {
         headers: {
           'Authorization': AUTH_HEADER,
@@ -193,7 +207,7 @@ const TimeSheet = () => {
       })
         .then((response) => {
           console.log('Timesheet updated:', response.data);
-  
+
           // Update the timesheets state with the edited item
           const updatedTimesheets = timesheets.map((item) =>
             item.id === currentEditingItem.id
@@ -220,7 +234,7 @@ const TimeSheet = () => {
     } else {
       alert('Please fill all fields.');
     }
-  };  
+  };
 
   const handleDeleteTimesheet = (itemId) => {
     axios.delete(`${API_BASE_URL}/${itemId}`, {
@@ -251,11 +265,16 @@ const TimeSheet = () => {
     return { start, end };
   };
 
+  const navigate = useNavigate();
+
   const handleWeekSelect = (weekNumber) => {
     setSelectedWeek(weekNumber);
+    setIsProceedToPDF(true);  // Change button text after week selection
+    setIsWeekSelected(true);  // Indicate week has been selected
+    setIsWeekSelectionModalOpen(false);  // Close modal
 
+    // Implement your week filtering logic here (you already have this part)
     const { start, end } = getWeekRange(weekNumber);
-
     setTimesheets(prevTimesheets =>
       prevTimesheets.map(item => ({
         ...item,
@@ -263,6 +282,7 @@ const TimeSheet = () => {
       }))
     );
   };
+
 
 
   const handleSelectAll = () => {
@@ -292,7 +312,7 @@ const TimeSheet = () => {
           'Authorization': AUTH_HEADER,
         },
       });
-  
+
       // Extract the group_leader field from ACF
       return response.data.acf.group_leader || false;
     } catch (error) {
@@ -307,8 +327,7 @@ const TimeSheet = () => {
         <div className="flex justify-between items-center mb-4">
           <label
             htmlFor="date"
-            className={`block font-medium mr-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
-              }`}
+            className={`block font-medium mr-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
           >
             Filter by Date:
           </label>
@@ -318,65 +337,72 @@ const TimeSheet = () => {
               id="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className={`border rounded-lg px-3 py-2 ${theme === 'dark' ? 'bg-gray-800 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
-                }`}
+              className={`border rounded-lg px-3 py-2 ${theme === 'dark' ? 'bg-gray-800 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
             />
           </div>
-
-
-          <div>
+  
+          <div className="flex items-center gap-4">
             <select
-              value={selectedWeek}
-              onChange={(e) => handleWeekSelect(Number(e.target.value))}
-              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
-                }`}
-            >
-              {[...Array(10).keys()].map(week => (
-                <option key={week} value={week} className={`${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
-                  Week {week}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <select
-              value={selectedIntern || user?.id}
-              onChange={(e) => setSelectedIntern(e.target.value)}
-              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
-                }`}
+              value={selectedTeam}
+              onChange={(e) => setSelectedTeam(e.target.value)}
+              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
               disabled={!isGroupLeader} // Disable the dropdown if user?.groupLeader is false
             >
-              <option value={user?.id}>Select Intern</option>
-              {interns.map((intern) => (
-                <option key={intern.id} value={intern.id}>
-                  {intern.name}
+              <option value="">All</option>
+              {[
+                { id: 'RJ', name: 'RJ' },
+                { id: 'RN', name: 'RN' },
+                { id: 'TF', name: 'TF' }
+              ].map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
                 </option>
               ))}
             </select>
-          </div>
-
-
-          <div className="m-4">
-            <Link
-              to="/weekly"
-              className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors duration-300"
+  
+            <div>
+              <select
+                value={selectedIntern || user?.id}
+                onChange={(e) => setSelectedIntern(e.target.value)}
+                className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
+              >
+                <option value={user?.id}>Select Intern</option>
+                {interns
+                  .filter((intern) => {
+                    if (!selectedTeam) return true; // Show all if no team is selected
+                    return intern.internTeam.includes(selectedTeam); // Check if selectedTeam exists in internTeam array
+                  })
+                  .map((intern) => (
+                    <option key={intern.id} value={intern.id}>
+                      {intern.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+  
+            <button
+              onClick={() => {
+                if (isProceedToPDF) {
+                  navigate('/weekly'); // Redirect to the weekly page
+                } else {
+                  setIsWeekSelectionModalOpen(true);
+                }
+              }}
+              className={`${isProceedToPDF ? 'bg-green-500' : 'bg-red-500'} text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 transition-colors duration-300`}
             >
-              <PictureAsPdf />
-              Generate PDF
-            </Link>
-
+              {isProceedToPDF ? 'Proceed to PDF' : 'Generate PDF'}
+            </button>
+  
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300"
+            >
+              <AddIcon />
+              Add Timesheet
+            </button>
           </div>
-
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300"
-          >
-            <AddIcon />
-            Add Timesheet
-          </button>
         </div>
-
+  
         <div className="overflow-x-auto mb-4">
           <table className="min-w-full bg-gray-50 border border-gray-200">
             <TimesheetHeader
@@ -400,7 +426,15 @@ const TimeSheet = () => {
             </tbody>
           </table>
         </div>
-
+  
+        {isWeekSelectionModalOpen && (
+          <WeekSelectionModal
+            isOpen={isWeekSelectionModalOpen}
+            onClose={() => setIsWeekSelectionModalOpen(false)}
+            onSelect={handleWeekSelect}
+          />
+        )}
+  
         {isModalOpen && (
           <AddTimesheetModal
             isOpen={isModalOpen}
@@ -424,7 +458,7 @@ const TimeSheet = () => {
             setNewComment={setNewComment} // Passed setNewComment
           />
         )}
-
+  
         {isEditModalOpen && (
           <EditTimesheetModal
             isOpen={isEditModalOpen}
@@ -452,6 +486,7 @@ const TimeSheet = () => {
       </div>
     </Home>
   );
+  
 };
 
 export default TimeSheet;

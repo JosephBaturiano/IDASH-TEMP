@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import AddIcon from '@mui/icons-material/Add';
@@ -20,7 +20,6 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
   const [updatedTask, setUpdatedTask] = useState({});
   const [showAddModal, setShowAddModal] = useState(false); 
   const { theme } = useTheme(); 
-
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const authUsername = import.meta.env.VITE_AUTH_USERNAME;
   const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
@@ -52,7 +51,7 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       const users = response.data;
       const userIdToName = {};
       users.forEach((user) => {
-        userIdToName[user.id] = user.name; // Map user IDs to names
+        userIdToName[user.id] = user.name;
       });
       setUserNames(userIdToName);
     } catch (error) {
@@ -72,7 +71,6 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           per_page: 50, // Adjust based on API capabilities
         },
       });
-
       // Sort tasks by task number in ascending order
       const sortedTasks = response.data.sort((a, b) => {
         const taskNumberA = a.acf ? parseFloat(a.acf.task_number) : 0;
@@ -89,24 +87,19 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
       if (assignedToMe && currentUserId) {
         filteredTasks = sortedTasks.filter((task) => {
           const assignedTo = task.acf?.assigned_to || [];
-          // Filter tasks where currentUserId is in the assigned_to array
-          // OR task is assigned to id=19 and currentUserId is in rj_id
-          // OR task is assigned to id=20 and currentUserId is in tf_id
-          // OR task is assigned to id=21 and currentUserId is in rn_id
-          // OR task is assigned to id=22 (visible to all users)
           return (
             assignedTo.includes(currentUserId) ||
             (assignedTo.includes(19) && rj_id.includes(currentUserId)) ||
             (assignedTo.includes(20) && tf_id.includes(currentUserId)) ||
             (assignedTo.includes(21) && rn_id.includes(currentUserId)) ||
-            assignedTo.includes(22) // Visible to all users
+            assignedTo.includes(22)
           );
         });
       }
 
       setTasks(filteredTasks);
       setCurrentPage(page);
-      setTotalPages(parseInt(response.headers['x-wp-totalpages'], 10)); // Update total pages from response headers
+      setTotalPages(parseInt(response.headers['x-wp-totalpages'], 10));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -366,11 +359,10 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
   const handleArchive = async (taskId) => {
     if (!isGroupLeader) {
       alert('Only the Group Leader can archive a task.');
-      return; // Prevent archiving if the user is not a Group Leader
+      return;
     }
 
     const isConfirmed = window.confirm('Are you sure you want to archive this task?');
-
     if (isConfirmed) {
       try {
         const response = await axios.get(`${apiBaseUrl}task/${taskId}`, {
@@ -381,7 +373,6 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
         });
 
         const taskToArchive = response.data;
-
         if (!taskToArchive) {
           throw new Error('Task not found');
         }
@@ -392,13 +383,12 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
             task_description: taskToArchive.acf.task_description,
             date_created: taskToArchive.date_created || new Date().toISOString().split('T')[0],
             allocated_time: taskToArchive.acf.allocated_time,
-            assigned_to: Array.isArray(taskToArchive.acf.assigned_to) ? taskToArchive.acf.assigned_to : [], // Ensure it's an array
+            assigned_to: Array.isArray(taskToArchive.acf.assigned_to) ? taskToArchive.acf.assigned_to : [],
             status: taskToArchive.acf.status,
           },
           status: 'publish',
         };
 
-        // Log postData for debugging
         console.log('Archive postData:', postData);
 
         await axios.post(`${apiBaseUrl}archive/`, postData, {
@@ -421,7 +411,6 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
         setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
 
       } catch (err) {
-        // Log detailed error message
         console.error('Error details:', err.response ? err.response.data : err.message);
         setError(`Failed to archive: ${err.message}`);
       }

@@ -15,6 +15,8 @@ import { NotificationProvider } from './context/NotificationContext'
 import { ProjectProvider } from './context/ProjectContext'
 import Settings from './components/Settings'
 import { ThemeProvider } from './context/ThemeContext'
+import { UserProvider } from './context/UserContext'
+
 
 
 const App = () => {
@@ -23,20 +25,22 @@ const App = () => {
       <NotificationProvider>
         <TimesheetProvider>
           <ProjectProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path='/' element={<Dashboard />} />
-                <Route path='/login' element={<Login />} />
-                <Route path='/announcement' element={<Announcement />} />
-                <Route path='/profile' element={<Profile />} />
-                <Route path='/teamtask' element={<TeamTask />} />
-                <Route path='/timesheet' element={<TimeSheet />} />
-                <Route path='/taskdeliverables' element={<TaskDeliverables />} />
-                <Route path='/files' element={<Files />} />
-                <Route path='/weekly' element={<Weekly />} />
-                <Route path='/settings' element={<Settings />} />
-              </Routes>
-            </BrowserRouter>
+           <UserProvider>
+              <BrowserRouter>
+                <Routes>
+                  <Route path='/' element={<Dashboard />} />
+                  <Route path='/login' element={<Login />} />
+                  <Route path='/announcement' element={<Announcement />} />
+                  <Route path='/profile' element={<Profile />} />
+                  <Route path='/teamtask' element={<TeamTask />} />
+                  <Route path='/timesheet' element={<TimeSheet />} />
+                  <Route path='/taskdeliverables' element={<TaskDeliverables />} />
+                  <Route path='/files' element={<Files />} />
+                  <Route path='/weekly' element={<Weekly />} />
+                  <Route path='/settings' element={<Settings />} />
+                </Routes>
+              </BrowserRouter>
+            </UserProvider>
           </ProjectProvider>
         </TimesheetProvider>
       </NotificationProvider>
