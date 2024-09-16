@@ -52,8 +52,6 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
   
     return `${hours}:${minutes}`;
   };
-  
-
   return (
     <tr
       key={item.id}
@@ -76,7 +74,23 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
       <td className={`px-2 py-2 ${textColor} text-center`}>{item.timeEnded}</td>
       <td className={`px-2 py-2 ${textColor} text-center`}>{calculateDuration(item.timeStarted, item.timeEnded)}</td>
       <td className={`px-2 py-2 ${textColor} text-center`}>{item.withWhom}</td>
-      <td className={`px-2 py-2 ${textColor} text-center break-words max-w-[150px]`}>{item.deliverables}</td>
+      <td className={`px-2 py-2 ${textColor} text-left break-words max-w-[150px]`}>
+        {item.deliverables.split(/(https?:\/\/\S+)/).map((part, index) =>
+          part.match(/https?:\/\/\S+/) ? (
+            <a 
+              key={index} 
+              href={part} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-blue-600 hover:underline"
+            >
+              {part}
+            </a>
+          ) : (
+            <span key={index}>{part}</span>
+          )
+        )}
+      </td>
       <td className="px-2 py-2 text-center">
         <div className="flex items-center justify-center h-full space-x-2">
           <button
@@ -102,5 +116,4 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
     </tr>
   );
 };
-
 export default TimeSheetCard;
