@@ -4,29 +4,28 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import Select from 'react-select';
-import { useTheme } from '../context/ThemeContext'; // Import useTheme to get the theme
+import { useTheme } from '../context/ThemeContext'; 
 
 const TaskCard = ({ assignedToMe, currentUserId }) => {
   const [tasks, setTasks] = useState([]);
   const [userNames, setUserNames] = useState({});
-  const [userOptions, setUserOptions] = useState([]); // State to store user options
+  const [userOptions, setUserOptions] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isGroupLeader, setIsGroupLeader] = useState(false); // State to track if the user is a Group Leader
-  const [currentPage, setCurrentPage] = useState(1); // Add state for pagination
-  const [totalPages, setTotalPages] = useState(1); // Add state for total pages
+  const [isGroupLeader, setIsGroupLeader] = useState(false); 
+  const [currentPage, setCurrentPage] = useState(1); 
+  const [totalPages, setTotalPages] = useState(1); 
   const [editingTask, setEditingTask] = useState(null);
-  const [newTask, setNewTask] = useState({}); // State for new task
+  const [newTask, setNewTask] = useState({}); 
   const [updatedTask, setUpdatedTask] = useState({});
-  const [showAddModal, setShowAddModal] = useState(false); // State to control add modal visibility
-  const { theme } = useTheme(); // Get the current theme
+  const [showAddModal, setShowAddModal] = useState(false); 
+  const { theme } = useTheme(); 
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const authUsername = import.meta.env.VITE_AUTH_USERNAME;
   const authPassword = import.meta.env.VITE_AUTH_PASSWORD;
   const authHeader = 'Basic ' + btoa(`${authUsername}:${authPassword}`);
 
-  // Function to check if the user is a Group Leader
   const checkIfGroupLeader = async () => {
     try {
       const response = await axios.get(`${apiBaseUrl}users/me`, {
@@ -35,8 +34,6 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           password: authPassword,
         },
       });
-
-      // Extract the group_leader field from ACF
       return response.data.acf.group_leader;
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -239,6 +236,8 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
     }
   
     const updatedPayload = {
+      title: updatedTask.task_description,
+      status: 'publish',
       acf: {
         ...updatedTask,
         // Ensure assigned_to is always an array
@@ -296,6 +295,7 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
     }
     // Ensure the status field is set properly; fallback to 'Not Started' if it's not provided
     const postData = {
+      title: newTask.task_description,
       status: 'publish',
       acf: {
         ...newTask,
@@ -321,9 +321,7 @@ const TaskCard = ({ assignedToMe, currentUserId }) => {
           },
         }
       );
-
       console.log('Add task response:', response.data); // Debugging
-
       // Ensure response.data matches the format expected in setTasks
       const addedTask = response.data;
       setTasks(prevTasks => [...prevTasks, addedTask]); // Use functional update to avoid stale state
