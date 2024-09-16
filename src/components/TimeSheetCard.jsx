@@ -18,9 +18,7 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
 
   // Function to calculate duration in hours and minutes
   const calculateDuration = (startTime, endTime) => {
-    // Log the values to debug
-    console.log('Start Time:', startTime, 'End Time:', endTime);
-  
+    
     // Helper function to convert "HH:MM AM/PM" to minutes since midnight
     const convertToMinutes = (time) => {
       const [timePart, modifier] = time.split(' ');
@@ -60,37 +58,30 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
     <tr
       key={item.id}
       className={`${bgColor} ${borderColor} ${hoverColor} border-t transition-colors duration-300 cursor-pointer`}
-      onClick={handleToggleComment} // Make the entire row clickable
+      onClick={handleToggleComment}
     >
-      {/* Task Number with Comment Indicator */}
       <td className={`px-2 py-2 ${textColor} font-medium text-center relative group`}>
         <span>{item.taskNumber}</span>
-
-        {/* Conditionally show the paper fold indicator only if a comment exists */}
         {item.comment && item.comment !== 'No Comment' && (
           <div className="comment-indicator absolute top-0 left-0 w-3 h-3 bg-blue-500"></div>
         )}
-
-        {/* Display the comment if it's visible */}
         {isCommentVisible && item.comment && item.comment !== 'No Comment' && (
           <div className="absolute text-left top-full mt-1 left-0 w-64 bg-blue-500 text-white text-sm rounded py-2 px-3 z-50 overflow-auto whitespace-normal break-words">
             {item.comment}
           </div>
         )}
       </td>
-
       <td className={`px-2 py-2 ${textColor} text-center break-words max-w-[150px]`}>{item.description}</td>
       <td className={`px-2 py-2 ${textColor} text-center`}>{item.timeStarted}</td>
       <td className={`px-2 py-2 ${textColor} text-center`}>{item.timeEnded}</td>
-      <td className={`px-2 py-2 ${textColor} text-center`}>{calculateDuration(item.timeStarted, item.timeEnded)}</td> {/* Duration Column */}
+      <td className={`px-2 py-2 ${textColor} text-center`}>{calculateDuration(item.timeStarted, item.timeEnded)}</td>
       <td className={`px-2 py-2 ${textColor} text-center`}>{item.withWhom}</td>
       <td className={`px-2 py-2 ${textColor} text-center break-words max-w-[150px]`}>{item.deliverables}</td>
-
-      <td className={`px-2 py-2 text-center`}>
+      <td className="px-2 py-2 text-center">
         <div className="flex items-center justify-center h-full space-x-2">
           <button
             onClick={(e) => {
-              e.stopPropagation(); // Prevent comment toggle when clicking on the edit button
+              e.stopPropagation();
               onEdit(item);
             }}
             className="bg-blue-100 p-1 rounded-full hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300"
@@ -99,9 +90,9 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
           </button>
           <input
             type="checkbox"
-            checked={item.includeInReport || false} // Ensure a boolean value is always passed
+            checked={item.includeInReport || false}
             onChange={(e) => {
-              e.stopPropagation(); // Prevent comment toggle when clicking on checkbox
+              e.stopPropagation();
               onToggleInclude(item.id);
             }}
             className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
