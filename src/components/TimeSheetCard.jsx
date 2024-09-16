@@ -16,6 +16,46 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
     setIsCommentVisible(!isCommentVisible); // Toggle the comment's visibility on click
   };
 
+  // Function to calculate duration in hours and minutes
+  const calculateDuration = (startTime, endTime) => {
+    // Log the values to debug
+    console.log('Start Time:', startTime, 'End Time:', endTime);
+  
+    // Helper function to convert "HH:MM AM/PM" to minutes since midnight
+    const convertToMinutes = (time) => {
+      const [timePart, modifier] = time.split(' ');
+      let [hours, minutes] = timePart.split(':').map(Number);
+  
+      if (modifier === 'PM' && hours !== 12) {
+        hours += 12;
+      }
+      if (modifier === 'AM' && hours === 12) {
+        hours = 0;
+      }
+  
+      return hours * 60 + minutes;
+    };
+  
+    const startTotalMinutes = convertToMinutes(startTime);
+    const endTotalMinutes = convertToMinutes(endTime);
+  
+    // Calculate duration in minutes
+    const durationMinutes = endTotalMinutes - startTotalMinutes;
+  
+    // Handle negative duration (end time before start time)
+    if (durationMinutes < 0) {
+      console.warn('End time is before start time', { startTime, endTime });
+      return 'Invalid duration';
+    }
+  
+    // Convert duration to hours and minutes
+    const hours = Math.floor(durationMinutes / 60);
+    const minutes = (durationMinutes % 60).toString().padStart(2, '0'); // Ensure 2 digits for minutes
+  
+    return `${hours}:${minutes}`;
+  };
+  
+
   return (
     <tr
       key={item.id}
@@ -42,6 +82,7 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
       <td className={`px-2 py-2 ${textColor} text-center break-words max-w-[150px]`}>{item.description}</td>
       <td className={`px-2 py-2 ${textColor} text-center`}>{item.timeStarted}</td>
       <td className={`px-2 py-2 ${textColor} text-center`}>{item.timeEnded}</td>
+      <td className={`px-2 py-2 ${textColor} text-center`}>{calculateDuration(item.timeStarted, item.timeEnded)}</td> {/* Duration Column */}
       <td className={`px-2 py-2 ${textColor} text-center`}>{item.withWhom}</td>
       <td className={`px-2 py-2 ${textColor} text-center break-words max-w-[150px]`}>{item.deliverables}</td>
 

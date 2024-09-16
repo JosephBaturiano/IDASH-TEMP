@@ -25,6 +25,7 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Task Description</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Time Started</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Time Ended</th>
+        <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Duration</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>With Whom</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'}`}>Deliverables</th>
         <th className={`px-2 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-200'} flex items-center justify-center`}>
