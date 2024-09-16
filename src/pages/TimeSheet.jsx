@@ -44,6 +44,8 @@ const TimesheetHeader = ({ onSelectAll, isAllSelected }) => {
 };
 
 const TimeSheet = () => {
+  const [isWeekSelected, setIsWeekSelected] = useState(false);  // To toggle between buttons
+  const [isProceedToPDF, setIsProceedToPDF] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedWeek, setSelectedWeek] = useState(null);
   const {
@@ -265,18 +267,18 @@ const TimeSheet = () => {
 
   const handleWeekSelect = (weekNumber) => {
     setSelectedWeek(weekNumber);
-    // Perform week selection logic
-    const { start, end } = getWeekRange(weekNumber);
+    setIsProceedToPDF(true);  // Change button text after week selection
+    setIsWeekSelected(true);  // Indicate week has been selected
+    setIsWeekSelectionModalOpen(false);  // Close modal
 
+    // Implement your week filtering logic here (you already have this part)
+    const { start, end } = getWeekRange(weekNumber);
     setTimesheets(prevTimesheets =>
       prevTimesheets.map(item => ({
         ...item,
         includeInReport: item.date >= start && item.date <= end,
       }))
     );
-
-    // Redirect to the weekly report page
-    navigate('/weekly');
   };
 
 
@@ -336,7 +338,7 @@ const TimeSheet = () => {
               className={`border rounded-lg px-3 py-2 ${theme === 'dark' ? 'bg-gray-800 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
             />
           </div>
-  
+
           <div className="flex items-center gap-4">
             <select
               value={selectedIntern || user?.id}
@@ -351,15 +353,21 @@ const TimeSheet = () => {
                 </option>
               ))}
             </select>
-  
+
             <button
-              onClick={() => setIsWeekSelectionModalOpen(true)}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors duration-300"
+              onClick={() => {
+                if (isProceedToPDF) {
+                  navigate('/weekly'); // Redirect to the weekly page
+                } else {
+                  setIsWeekSelectionModalOpen(true);
+                }
+              }}
+              className={`${isProceedToPDF ? 'bg-green-500' : 'bg-red-500'
+                } text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 transition-colors duration-300`}
             >
-              <PictureAsPdf />
-              Generate PDF
+              {isProceedToPDF ? 'Proceed to PDF' : 'Generate PDF'}
             </button>
-  
+
             <button
               onClick={() => setIsModalOpen(true)}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300"
@@ -369,7 +377,7 @@ const TimeSheet = () => {
             </button>
           </div>
         </div>
-  
+
         <div className="overflow-x-auto mb-4">
           <table className="min-w-full bg-gray-50 border border-gray-200">
             <TimesheetHeader
@@ -393,7 +401,7 @@ const TimeSheet = () => {
             </tbody>
           </table>
         </div>
-  
+
         {isWeekSelectionModalOpen && (
           <WeekSelectionModal
             isOpen={isWeekSelectionModalOpen}
@@ -401,7 +409,7 @@ const TimeSheet = () => {
             onSelect={handleWeekSelect}
           />
         )}
-  
+
         {isModalOpen && (
           <AddTimesheetModal
             isOpen={isModalOpen}
@@ -425,7 +433,7 @@ const TimeSheet = () => {
             setNewComment={setNewComment} // Passed setNewComment
           />
         )}
-  
+
         {isEditModalOpen && (
           <EditTimesheetModal
             isOpen={isEditModalOpen}
@@ -452,7 +460,7 @@ const TimeSheet = () => {
         )}
       </div>
     </Home>
-  );  
+  );
 };
 
 export default TimeSheet;
