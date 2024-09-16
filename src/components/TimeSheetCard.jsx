@@ -69,7 +69,7 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
           </div>
         )}
       </td>
-      <td className={`px-2 py-2 ${textColor} text-center break-words max-w-[150px]`}>{item.description}</td>
+      <td className={`px-2 py-2 ${textColor} text-left break-words max-w-[150px]`}>{item.description}</td>
       <td className={`px-2 py-2 ${textColor} text-center`}>{item.timeStarted}</td>
       <td className={`px-2 py-2 ${textColor} text-center`}>{item.timeEnded}</td>
       <td className={`px-2 py-2 ${textColor} text-center`}>{calculateDuration(item.timeStarted, item.timeEnded)}</td>
