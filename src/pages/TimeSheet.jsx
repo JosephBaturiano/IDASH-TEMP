@@ -65,6 +65,7 @@ const TimeSheet = () => {
   const [isGroupLeader, setIsGroupLeader] = useState(false);
   const [newSelectedDate, setNewSelectedDate] = useState('');
   const [newComment, setNewComment] = useState(''); // Added this state for comment
+  const [selectedTeam, setSelectedTeam] = useState(''); // State for selected team
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -347,18 +348,44 @@ const TimeSheet = () => {
 
           <div>
             <select
-              value={selectedIntern || user?.id}
-              onChange={(e) => setSelectedIntern(e.target.value)}
+              id="team"
+              value={selectedTeam}
+              onChange={(e) => setSelectedTeam(e.target.value)}
               className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'
-                }`}
+              }`}              
               disabled={!isGroupLeader} // Disable the dropdown if user?.groupLeader is false
             >
-              <option value={user?.id}>Select Intern</option>
-              {interns.map((intern) => (
-                <option key={intern.id} value={intern.id}>
-                  {intern.name}
+              <option value="">All</option>
+              {[
+                { id: 'RJ', name: 'RJ' },
+                { id: 'RN', name: 'RN' },
+                { id: 'TF', name: 'TF' }
+              ].map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
                 </option>
               ))}
+            </select>
+          </div>
+
+          <div>
+            <select
+              value={selectedIntern || user?.id}
+              onChange={(e) => setSelectedIntern(e.target.value)}
+              className={`mr-2 border rounded-lg px-4 py-2 h-[40px] flex items-center ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
+            >
+              <option value={user?.id}>Select Intern</option>
+
+              {interns
+                .filter((intern) => {
+                  if (!selectedTeam) return true; // Show all if no team is selected
+                  return intern.internTeam.includes(selectedTeam); // Check if selectedTeam exists in internTeam array
+                })
+                .map((intern) => (
+                  <option key={intern.id} value={intern.id}>
+                    {intern.name}
+                  </option>
+                ))}
             </select>
           </div>
 
