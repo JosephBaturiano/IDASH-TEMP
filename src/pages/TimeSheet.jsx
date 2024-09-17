@@ -323,8 +323,8 @@ const TimeSheet = () => {
 
   return (
     <Home>
-      <div className={`container mx-auto px-4 py-6 ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
-        <div className="flex justify-between items-center mb-4">
+      <div className={`container mx-auto px-6 py-6 ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
+        <div className="flex justify-between items-center mx-5 mb-5">
           <label
             htmlFor="date"
             className={`block font-medium mr-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}
@@ -403,7 +403,7 @@ const TimeSheet = () => {
           </div>
         </div>
   
-        <div className="overflow-x-auto mb-4">
+        <div className="mt-8 mb-8 overflow-auto h-[calc(76vh-100px)]">
           <table className="min-w-full bg-gray-50 border border-gray-200">
             <TimesheetHeader
               onSelectAll={handleSelectAll}
