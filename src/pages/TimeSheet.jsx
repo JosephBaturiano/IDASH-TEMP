@@ -97,16 +97,20 @@ const TimeSheet = () => {
   }, []);
 
   const normalizeDate = (dateString) => {
+    // Check if the input is null or empty
+    if (dateString === null || dateString === '') {
+        return dateString;
+    }
+
     // Check if the date is in the format 'dd/mm/yyyy'
     if (dateString.includes('/')) {
-      const [day, month, year] = dateString.split('/');
-      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`; // Convert to 'yyyy-mm-dd'
+        const [day, month, year] = dateString.split('/');
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`; // Convert to 'yyyy-mm-dd'
     }
 
     // If already in 'yyyy-mm-dd' format, return as is
     return dateString;
-  };
-
+};
 
   const filteredTimesheets = selectedDate
     ? timesheets.filter((item) => {
