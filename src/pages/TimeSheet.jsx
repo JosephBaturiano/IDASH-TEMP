@@ -321,6 +321,48 @@ const TimeSheet = () => {
     }
   };
 
+  const groupAndSortTimesheetsByDate = (timesheets) => {
+    const grouped = timesheets.reduce((grouped, item) => {
+      const itemDate = normalizeDate(item.date);
+  
+      if (!grouped[itemDate]) {
+        grouped[itemDate] = [];
+      }
+  
+      grouped[itemDate].push(item);
+  
+      return grouped;
+    }, {});
+  
+    // Sort timesheets by `timeStarted` in hh:mm AM/PM format
+    Object.keys(grouped).forEach(date => {
+      grouped[date].sort((a, b) => {
+        const timeA = convertTo24HourFormat(a.timeStarted);
+        const timeB = convertTo24HourFormat(b.timeStarted);
+  
+        return timeA - timeB;
+      });
+    });
+  
+    return grouped;
+  };
+  
+  // Helper function to convert `hh:mm AM/PM` to 24-hour time in minutes from midnight
+  const convertTo24HourFormat = (time) => {
+    const [timePart, modifier] = time.split(' '); // Split into time and AM/PM part
+    let [hours, minutes] = timePart.split(':').map(Number);
+  
+    if (modifier === 'PM' && hours !== 12) {
+      hours += 12; // Convert PM hours (except 12 PM)
+    } else if (modifier === 'AM' && hours === 12) {
+      hours = 0; // Convert 12 AM to midnight
+    }
+  
+    return hours * 60 + minutes; // Convert to total minutes from midnight
+  };
+  
+  const groupedTimesheets = groupAndSortTimesheetsByDate(filteredTimesheets);
+
   return (
     <Home>
       <div className={`container mx-auto px-4 py-6 ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}`}>
@@ -404,23 +446,22 @@ const TimeSheet = () => {
         </div>
   
         <div className="overflow-x-auto mb-4">
-          <table className="min-w-full bg-gray-50 border border-gray-200">
-            <TimesheetHeader
-              onSelectAll={handleSelectAll}
-              isAllSelected={isAllSelected}
-              onWeekSelect={handleWeekSelect}
-              selectedWeek={selectedWeek}
-            />
+          <table className="table-auto w-full border-collapse">
+            <TimesheetHeader onSelectAll={() => setIsAllSelected(!isAllSelected)} isAllSelected={isAllSelected} />
             <tbody>
-              {filteredTimesheets.length === 0 ? (
+              {Object.keys(groupedTimesheets).length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-4 py-2 text-center text-gray-500">
+                  <td colSpan="8" className="px-4 py-2 text-center text-gray-500">
                     No timesheets available for this date.
                   </td>
                 </tr>
               ) : (
-                filteredTimesheets.map((item) => (
-                  <TimeSheetCard key={item.id} item={item} onEdit={handleEditTimesheet} onToggleInclude={handleToggleInclude} />
+                Object.keys(groupedTimesheets).map((date) => (
+                  <React.Fragment key={date}>
+                    {groupedTimesheets[date].map((item) => (
+                      <TimeSheetCard key={item.id} item={item} onEdit={handleEditTimesheet} />
+                    ))}
+                  </React.Fragment>
                 ))
               )}
             </tbody>
