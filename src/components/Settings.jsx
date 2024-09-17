@@ -46,24 +46,24 @@ const Settings = () => {
       case 'about':
         return (
           <div className={`mb-6 p-4 mt-20 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
-            <h2 className={`text-xl font-bold mb-4 ${textColor}`}>About App</h2>
-              <p className={`mb-4 ${textColor}`}>
-                This application provides a comprehensive task management system designed to streamline your workflow. It features intuitive task creation, editing, and tracking functionalities, along with customizable themes and notifications.
-              </p>
-              <p className={`mb-4 ${textColor}`}>
-                Version: 1.0.0
-              </p>
-              <p className={`mb-4 ${textColor}`}>
-                For more information, visit our <a href="https://example.com" className="text-blue-500 hover:underline">website</a>.
-              </p>
+            <h2 className={`text-xl font-bold mb-4 ${textColor}`}>About</h2>
+            <p className={`mb-5 mx-5 ${textColor}`}>
+              <b>I-DASH</b> is a dashboard designed to improve internship program management. It helps interns to log timesheets, generate weekly reports, track time rendered, and manage projects, all in one place.
+            </p>
+            <p className={`mb-5 mx-5 ${textColor}`}>
+              Version: 1.0.0
+            </p>
+            <p className={`mb-5 mx-5 ${textColor}`}>
+              For more information, visit our <a href="https://github.com/vt4b/I-DASH.git" className="text-blue-500 hover:underline">GitHub repository</a>.
+            </p>
           </div>
-        );
+        );        
 
       case 'theme':
         return (
           <div className={`mb-6 p-4 mt-20 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
             <h2 className={`text-xl font-bold mb-4 ${textColor}`}>Theme</h2>
-            <p className={`mb-4 ${textColor}`}>
+            <p className={`mb-5 mx-5 ${textColor}`}>
               Adjust the appearance of the application by selecting your preferred theme. You can switch between light and dark modes.
             </p>
             <div className={`flex items-center justify-center space-x-4 ${backgroundColor} p-6`}>
@@ -94,7 +94,7 @@ const Settings = () => {
         return (
           <div className={`mb-6 p-4 mt-20 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
             <h2 className={`text-xl font-bold mb-4 ${textColor}`}>Notifications</h2>
-            <p className={`mb-4 ${textColor}`}>
+            <p className={`mb-5 mx-5 ${textColor}`}>
               Manage your notification preferences here. You can enable or disable notifications based on your needs.
             </p>
             <div className={`flex items-center justify-center space-x-4 ${backgroundColor} p-6`}>
@@ -116,7 +116,7 @@ const Settings = () => {
       return (
         <div className={`mb-6 p-4 mt-20 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
           <h2 className={`text-xl font-bold mb-4 ${textColor}`}>Language</h2>
-          <p className={`mb-4 ${textColor}`}>
+          <p className={`mb-5 mx-5 ${textColor}`}>
             Select your preferred language from the dropdown below.
           </p>
           <div className={`flex items-center justify-center space-x-4 ${backgroundColor} p-6`}>
@@ -148,14 +148,14 @@ const Settings = () => {
       <div className="min-h-screen flex bg-gray-900">
         {/* Sidebar */}
         <div className="w-1/4 bg-gray-100 p-6">
-          <h1 className="text-2xl font-bold mb-6 mt-6 mx-6 text-gray-800">Settings</h1>
+          <h1 className="text-2xl font-bold mb-10 mt-4 mx-4 text-gray-800">Settings</h1>
           <div className="flex flex-col">
             <button
               onClick={() => setSelectedSection('about')}
               className={`flex items-center p-4 mb-4 rounded-lg ${selectedSection === 'about' ? 'bg-gray-300' : 'bg-white'}`}
             >
               <Info className="mr-2" />
-              <span>About App</span>
+              <span>About</span>
             </button>
             <button
               onClick={() => setSelectedSection('theme')}
