@@ -53,7 +53,7 @@ const IssuesCard = () => {
       date: issue.acf.date || '',
       who: issue.acf.who || '',
       issue_number: issue.acf.issue_number || '',
-      status: issue.acf.status || 'open',
+      status: issue.acf.status || '',
     });
   };
 
