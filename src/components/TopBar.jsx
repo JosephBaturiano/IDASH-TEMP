@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Menu, MenuItem, IconButton, ListItemIcon } from '@mui/material';
 import { Logout, Person, Settings } from '@mui/icons-material';
@@ -10,8 +10,8 @@ import { useNotification } from '../context/NotificationContext';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme
 import { format } from 'date-fns';
 
-const TopBar = ({currentUserId} ) => {
-  const { timesheets } = useTimesheets();
+const TopBar = () => {
+  const { timesheets, selectedIntern } = useTimesheets(); // Get selectedIntern from TimesheetContext
   const {
     user = {},
     profileImageUrl = '',
@@ -19,7 +19,6 @@ const TopBar = ({currentUserId} ) => {
     unreadCount = 0,
     markAllAsRead = () => { },
     notificationsEnabled,
-    toggleNotifications
   } = useNotification();
   const { theme } = useTheme(); // Use theme from context
 
@@ -45,7 +44,7 @@ const TopBar = ({currentUserId} ) => {
         <div className="flex items-center space-x-4 bg-gray-200 p-2 rounded-lg shadow-md">
           <div className="flex flex-col font-bold text-center">
             <span className="text-xs font-bold text-gray-600 pb-1">Time Rendered</span>
-            <TimeRendered timesheets={timesheets} currentUserId={currentUserId} />
+            <TimeRendered timesheets={timesheets} currentUserId={selectedIntern} />
           </div>
         </div>
 
