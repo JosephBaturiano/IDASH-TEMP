@@ -67,7 +67,7 @@ const calculateTotalTime = (timesheets, currentUserId) => {
     14: 3839,  // MRS: Additional minutes
 
     //RN TEAM
-    9: 1670,   // CDS: Additional minutes
+    9: 1820,   // CDS: Additional minutes
     18: 8053,  // LAA: Additional minutes
     11: 7226,  // RTL: Additional minutes
     16: 7164,  // UJE: Additional minutes
