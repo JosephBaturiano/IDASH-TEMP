@@ -64,6 +64,7 @@ const Settings = () => {
           title: update.acf.title,
           description: update.acf.update_description,
           date: update.acf.date, // Changed to `date`
+          about: update.acf.about,
         }));
 
         setUpdates(formattedUpdates);
@@ -92,17 +93,25 @@ const Settings = () => {
     switch (selectedSection) {
       case 'about':
         return (
-          <div className={`mb-6 p-4 mt-10 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
-            <h2 className={`text-xl font-bold mb-4 ${textColor}`}>About</h2>
-            <p className={`mb-5 mx-5 ${textColor}`}>
-              <b>I-DASH</b> is a dashboard designed to improve internship program management. It helps interns to log timesheets, generate weekly reports, track time rendered, and manage projects, all in one place.
-            </p>
-            <p className={`mb-5 mx-5 ${textColor}`}>
-              For more information, visit our <a href="https://github.com/vt4b/I-DASH.git" className="text-blue-500 hover:underline">GitHub repository</a>.
-            </p>
+          <div className={`mb-8 p-6 mt-12 mx-8 border-2 ${borderColor} rounded-xl shadow-lg ${backgroundColor}`}>
+            <h2 className={`text-2xl font-bold mb-6 ${textColor}`}>About</h2>
+            {updates.length > 0 ? (
+              updates.map((update, index) => (
+                <div
+                  key={index}
+                >
+                  <p className={`${textColor} text-gray-700 font-medium`}>
+                    <span className="font-normal">{update.about}</span>
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-lg italic"></p>
+            )}
           </div>
-        );        
 
+      );
+         
       case 'theme':
         return (
           <div className={`mb-6 p-4 mt-10 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
