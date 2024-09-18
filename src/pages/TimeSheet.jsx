@@ -72,6 +72,7 @@ const TimeSheet = () => {
   const [newComment, setNewComment] = useState(''); // Added this state for comment
   const [isWeekSelectionModalOpen, setIsWeekSelectionModalOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState(''); // State for selected team
+  const [isSaving, setIsSaving] = useState(false); // Add a loading state
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -128,6 +129,10 @@ const TimeSheet = () => {
     : timesheets;
 
   const handleAddTimesheet = () => {
+    if (isSaving) {
+      return; // If already saving, do nothing
+    }
+
     if (!newTimeStarted) {
       alert("Time Started is required. Please fill in the Time Started field.");
       return; // Stop the function if Time Started is missing
@@ -140,6 +145,10 @@ const TimeSheet = () => {
       alert("Date Created is required. Please select a Date.");
       return; // Stop the function if Date Created is missing
     }
+
+    // Start the saving process, disable the button
+    setIsSaving(true);
+
     const postData = {
       title: newDescription || 'No Description',
       content: `Task Number: ${newTaskNumber || 'No Task Number'}`,
@@ -177,10 +186,16 @@ const TimeSheet = () => {
 
         setTimesheets([...timesheets, newTimesheet]);
         setIsModalOpen(false);
+
+        // Success message
+        window.alert('Timesheet successfully added!');
       })
       .catch((error) => {
         console.error('Error adding timesheet:', error);
         alert('There was an error adding the timesheet.');
+      })
+      .finally(() => {
+        setIsSaving(false); // Ensure the button is enabled again
       });
   };
 
@@ -254,6 +269,9 @@ const TimeSheet = () => {
           );
           setTimesheets(updatedTimesheets);
           setIsEditModalOpen(false);
+          
+          // Show success message
+          window.alert('Changes to the timesheet have been successfully saved.');
         })
         .catch((error) => {
           console.error('Error updating timesheet:', error);

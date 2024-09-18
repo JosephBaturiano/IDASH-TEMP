@@ -20,7 +20,9 @@ const AddTimesheetModal = ({
   selectedDate, // Use newSelectedDate for the date
   setSelectedDate, // Use setNewSelectedDate for the date setter
   newComment, // Add newComment prop
-  setNewComment // Add setNewComment prop
+  setNewComment, // Add setNewComment prop
+  isSaving, // Add isSaving prop
+  setIsSaving // Add setIsSaving prop
 }) => {
   const { theme } = useTheme(); // Get the current theme
 
@@ -138,10 +140,12 @@ const AddTimesheetModal = ({
         <div className="mt-4 flex justify-end space-x-4">
           <button
             onClick={onSubmit}
-            className={`py-2 px-4 rounded-lg text-white ${buttonBgAdd}`}
+            className={`py-2 px-4 rounded-lg text-white ${buttonBgAdd} ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isSaving} // Disable the button based on isSaving state
           >
-            Add Timesheet
+            {isSaving ? 'Saving...' : 'Add Timesheet'}
           </button>
+
           <button
             onClick={onClose}
             className={`py-2 px-4 rounded-lg text-white ${buttonBgCancel}`}
