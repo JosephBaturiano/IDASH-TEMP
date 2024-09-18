@@ -172,6 +172,8 @@ export function TimesheetProvider({ children }) {
         deliverables: post.acf.deliverables,
         date: post.acf.date_created,
         comment: post.acf.comment || 'No Comment', // Include comment field
+        commentOne: post.acf.comment_one || 'No Comment 1', // New comment 1 field
+        commentTwo: post.acf.comment_two || 'No Comment 2'
       }));
 
       setTimesheets(formattedPosts.reverse());

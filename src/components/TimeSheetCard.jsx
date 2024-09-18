@@ -18,41 +18,35 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
 
   // Function to calculate duration in hours and minutes
   const calculateDuration = (startTime, endTime) => {
-    
-    // Helper function to convert "HH:MM AM/PM" to minutes since midnight
     const convertToMinutes = (time) => {
       const [timePart, modifier] = time.split(' ');
       let [hours, minutes] = timePart.split(':').map(Number);
-  
+
       if (modifier === 'PM' && hours !== 12) {
         hours += 12;
       }
       if (modifier === 'AM' && hours === 12) {
         hours = 0;
       }
-  
+
       return hours * 60 + minutes;
     };
-  
+
     const startTotalMinutes = convertToMinutes(startTime);
     const endTotalMinutes = convertToMinutes(endTime);
-  
-    // Calculate duration in minutes
+
     const durationMinutes = endTotalMinutes - startTotalMinutes;
-  
-    // Handle negative duration (end time before start time)
+
     if (durationMinutes < 0) {
       console.warn('End time is before start time', { startTime, endTime });
       return 'Invalid duration';
     }
-  
-    // Convert duration to hours and minutes
+
     const hours = Math.floor(durationMinutes / 60);
-    const minutes = (durationMinutes % 60).toString().padStart(2, '0'); // Ensure 2 digits for minutes
-  
+    const minutes = (durationMinutes % 60).toString().padStart(2, '0');
+
     return `${hours}:${minutes}`;
   };
-  
 
   return (
     <tr
@@ -65,9 +59,26 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
         {item.comment && item.comment !== 'No Comment' && (
           <div className="comment-indicator absolute top-0 left-0 w-3 h-3 bg-blue-500"></div>
         )}
-        {isCommentVisible && item.comment && item.comment !== 'No Comment' && (
+        {isCommentVisible && (
           <div className="absolute text-left top-full mt-1 left-0 w-64 bg-blue-500 text-white text-sm rounded py-2 px-3 z-50 overflow-auto whitespace-normal break-words">
-            {item.comment}
+            {/* Show Comment */}
+            {item.comment && item.comment !== 'No Comment' && (
+              <div className="mb-2">
+                <strong>Comment:</strong> {item.comment}
+              </div>
+            )}
+            {/* Show Comment 1 */}
+            {item.commentOne && item.commentOne !== 'No Comment 1' && (
+              <div className="mb-2">
+                <strong>Comment 1:</strong> {item.commentOne}
+              </div>
+            )}
+            {/* Show Comment 2 */}
+            {item.commentTwo && item.commentTwo !== 'No Comment 2' && (
+              <div>
+                <strong>Comment 2:</strong> {item.commentTwo}
+              </div>
+            )}
           </div>
         )}
       </td>
