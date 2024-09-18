@@ -1,5 +1,5 @@
-import React from 'react';
-import { useTheme } from '../context/ThemeContext'; // Import useTheme
+import React, { useState } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 const EditTimesheetModal = ({
     isOpen,
@@ -26,8 +26,10 @@ const EditTimesheetModal = ({
     setComment1, // Setter for Comment 1
     comment2, // Comment 2 prop
     setComment2 // Setter for Comment 2
+
 }) => {
     const { theme } = useTheme(); // Get the current theme
+    const [isSubmitting, setIsSubmitting] = useState(false); // Added state for submission
 
     if (!isOpen) return null;
 
@@ -40,6 +42,14 @@ const EditTimesheetModal = ({
     const buttonBgSave = theme === 'dark' ? 'bg-green-500' : 'bg-green-600';
     const buttonBgCancel = theme === 'dark' ? 'bg-red-600' : 'bg-red-500';
     const buttonBgDelete = theme === 'dark' ? 'bg-red-800' : 'bg-red-700';
+
+    // Prevent multiple submissions
+    const handleSubmit = () => {
+        if (!isSubmitting) {
+            setIsSubmitting(true); // Disable button after first click
+            onSubmit(); // Call the submit function
+        }
+    };
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
@@ -107,6 +117,7 @@ const EditTimesheetModal = ({
 
                         <div>
                             <label htmlFor="with-whom" className={`block text-sm font-medium mb-1 ${textColor}`}>With Whom</label>
+
                             <input
                                 id="with-whom"
                                 type="text"
@@ -171,10 +182,11 @@ const EditTimesheetModal = ({
 
                 <div className="mt-4 flex justify-end space-x-4">
                     <button
-                        onClick={onSubmit}
+                        onClick={handleSubmit} // Updated to handle submit prevention
                         className={`py-2 px-4 rounded-lg text-white ${buttonBgSave}`}
+                        disabled={isSubmitting} // Disable button during submission
                     >
-                        Save Changes
+                        {isSubmitting ? 'Saving...' : 'Save Changes'}
                     </button>
                     <button
                         onClick={onClose}

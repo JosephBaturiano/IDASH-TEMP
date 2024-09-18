@@ -27,7 +27,9 @@ const AddTimesheetModal = ({
   setNewComment2 // Setter for Comment 2
 }) => {
   const { theme } = useTheme(); // Get the current theme
+  const [isSubmitting, setIsSubmitting] = useState(false); // Add isSubmitting state
   const [commentFieldsVisible, setCommentFieldsVisible] = useState(0); // State to track the number of comment fields shown
+
 
   if (!isOpen) return null;
 
@@ -40,7 +42,12 @@ const AddTimesheetModal = ({
   const buttonBgAdd = theme === 'dark' ? 'bg-green-500' : 'bg-green-600';
   const buttonBgCancel = theme === 'dark' ? 'bg-red-600' : 'bg-red-500';
 
+  const handleSubmit = () => {
+    if (!isSubmitting) {
+      setIsSubmitting(true); // Disable button after first click
+      onSubmit(); // Call the submit function
   // Function to add more comment fields
+      
   const handleAddCommentField = () => {
     if (commentFieldsVisible < 2) {
       setCommentFieldsVisible(commentFieldsVisible + 1);
@@ -193,10 +200,11 @@ const AddTimesheetModal = ({
 
         <div className="mt-4 flex justify-end space-x-4">
           <button
-            onClick={onSubmit}
+            onClick={handleSubmit} // Use handleSubmit to prevent double-click
             className={`py-2 px-4 rounded-lg text-white ${buttonBgAdd}`}
+            disabled={isSubmitting} // Disable button if submitting
           >
-            Add Timesheet
+            {isSubmitting ? 'Submitting...' : 'Add Timesheet'}
           </button>
           <button
             onClick={onClose}
