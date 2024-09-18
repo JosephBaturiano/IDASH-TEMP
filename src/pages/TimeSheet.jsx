@@ -210,7 +210,29 @@ const TimeSheet = () => {
           comment_two: newComment2, // Comment 2 field
         }
       };
-
+  
+      // Optimistically update the local state before making the API call
+      const updatedTimesheets = timesheets.map((item) =>
+        item.id === currentEditingItem.id
+          ? {
+              ...item,
+              taskNumber: newTaskNumber,
+              description: newDescription,
+              timeStarted: formatTime(newTimeStarted),
+              timeEnded: formatTime(newTimeEnded),
+              withWhom: newWithWhom,
+              deliverables: newDeliverables,
+              date: newSelectedDate,
+              comment: newComment, // Update the comment in the timesheet
+              commentOne: newComment1, // Update Comment 1
+              commentTwo: newComment2, // Update Comment 2
+            }
+          : item
+      );
+  
+      setTimesheets(updatedTimesheets); // Update state immediately
+  
+      // Send the API request to save changes
       axios.post(`${API_BASE_URL}/${currentEditingItem.id}`, updatedPostData, {
         headers: {
           'Authorization': AUTH_HEADER,
@@ -219,36 +241,24 @@ const TimeSheet = () => {
       })
         .then((response) => {
           console.log('Timesheet updated:', response.data);
-
-          // Update the timesheets state with the edited item
-          const updatedTimesheets = timesheets.map((item) =>
-            item.id === currentEditingItem.id
-              ? {
-                ...item,
-                taskNumber: newTaskNumber,
-                description: newDescription,
-                timeStarted: formatTime(newTimeStarted),
-                timeEnded: formatTime(newTimeEnded),
-                withWhom: newWithWhom,
-                deliverables: newDeliverables,
-                date: newSelectedDate,
-                comment: newComment, // Update the comment in the timesheet
-                comment_one: newComment1, // Update Comment 1
-                comment_two: newComment2, // Update Comment 2
-              }
-              : item
-          );
-          setTimesheets(updatedTimesheets);
-          setIsEditModalOpen(false);
+          setIsEditModalOpen(false); // Close modal on success
         })
         .catch((error) => {
           console.error('Error updating timesheet:', error);
           alert('There was an error updating the timesheet.');
+  
+          // Revert the state back if the API call fails
+          const revertedTimesheets = timesheets.map((item) =>
+            item.id === currentEditingItem.id
+              ? { ...item, ...currentEditingItem } // Revert to the original item
+              : item
+          );
+          setTimesheets(revertedTimesheets);
         });
     } else {
       alert('Please fill all fields.');
     }
-  };
+  };  
 
   const handleDeleteTimesheet = (itemId) => {
     axios.delete(`${API_BASE_URL}/${itemId}`, {
