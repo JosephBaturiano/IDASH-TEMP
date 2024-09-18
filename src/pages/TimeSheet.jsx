@@ -195,8 +195,6 @@ const TimeSheet = () => {
         setTimesheets([...timesheets, newTimesheet]);
         setIsModalOpen(false);
 
-        // Success message
-        window.alert('Timesheet successfully added!');
       })
       .catch((error) => {
         console.error('Error adding timesheet:', error);

@@ -43,12 +43,27 @@ const AddTimesheetModal = ({
   const buttonBgCancel = theme === 'dark' ? 'bg-red-600' : 'bg-red-500';
 
   const handleSubmit = () => {
-    if (!isSubmitting) {
-      setIsSubmitting(true); // Disable button after first click
-      onSubmit(); // Call the submit function
-  // Function to add more comment fields
+    if (isSubmitting) return; // Prevent multiple submissions
+  
+    // Perform validation checks
+    if (!newTimeStarted) {
+      alert("Time Started is required. Please fill in the Time Started field.");
+      return;
     }
-  };
+    if (!newTimeEnded) {
+      alert("Time Ended is required. Please fill in the Time Ended field.");
+      return;
+    }
+    if (!selectedDate) {
+      alert("Date Created is required. Please select a Date.");
+      return;
+    }
+  
+    // All validations passed, proceed with submission
+    setIsSubmitting(true); // Set submitting state to true
+  
+    onSubmit(); // Call the submit function
+  };  
       
   const handleAddCommentField = () => {
     if (commentFieldsVisible < 2) {
