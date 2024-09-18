@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme
 
 const AddTimesheetModal = ({
@@ -27,6 +27,7 @@ const AddTimesheetModal = ({
   setNewComment2 // Setter for Comment 2
 }) => {
   const { theme } = useTheme(); // Get the current theme
+  const [commentFieldsVisible, setCommentFieldsVisible] = useState(0); // State to track the number of comment fields shown
 
   if (!isOpen) return null;
 
@@ -38,6 +39,13 @@ const AddTimesheetModal = ({
   const inputTextColor = theme === 'dark' ? 'text-gray-300' : 'text-gray-900'; // Text color for inputs
   const buttonBgAdd = theme === 'dark' ? 'bg-green-500' : 'bg-green-600';
   const buttonBgCancel = theme === 'dark' ? 'bg-red-600' : 'bg-red-500';
+
+  // Function to add more comment fields
+  const handleAddCommentField = () => {
+    if (commentFieldsVisible < 2) {
+      setCommentFieldsVisible(commentFieldsVisible + 1);
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
@@ -141,31 +149,45 @@ const AddTimesheetModal = ({
               />
             </div>
 
-            {/* Comment 1 Input */}
-            <div>
-              <label htmlFor="comment-1" className={`block text-sm font-medium mb-1 ${textColor}`}>Comment 1</label>
-              <textarea
-                id="comment-1"
-                placeholder="Add comment 1"
-                value={newComment1}
-                onChange={(e) => setNewComment1(e.target.value)}
-                className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
-                rows="3"
-              />
-            </div>
+            {/* Conditionally Render Comment 1 */}
+            {commentFieldsVisible >= 1 && (
+              <div>
+                <label htmlFor="comment-1" className={`block text-sm font-medium mb-1 ${textColor}`}>Comment 1</label>
+                <textarea
+                  id="comment-1"
+                  placeholder="Add comment 1"
+                  value={newComment1}
+                  onChange={(e) => setNewComment1(e.target.value)}
+                  className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
+                  rows="3"
+                />
+              </div>
+            )}
 
-            {/* Comment 2 Input */}
-            <div>
-              <label htmlFor="comment-2" className={`block text-sm font-medium mb-1 ${textColor}`}>Comment 2</label>
-              <textarea
-                id="comment-2"
-                placeholder="Add comment 2"
-                value={newComment2}
-                onChange={(e) => setNewComment2(e.target.value)}
-                className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
-                rows="3"
-              />
-            </div>
+            {/* Conditionally Render Comment 2 */}
+            {commentFieldsVisible >= 2 && (
+              <div>
+                <label htmlFor="comment-2" className={`block text-sm font-medium mb-1 ${textColor}`}>Comment 2</label>
+                <textarea
+                  id="comment-2"
+                  placeholder="Add comment 2"
+                  value={newComment2}
+                  onChange={(e) => setNewComment2(e.target.value)}
+                  className={`border rounded-lg p-2 w-full ${borderColor} ${inputBgColor} ${inputTextColor}`}
+                  rows="3"
+                />
+              </div>
+            )}
+
+            {/* Button to Add More Comment Fields */}
+            {commentFieldsVisible < 2 && (
+              <button
+                onClick={handleAddCommentField}
+                className="mt-2 text-blue-500 underline"
+              >
+                + Comment
+              </button>
+            )}
           </div>
         </div>
 
