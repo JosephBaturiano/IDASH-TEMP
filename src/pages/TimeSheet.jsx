@@ -128,6 +128,18 @@ const TimeSheet = () => {
     : timesheets;
 
   const handleAddTimesheet = () => {
+    if (!newTimeStarted) {
+      alert("Time Started is required. Please fill in the Time Started field.");
+      return; // Stop the function if Time Started is missing
+    }
+    if (!newTimeEnded) {
+      alert("Time Ended is required. Please fill in the Time Ended field.");
+      return; // Stop the function if Time Ended is missing
+    }
+    if (!newSelectedDate) {
+      alert("Date Created is required. Please select a Date.");
+      return; // Stop the function if Date Created is missing
+    }
     const postData = {
       title: newDescription || 'No Description',
       content: `Task Number: ${newTaskNumber || 'No Task Number'}`,
@@ -186,6 +198,18 @@ const TimeSheet = () => {
   };
 
   const handleSaveEdit = () => {
+    if (!newTimeStarted) {
+      alert("Time Started is required. Please fill in the Time Started field.");
+      return; // Stop the function if Time Started is missing
+    }
+    if (!newTimeEnded) {
+      alert("Time Ended is required. Please fill in the Time Ended field.");
+      return; // Stop the function if Time Ended is missing
+    }
+    if (!newSelectedDate) {
+      alert("Date Created is required. Please select a Date.");
+      return; // Stop the function if Date Created is missing
+    }
     if (newTaskNumber && newDescription && newTimeStarted && newTimeEnded && newWithWhom && newDeliverables && newSelectedDate) {
       const updatedPostData = {
         title: newTaskNumber,
