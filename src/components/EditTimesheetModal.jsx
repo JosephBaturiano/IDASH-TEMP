@@ -1,5 +1,5 @@
-import React from 'react';
-import { useTheme } from '../context/ThemeContext'; // Import useTheme
+import React, { useState } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 const EditTimesheetModal = ({
     isOpen,
@@ -20,10 +20,11 @@ const EditTimesheetModal = ({
     setDeliverables,
     selectedDate,
     setSelectedDate,
-    comments, // Add comments prop
-    setComments // Add setComments prop
+    comments,
+    setComments
 }) => {
     const { theme } = useTheme(); // Get the current theme
+    const [isSubmitting, setIsSubmitting] = useState(false); // Added state for submission
 
     if (!isOpen) return null;
 
@@ -36,6 +37,14 @@ const EditTimesheetModal = ({
     const buttonBgSave = theme === 'dark' ? 'bg-green-500' : 'bg-green-600';
     const buttonBgCancel = theme === 'dark' ? 'bg-red-600' : 'bg-red-500';
     const buttonBgDelete = theme === 'dark' ? 'bg-red-800' : 'bg-red-700';
+
+    // Prevent multiple submissions
+    const handleSubmit = () => {
+        if (!isSubmitting) {
+            setIsSubmitting(true); // Disable button after first click
+            onSubmit(); // Call the submit function
+        }
+    };
 
     return (
         <div className={`fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50`}>
@@ -75,7 +84,6 @@ const EditTimesheetModal = ({
                         />
                     </div>
 
-                    {/* Time Inputs with Labels in a Single Line */}
                     <div className="flex space-x-4">
                         <div className="flex-1">
                             <label htmlFor="start-time" className={`block text-sm font-medium mb-1 ${textColor}`}>Start Time</label>
@@ -122,7 +130,6 @@ const EditTimesheetModal = ({
                         />
                     </div>
 
-                    {/* Comments Input Field */}
                     <div>
                         <label htmlFor="comments" className={`block text-sm font-medium mb-1 ${textColor}`}>Comments</label>
                         <textarea
@@ -136,10 +143,11 @@ const EditTimesheetModal = ({
                 </div>
                 <div className="mt-4 flex justify-end space-x-4">
                     <button
-                        onClick={onSubmit}
+                        onClick={handleSubmit} // Updated to handle submit prevention
                         className={`py-2 px-4 rounded-lg text-white ${buttonBgSave}`}
+                        disabled={isSubmitting} // Disable button during submission
                     >
-                        Save Changes
+                        {isSubmitting ? 'Saving...' : 'Save Changes'}
                     </button>
                     <button
                         onClick={onClose}
