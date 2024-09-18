@@ -163,8 +163,8 @@ const TimeSheet = () => {
           deliverables: newDeliverables || 'N/A',
           date: newSelectedDate || new Date().toISOString().split('T')[0],
           comment: newComment || 'No Comment',  // Store the comment
-          comment_one: newComment1 || 'No Comment 1', // Comment 1
-          comment_two: newComment2 || 'No Comment 2', // Comment 2
+          commentOne: newComment1 || 'No Comment 1', // Comment 1
+          commentTwo: newComment2 || 'No Comment 2', // Comment 2
         };
 
         setTimesheets([...timesheets, newTimesheet]);
@@ -186,8 +186,8 @@ const TimeSheet = () => {
     setNewDeliverables(item.deliverables);
     setNewSelectedDate(item.date)
     setNewComment(item.comment);
-    setNewComment1(item.comment_one || ''); // Ensure comment_one is set correctly
-    setNewComment2(item.comment_two || ''); // Ensure comment_two is set correctly
+    setNewComment1(item.commentOne); // Ensure comment_one is set correctly
+    setNewComment2(item.commentTwo); // Ensure comment_two is set correctly
     setIsEditModalOpen(true);
   };
 
