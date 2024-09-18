@@ -47,6 +47,8 @@ const AddTimesheetModal = ({
       setIsSubmitting(true); // Disable button after first click
       onSubmit(); // Call the submit function
   // Function to add more comment fields
+    }
+  };
       
   const handleAddCommentField = () => {
     if (commentFieldsVisible < 2) {
