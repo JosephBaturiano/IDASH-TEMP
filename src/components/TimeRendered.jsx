@@ -56,22 +56,22 @@ const calculateTotalTime = (timesheets, currentUserId) => {
   // Define additional time for specific user IDs
   const additionalTimeByUserId = {
     // TF TEAM
-    10: 4799,  // AAA: Additional minutes
+    10: 4120,  // AAA: Additional minutes
     13: 6240,  // APS: Additional minutes
-    12: 6889,  // KNM: Additional minutes
+    12: 6512,  // KNM: Additional minutes
 
     // RJ TEAM
     8: 5735,   // CJO: Additional minutes
-    15: 2612,  // EDL: Additional minutes
+    15: 2520,  // EDL: Additional minutes
     3: 2400,   // JBM: Additional minutes
-    14: 3839,  // MRS: Additional minutes
+    14: 5707,  // MRS: Additional minutes
 
     //RN TEAM
-    9: 1967,   // CDS: Additional minutes
-    18: 8053,  // LAA: Additional minutes
-    11: 7226,  // RTL: Additional minutes
-    16: 7164,  // UJE: Additional minutes
-    17: 7254   // JZB: Additional minutes
+    9: 3926,   // CDS: Additional minutes
+    18: 8562,  // LAA: Additional minutes
+    11: 8562,  // RTL: Additional minutes
+    16: 5763,  // UJE: Additional minutes
+    17: 6883   // JZB: Additional minutes
   };
 
   const additionalTime = additionalTimeByUserId[currentUserId] || 0;
