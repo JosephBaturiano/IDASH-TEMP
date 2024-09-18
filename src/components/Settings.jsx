@@ -18,7 +18,7 @@ const Settings = () => {
   const [updates, setUpdates] = useState([]);
 
   // Managing state for which section to show
-  const [selectedSection, setSelectedSection] = useState('theme');
+  const [selectedSection, setSelectedSection] = useState('updates');
 
   const [notifications, setNotifications] = useState(() => {
     const saved = localStorage.getItem('notificationsEnabled');
@@ -92,7 +92,7 @@ const Settings = () => {
     switch (selectedSection) {
       case 'about':
         return (
-          <div className={`mb-6 p-4 mt-20 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
+          <div className={`mb-6 p-4 mt-10 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
             <h2 className={`text-xl font-bold mb-4 ${textColor}`}>About</h2>
             <p className={`mb-5 mx-5 ${textColor}`}>
               <b>I-DASH</b> is a dashboard designed to improve internship program management. It helps interns to log timesheets, generate weekly reports, track time rendered, and manage projects, all in one place.
@@ -105,7 +105,7 @@ const Settings = () => {
 
       case 'theme':
         return (
-          <div className={`mb-6 p-4 mt-20 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
+          <div className={`mb-6 p-4 mt-10 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
             <h2 className={`text-xl font-bold mb-4 ${textColor}`}>Theme</h2>
             <p className={`mb-5 mx-5 ${textColor}`}>
               Adjust the appearance of the application by selecting your preferred theme. You can switch between light and dark modes.
@@ -136,7 +136,7 @@ const Settings = () => {
         
       case 'notifications':
         return (
-          <div className={`mb-6 p-4 mt-20 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
+          <div className={`mb-6 p-4 mt-10 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
             <h2 className={`text-xl font-bold mb-4 ${textColor}`}>Notifications</h2>
             <p className={`mb-5 mx-5 ${textColor}`}>
               Manage your notification preferences here. You can enable or disable notifications based on your needs.
@@ -158,7 +158,7 @@ const Settings = () => {
         );
      case 'language':
       return (
-        <div className={`mb-6 p-4 mt-20 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
+        <div className={`mb-6 p-4 mt-10 mx-6 border ${borderColor} rounded-lg ${backgroundColor}`}>
           <h2 className={`text-xl font-bold mb-4 ${textColor}`}>Language</h2>
           <p className={`mb-5 mx-5 ${textColor}`}>
             Select your preferred language from the dropdown below.
@@ -182,14 +182,14 @@ const Settings = () => {
         );
       case 'updates':
         return (
-          <div className={`mb-6 p-4 mt-20 mx-6 border ${borderColor} rounded-lg ${backgroundColor} shadow-lg`}>
-          <h2 className={`text-2xl font-bold mb-6 ${textColor}`}>Update</h2>
-          <div className="space-y-4">
+          <div className={`mb-6 p-4 mt-10 mx-6 border ${borderColor} rounded-lg ${backgroundColor} max-h-[400px] overflow-y-auto`}>
+          <h2 className={`text-xl font-bold mb-5 ${textColor}`}>Updates</h2>
+          <div className="space-y-4 mb-5">
             {updates.length > 0 ? (
               updates.map((update, index) => (
                 <div
                   key={index}
-                  className="border border-gray-200 p-6 rounded-lg bg-white shadow-md hover:bg-gray-50 transition ease-in-out duration-200"
+                  className="border border-gray-500 p-6 rounded-lg bg-white shadow-md hover:bg-gray-50 transition ease-in-out duration-200"
                 >
                   <p className="text-sm text-600 font-medium">
                     Version: <span className="font-normal">{update.version}</span>
