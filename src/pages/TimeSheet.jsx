@@ -70,6 +70,8 @@ const TimeSheet = () => {
   const [isGroupLeader, setIsGroupLeader] = useState(false);
   const [newSelectedDate, setNewSelectedDate] = useState('');
   const [newComment, setNewComment] = useState(''); // Added this state for comment
+  const [newComment1, setNewComment1] = useState(''); // Comment 1
+  const [newComment2, setNewComment2] = useState(''); // Comment 2
   const [isWeekSelectionModalOpen, setIsWeekSelectionModalOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState(''); // State for selected team
   const { theme } = useTheme();
@@ -84,6 +86,8 @@ const TimeSheet = () => {
       setNewDeliverables('');
       setNewSelectedDate('');
       setNewComment(''); // Reset comment  
+      setNewComment1(''); // Reset Comment 1
+      setNewComment2(''); // Reset Comment 2
     }
   }, [isModalOpen]);
 
@@ -141,6 +145,8 @@ const TimeSheet = () => {
         with_whom: newWithWhom || 'N/A',
         deliverables: newDeliverables || 'N/A',
         comment: newComment || 'No Comment',  // Include the comment field here
+        comment_one: newComment1 || 'No Comment 1', // Comment 1 field
+        comment_two: newComment2 || 'No Comment 2', // Comment 2 field
       }
     };
 
@@ -161,6 +167,8 @@ const TimeSheet = () => {
           deliverables: newDeliverables || 'N/A',
           date: newSelectedDate || new Date().toISOString().split('T')[0],
           comment: newComment || 'No Comment',  // Store the comment
+          commentOne: newComment1 || 'No Comment 1', // Comment 1
+          commentTwo: newComment2 || 'No Comment 2', // Comment 2
         };
 
         setTimesheets([...timesheets, newTimesheet]);
@@ -182,6 +190,8 @@ const TimeSheet = () => {
     setNewDeliverables(item.deliverables);
     setNewSelectedDate(item.date)
     setNewComment(item.comment);
+    setNewComment1(item.commentOne); // Ensure comment_one is set correctly
+    setNewComment2(item.commentTwo); // Ensure comment_two is set correctly
     setIsEditModalOpen(true);
   };
 
@@ -200,9 +210,33 @@ const TimeSheet = () => {
           with_whom: newWithWhom,
           deliverables: newDeliverables,
           comment: newComment, // Include comment in the update data
+          comment_one: newComment1, // Comment 1 field
+          comment_two: newComment2, // Comment 2 field
         }
       };
-
+  
+      // Optimistically update the local state before making the API call
+      const updatedTimesheets = timesheets.map((item) =>
+        item.id === currentEditingItem.id
+          ? {
+              ...item,
+              taskNumber: newTaskNumber,
+              description: newDescription,
+              timeStarted: formatTime(newTimeStarted),
+              timeEnded: formatTime(newTimeEnded),
+              withWhom: newWithWhom,
+              deliverables: newDeliverables,
+              date: newSelectedDate,
+              comment: newComment, // Update the comment in the timesheet
+              commentOne: newComment1, // Update Comment 1
+              commentTwo: newComment2, // Update Comment 2
+            }
+          : item
+      );
+  
+      setTimesheets(updatedTimesheets); // Update state immediately
+  
+      // Send the API request to save changes
       axios.post(`${API_BASE_URL}/${currentEditingItem.id}`, updatedPostData, {
         headers: {
           'Authorization': AUTH_HEADER,
@@ -211,34 +245,24 @@ const TimeSheet = () => {
       })
         .then((response) => {
           console.log('Timesheet updated:', response.data);
-
-          // Update the timesheets state with the edited item
-          const updatedTimesheets = timesheets.map((item) =>
-            item.id === currentEditingItem.id
-              ? {
-                ...item,
-                taskNumber: newTaskNumber,
-                description: newDescription,
-                timeStarted: formatTime(newTimeStarted),
-                timeEnded: formatTime(newTimeEnded),
-                withWhom: newWithWhom,
-                deliverables: newDeliverables,
-                date: newSelectedDate,
-                comment: newComment, // Update the comment in the timesheet
-              }
-              : item
-          );
-          setTimesheets(updatedTimesheets);
-          setIsEditModalOpen(false);
+          setIsEditModalOpen(false); // Close modal on success
         })
         .catch((error) => {
           console.error('Error updating timesheet:', error);
           alert('There was an error updating the timesheet.');
+  
+          // Revert the state back if the API call fails
+          const revertedTimesheets = timesheets.map((item) =>
+            item.id === currentEditingItem.id
+              ? { ...item, ...currentEditingItem } // Revert to the original item
+              : item
+          );
+          setTimesheets(revertedTimesheets);
         });
     } else {
       alert('Please fill all fields.');
     }
-  };
+  };  
 
   const handleDeleteTimesheet = (itemId) => {
     axios.delete(`${API_BASE_URL}/${itemId}`, {
@@ -386,7 +410,7 @@ const TimeSheet = () => {
               className={`border rounded-lg px-3 py-2 ${theme === 'dark' ? 'bg-gray-800 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
             />
           </div>
-  
+
           <div className="flex items-center gap-4">
             <select
               value={selectedTeam}
@@ -405,7 +429,7 @@ const TimeSheet = () => {
                 </option>
               ))}
             </select>
-  
+
             <div>
               <select
                 value={selectedIntern || user?.id}
@@ -425,7 +449,7 @@ const TimeSheet = () => {
                   ))}
               </select>
             </div>
-  
+
             <button
               onClick={() => {
                 if (isProceedToPDF) {
@@ -438,7 +462,7 @@ const TimeSheet = () => {
             >
               {isProceedToPDF ? 'Proceed to PDF' : 'Generate PDF'}
             </button>
-  
+
             <button
               onClick={() => setIsModalOpen(true)}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300"
@@ -448,7 +472,7 @@ const TimeSheet = () => {
             </button>
           </div>
         </div>
-  
+
         <div className="mt-8 mb-8 overflow-auto h-[calc(76vh-100px)]">
           <table className="min-w-full bg-gray-50 border border-gray-200">
             <TimesheetHeader
@@ -477,7 +501,7 @@ const TimeSheet = () => {
             </tbody>
           </table>
         </div>
-  
+
         {isWeekSelectionModalOpen && (
           <WeekSelectionModal
             isOpen={isWeekSelectionModalOpen}
@@ -485,7 +509,7 @@ const TimeSheet = () => {
             onSelect={handleWeekSelect}
           />
         )}
-  
+
         {isModalOpen && (
           <AddTimesheetModal
             isOpen={isModalOpen}
@@ -507,9 +531,13 @@ const TimeSheet = () => {
             setNewDeliverables={setNewDeliverables}
             newComment={newComment} // Passed newComment
             setNewComment={setNewComment} // Passed setNewComment
+            newComment1={newComment1} // Pass the new Comment 1 state
+            setNewComment1={setNewComment1} // Pass the setter for Comment 1
+            newComment2={newComment2} // Pass the new Comment 2 state
+            setNewComment2={setNewComment2} // Pass the setter for Comment 2
           />
         )}
-  
+
         {isEditModalOpen && (
           <EditTimesheetModal
             isOpen={isEditModalOpen}
@@ -531,13 +559,17 @@ const TimeSheet = () => {
             setDeliverables={setNewDeliverables}
             comments={newComment} // Pass the comment state
             setComments={setNewComment} // Pass the comment setter
+            comment1={newComment1} // Pass Comment 1 state
+            setComment1={setNewComment1} // Pass the setter for Comment 1
+            comment2={newComment2} // Pass Comment 2 state
+            setComment2={setNewComment2} // Pass the setter for Comment 2
             onDelete={() => handleDeleteTimesheet(currentEditingItem.id)}
           />
         )}
       </div>
     </Home>
   );
-  
+
 };
 
 export default TimeSheet;
