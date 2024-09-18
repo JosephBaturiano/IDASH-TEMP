@@ -208,6 +208,7 @@ const AddTimesheetModal = ({
           >
             {isSubmitting ? 'Submitting...' : 'Add Timesheet'}
           </button>
+
           <button
             onClick={onClose}
             className={`py-2 px-4 rounded-lg text-white ${buttonBgCancel}`}

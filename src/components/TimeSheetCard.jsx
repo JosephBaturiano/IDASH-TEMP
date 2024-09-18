@@ -54,7 +54,7 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
       className={`${bgColor} ${borderColor} ${hoverColor} border-t transition-colors duration-300 cursor-pointer`}
       onClick={handleToggleComment}
     >
-      <td className={`px-2 py-2 ${textColor} font-medium text-center relative group`}>
+      <td className={`px-2 py-2 ${textColor} font-medium text-center relative group max-w-[120px]`}>
         <span>{item.taskNumber}</span>
         {item.comment && item.comment !== 'No Comment' && (
           <div className="comment-indicator absolute top-0 left-0 w-3 h-3 bg-blue-500"></div>
@@ -82,12 +82,12 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
           </div>
         )}
       </td>
-      <td className={`px-2 py-2 ${textColor} text-center break-words max-w-[150px]`}>{item.description}</td>
-      <td className={`px-2 py-2 ${textColor} text-center`}>{item.timeStarted}</td>
-      <td className={`px-2 py-2 ${textColor} text-center`}>{item.timeEnded}</td>
-      <td className={`px-2 py-2 ${textColor} text-center`}>{calculateDuration(item.timeStarted, item.timeEnded)}</td>
-      <td className={`px-2 py-2 ${textColor} text-center`}>{item.withWhom}</td>
-      <td className={`px-2 py-2 ${textColor} text-left break-words       max-w-[150px]`}>
+      <td className={`px-2 py-2 ${textColor} text-left break-words max-w-[180px]`}>{item.description}</td>
+      <td className={`px-2 py-2 ${textColor} text-center max-w-[100px]`}>{item.timeStarted}</td>
+      <td className={`px-2 py-2 ${textColor} text-center max-w-[100px]`}>{item.timeEnded}</td>
+      <td className={`px-2 py-2 ${textColor} text-center max-w-[100px]]`}>{calculateDuration(item.timeStarted, item.timeEnded)}</td>
+      <td className={`px-2 py-2 ${textColor} text-center max-w-[120px]`}>{item.withWhom}</td>
+      <td className={`px-2 py-2 ${textColor} text-left break-words max-w-[180px]`}>
         {item.deliverables.split(/(https?:\/\/\S+)/).map((part, index) =>
           part.match(/https?:\/\/\S+/) ? (
             <a 
@@ -104,7 +104,7 @@ const TimeSheetCard = ({ item, onEdit, onToggleInclude }) => {
           )
         )}
       </td>
-      <td className="px-2 py-2 text-center">
+      <td className="px-2 py-2 text-center max-w-[180px]">
         <div className="flex items-center justify-center h-full space-x-2">
           <button
             onClick={(e) => {
