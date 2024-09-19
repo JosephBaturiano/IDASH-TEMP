@@ -1,52 +1,44 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext'; // Import useTheme from your context
 
-const convertTo24HourFormat = (time) => {
+// Converts time from 12-hour format to total minutes
+const convertToMinutes = (time) => {
   const [timePart, modifier] = time.split(' ');
-  const [hours, minutes] = timePart.split(':').map(Number);
-  
-  if (isNaN(hours) || isNaN(minutes)) {
-    console.error(`Invalid time format: ${time}`);
-    return null;
+  let [hours, minutes] = timePart.split(':').map(Number);
+
+  if (modifier.toLowerCase() === 'pm' && hours !== 12) {
+    hours += 12;
+  }
+  if (modifier.toLowerCase() === 'am' && hours === 12) {
+    hours = 0;
   }
 
-  let newHours = hours;
-  if (modifier === 'pm' && hours !== 12) {
-    newHours += 12;
-  }
-  if (modifier === 'am' && hours === 12) {
-    newHours = 0;
-  }
-
-  return { hours: newHours, minutes };
+  return hours * 60 + minutes;
 };
 
+// Calculate duration between start and end times
+const calculateDuration = (startTime, endTime) => {
+  const startTotalMinutes = convertToMinutes(startTime);
+  const endTotalMinutes = convertToMinutes(endTime);
+
+  let durationMinutes = endTotalMinutes - startTotalMinutes;
+
+  // Handle overnight times
+  if (durationMinutes < 0) {
+    durationMinutes += 24 * 60; // Add 24 hours worth of minutes
+  }
+
+  return durationMinutes;
+};
+
+// Calculate total time for all timesheets, adding additional time for specific users
 const calculateTotalTime = (timesheets, currentUserId) => {
-  console.log(`Current User ID: ${currentUserId}`); // Log the currentUserId to check if it's correct
-  
+  console.log(`Current User ID: ${currentUserId}`);
+
   let totalMinutes = timesheets.reduce((total, item) => {
     if (item.timeStarted && item.timeEnded) {
-      const startTime24 = convertTo24HourFormat(item.timeStarted);
-      const endTime24 = convertTo24HourFormat(item.timeEnded);
-
-      if (!startTime24 || !endTime24) {
-        console.error(`Invalid time conversion: ${item.timeStarted} - ${item.timeEnded}`);
-        return total; 
-      }
-
-      const startTime = new Date();
-      startTime.setHours(startTime24.hours, startTime24.minutes, 0, 0);
-
-      const endTime = new Date();
-      endTime.setHours(endTime24.hours, endTime24.minutes, 0, 0);
-
-      if (endTime < startTime) {
-        endTime.setDate(endTime.getDate() + 1); 
-      }
-
-      const diff = endTime - startTime;
-      const minutes = diff / (1000 * 60);
-      return total + minutes;
+      const durationMinutes = calculateDuration(item.timeStarted, item.timeEnded);
+      return total + durationMinutes;
     }
     return total;
   }, 0);
@@ -61,17 +53,17 @@ const calculateTotalTime = (timesheets, currentUserId) => {
     12: 6512,  // KNM: Additional minutes
 
     // RJ TEAM
-    8: 5735,   // CJO: Additional minutes
-    15: 2520,  // EDL: Additional minutes
-    3: 2400,   // JBM: Additional minutes
-    14: 5707,  // MRS: Additional minutes
+    8: 8615,   // CJO: Additional minutes
+    15: 6840,  // EDL: Additional minutes
+    3: 8171,   // JBM: Additional minutes
+    14: 9307,  // MRS: Additional minutes
 
-    //RN TEAM
-    9: 3926,   // CDS: Additional minutes
-    18: 8562,  // LAA: Additional minutes
-    11: 8562,  // RTL: Additional minutes
-    16: 5763,  // UJE: Additional minutes
-    17: 6883   // JZB: Additional minutes
+    // RN TEAM
+    9: 9161,   // CDS: Additional minutes
+    18: 5832,  // LAA: Additional minutes
+    11: 7866,  // RTL: Additional minutes
+    16: 10258,  // UJE: Additional minutes
+    17: 10469   // JZB: Additional minutes
   };
 
   const additionalTime = additionalTimeByUserId[currentUserId] || 0;
@@ -100,7 +92,7 @@ const TimeRendered = ({ timesheets, currentUserId }) => {
   return (
     <div className={`p-2 ${backgroundColor} rounded-lg shadow-md text-center`}>
       <p className={`${textColor}`}>
-        {totalHours} : {remainingMinutes} : 00
+        {totalHours} : {remainingMinutes.toString().padStart(2, '0')} : 00
       </p>
     </div>
   );
