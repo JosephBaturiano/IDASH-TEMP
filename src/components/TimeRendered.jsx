@@ -48,7 +48,7 @@ const calculateTotalTime = (timesheets, currentUserId) => {
   // Define additional time for specific user IDs
   const additionalTimeByUserId = {
     // TF TEAM
-    10: 4120,  // AAA: Additional minutes
+    10: 7008,  // AAA: Additional minutes
     13: 6240,  // APS: Additional minutes
     12: 6512,  // KNM: Additional minutes
 
