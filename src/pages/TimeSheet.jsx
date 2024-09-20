@@ -530,7 +530,7 @@ const TimeSheet = () => {
                 Object.keys(groupedTimesheets).map((date) => (
                   <React.Fragment key={date}>
                     {groupedTimesheets[date].map((item) => (
-                      <TimeSheetCard key={item.id} item={item} onEdit={handleEditTimesheet} />
+                      <TimeSheetCard key={item.id} item={item} onEdit={handleEditTimesheet} onToggleInclude={handleToggleInclude}/>
                     ))}
                   </React.Fragment>
                 ))
