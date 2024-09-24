@@ -60,35 +60,35 @@ Before setting up I-Dash, ensure you have the following installed:
 - **Calendar**: View the current month with highlighted dates.
 - **Ongoing Projects Tracker**: Displays active projects, assignment dates, assigned groups, and progress.
 
-![Dashboard Image](src\assets\images\Dashboard.png)
+![Dashboard Image](./src/assets/images/Dashboard.png)
 
 ### 2. Announcements
 - View and post important announcements.
 - Stay informed about internship rules and guidelines.
 
-![Announcements Image](src\assets\images\Announcements.png)
+![Announcements Image](./src/assets/images/Announcements.png)
 
 ### 3. Timesheet
 - Log working hours and view time entries.
 - Generate timesheet reports in PDF format.
 - Filter by date and select specific interns for viewing.
 - Used by group leaders during daily status meetings.
-![Timesheet Image](src\assets\images\Timesheet.png)
+![Timesheet Image](./src/assets/images/Timesheet.png)
 
 ### 4. Task Deliverables
 - Track assigned tasks, issues, and archives.
 - Editable only by group leaders.
 
-![Task Deliverables Image](src\assets\images\Task_Deliverables.png)
+![Task Deliverables Image](./src/assets/images/Task_Deliverables.png)
 
 ### 5. Files
 - Access and manage uploaded internship-related files, including OJT documents, media files, and other task deliverables.
 
-![Files Image](src\assets\images\Files.png) 
+![Files Image](./src/assets/images/Files.png) 
 
 ### 6. Team Task
 - Monitor team tasks and overall project progress.
-![Team Task Image](src\assets\images\Team_Task.png)
+![Team Task Image](./src/assets/images/Team_Task.png)
 
 ### 7. Time Rendered
 - Tracks the total time worked throughout the program, connected to the timesheet feature.
@@ -107,7 +107,7 @@ Before setting up I-Dash, ensure you have the following installed:
 - **Language**: Set your preferred interface language.
 - **Updates**: Stay informed about the latest features and changes.
 
-![Settings Image](src\assets\images\Settings.png)
+![Settings Image](./src/assets/images/Settings.png)
 
 ## User Guide
 ### Generate PDF Feature
