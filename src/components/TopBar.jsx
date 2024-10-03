@@ -35,13 +35,13 @@ const TopBar = () => {
   const handleNotificationClose = () => setNotificationEl(null);
 
   return (
-    <div className={`bg-${theme === 'light' ? 'white' : 'gray-800'} text-${theme === 'light' ? 'gray-900' : 'white'} py-4 px-6 flex items-center justify-between shadow-md`}>
-      <div className="flex items-center">
-        <h1 className="text-2xl font-bold">Welcome Intern!</h1>
+    <div className={`bg-${theme === 'light' ? 'white' : 'gray-800'} text-${theme === 'light' ? 'gray-900' : 'white'} py-2 md:py-4 px-4 md:px-6 flex flex-wrap md:flex-nowrap items-center justify-between shadow-md`}>
+      <div className="flex items-center w-full md:w-auto mb-2 md:mb-0">
+        <h1 className="text-xl md:text-2xl font-bold">Welcome Intern!</h1>
       </div>
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center justify-between w-full md:w-auto space-x-6">
         {/* Time Rendered */}
-        <div className="flex items-center space-x-4 bg-gray-200 p-2 rounded-lg shadow-md">
+        <div className="flex items-center space-x-4 bg-gray-200 p-1 md:p-2 rounded-lg shadow-md">
           <div className="flex flex-col font-bold text-center">
             <span className="text-xs font-bold text-gray-600 pb-1">Time Rendered</span>
             <TimeRendered timesheets={timesheets} currentUserId={selectedIntern} />
@@ -52,10 +52,10 @@ const TopBar = () => {
         {notificationsEnabled && (
           <div className="relative">
             {unreadCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">{unreadCount}</span>
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-1 py-0.5 md:px-2 md:py-1">{unreadCount}</span>
             )}
             <IconButton onClick={handleNotificationClick} className="p-0">
-              <NotificationsIcon className={`w-8 h-8 text-${theme === 'light' ? 'gray-900' : 'white'} cursor-pointer transition-transform duration-300 hover:scale-110`} />
+              <NotificationsIcon className={`w-6 h-6 md:w-8 md:h-8 text-${theme === 'light' ? 'gray-900' : 'white'} cursor-pointer transition-transform duration-300 hover:scale-110`} />
             </IconButton>
             <Menu
               anchorEl={notificationEl}
@@ -63,8 +63,8 @@ const TopBar = () => {
               onClose={handleNotificationClose}
               PaperProps={{
                 style: {
-                  width: '300px',
-                  maxHeight: '400px',
+                  width: '250px',
+                  maxHeight: '300px',
                   overflow: 'auto',
                   padding: '10px',
                   backgroundColor: theme === 'light' ? 'white' : '#333',
@@ -99,18 +99,18 @@ const TopBar = () => {
         )}
 
         {/* User Profile */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 md:space-x-4">
           <FullName name={user?.name} />
           {profileImageUrl ? (
             <img
               src={profileImageUrl}
               alt="Profile"
-              className="w-12 h-12 rounded-full object-cover cursor-pointer"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover cursor-pointer"
               onClick={handleProfileClick}
             />
           ) : (
             <div
-              className="w-12 h-12 flex items-center justify-center bg-gray-300 rounded-full cursor-pointer"
+              className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-gray-300 rounded-full cursor-pointer"
               onClick={handleProfileClick}
             >
               <span className="text-gray-800 text-xl">{user?.name?.charAt(0) || 'U'}</span>
@@ -147,7 +147,6 @@ const TopBar = () => {
               </ListItemIcon>
               Logout
             </MenuItem>
-
           </Menu>
         </div>
       </div>

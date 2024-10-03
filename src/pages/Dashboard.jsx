@@ -49,9 +49,9 @@ const Dashboard = () => {
 
   return (
     <Home currentUserId={currentUserId}>
-      <div className="flex flex-grow mt-4 gap-10">
+      <div className="flex flex-col lg:flex-row flex-grow mt-4 gap-4 lg:gap-10">
         {/* Left Column (Zoom and Project Cards) */}
-        <div className="w-2/3 space-y-4">
+        <div className="w-full lg:w-2/3 space-y-4">
           <ZoomCard />
           <div className={`text-[20px] font-bold ${textColor}`}>
             <h1>Ongoing Projects</h1>
@@ -60,7 +60,7 @@ const Dashboard = () => {
         </div>
 
         {/* Right Column (Calendar and Notification Cards) */}
-        <div className="w-1/3 space-y-4">
+        <div className="w-full lg:w-1/3 space-y-4">
           <Calendar currentMonth={new Date()} />
           <NotificationCard notifications={notifications} /> {/* Pass dynamically generated notifications */}
         </div>
